@@ -48,10 +48,11 @@ class RestAPIClient(object):
         logger.info("Accessing endpoint {}".format(url))
         response = requests.get(url, **kwargs)
         if response.status_code >= 400:
+            error_message = "Error {}: {}".format(response.status_code, response.content)
             if can_raise_exeption:
-                raise Exception("Error {}".format(response.status_code))
+                raise Exception(error_message)
             else:
-                return {"error": "{}".format(response.status_code)}
+                return {"error": error_message}
         json_response = response.json()
         self.pagination.update_next_page(json_response)
         return json_response
