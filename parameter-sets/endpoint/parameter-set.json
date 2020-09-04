@@ -1,0 +1,146 @@
+{
+    "meta" : {
+        "label": "Endpoint definition",
+        "description": "",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": true,
+    "defaultDefinableAtProjectLevel": true,
+
+    "pluginParams": [
+    ],
+
+    "params": [
+        {
+            "name": "endpoint_url",
+            "label": "URL template",
+            "description": "https://service.com/user/{username}/details",
+            "type": "STRING"
+        },
+        {
+            "name": "endpoint_verb",
+            "label": "HTML verb",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": "GET",
+            "selectChoices":[
+                {"value": "GET", "label": "GET"},
+                {"value": "POST", "label": "POST"},
+                {"value": "PUT", "label": "PUT"},
+                {"value": "PATCH", "label": "PATCH"},
+                {"value": "DELETE", "label": "DELETE"}
+            ]
+        },
+        {
+            "name": "endpoint_query_string",
+            "label": "Arguments (query string)",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "model.login_type == 'access_token'",
+            "defaultValue": [
+                {
+                    "from": "Authentication",
+                    "to": "Bearer {token}"
+                }
+            ]
+        },
+        {
+            "name": "endpoint_query_string",
+            "label": "Arguments (query string)",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "model.login_type != 'access_token'"
+        },
+        {
+            "name": "endpoint_body",
+            "label": "Body",
+            "description": "",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "endpoint_headers",
+            "label": "Headers",
+            "description": "",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Data formating"
+        },
+        {
+            "name": "extraction_key",
+            "label": "Key to extracted array",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Pagination"
+        },
+        {
+            "name": "pagination_type",
+            "label": "Pagination mechanism",
+            "description": "Consult the API's documentation",
+            "type": "SELECT",
+            "defaultValue": "na",
+            "selectChoices":[
+                {"value": "na", "label": "Not configured"},
+                {"value": "next_page", "label": "Next page URL"},
+                {"value": "top_skip", "label": "Top & Skip"}
+            ]
+        },
+        {
+            "name": "next_page_url_key",
+            "label": "Key to next page URL",
+            "description": "Dot separated json key path to next page URL",
+            "type": "STRING",
+            "visibilityCondition": "model.pagination_type=='next_page'"
+        },
+        {
+            "name": "top_key",
+            "label": "Key for top",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": "$top",
+            "visibilityCondition": "model.pagination_type=='top_skip'"
+        },
+        {
+            "name": "skip_key",
+            "label": "Key for skip",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": "$skip",
+            "visibilityCondition": "model.pagination_type=='top_skip'"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Data processing"
+        },
+        {
+            "name": "advanced_settings",
+            "label": "Display advanced settings",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced",
+            "visibilityCondition": "model.advanced_settings"
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "defaultValue": false,
+            "visibilityCondition": "model.advanced_settings"
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout",
+            "type": "INT",
+            "defaultValue": 3600,
+            "visibilityCondition": "model.advanced_settings"
+        }
+    ]
+}
