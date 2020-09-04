@@ -95,6 +95,7 @@
             "label": "Key to next page URL",
             "description": "Dot separated json key path to next page URL",
             "type": "STRING",
+            "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='next_page'"
         },
         {
@@ -102,7 +103,7 @@
             "label": "Key for top",
             "description": "",
             "type": "STRING",
-            "defaultValue": "$top",
+            "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='top_skip'"
         },
         {
@@ -110,7 +111,7 @@
             "label": "Key for skip",
             "description": "",
             "type": "STRING",
-            "defaultValue": "$skip",
+            "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='top_skip'"
         },
         {
