@@ -55,7 +55,8 @@
             "name": "endpoint_body",
             "label": "Body",
             "description": "",
-            "type": "KEY_VALUE_LIST"
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
         },
         {
             "name": "endpoint_headers",
@@ -86,8 +87,8 @@
             "defaultValue": "na",
             "selectChoices":[
                 {"value": "na", "label": "Not configured"},
-                {"value": "next_page", "label": "Next page URL"},
-                {"value": "top_skip", "label": "Top & Skip"}
+                {"value": "next_page", "label": "Next page URL provided"},
+                {"value": "offset", "label": "Offset pagination"}
             ]
         },
         {
@@ -104,7 +105,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.pagination_type=='top_skip'"
+            "visibilityCondition": "model.pagination_type=='offset'"
         },
         {
             "name": "skip_key",
@@ -112,7 +113,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.pagination_type=='top_skip'"
+            "visibilityCondition": "model.pagination_type=='offset'"
         },
         {
             "type": "SEPARATOR",
@@ -141,6 +142,14 @@
             "label": "Timeout",
             "type": "INT",
             "defaultValue": 3600,
+            "visibilityCondition": "model.advanced_settings"
+        },
+        {
+            "name": "rate_limit",
+            "label": "Rate limit (requests/s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1,
             "visibilityCondition": "model.advanced_settings"
         }
     ]
