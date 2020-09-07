@@ -1,0 +1,58 @@
+{
+    "meta": {
+        "label": "Rest API",
+        "description": "Retrieve data from any rest API balaaaaa",
+        "icon": "icon-puzzle-piece"
+    },
+    "kind": "PYTHON",
+    "inputRoles": [
+        {
+            "name": "input_A_role",
+            "label": "Dataset containing IDs",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+
+    "outputRoles": [
+        {
+            "name": "api_output",
+            "label": "main output displayed name",
+            "description": "what main output means",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "params": [
+        {
+            "type": "SEPARATOR",
+            "label": "Authenticationbluu"
+        },
+        {
+            "name": "credential",
+            "label": "Preset credentials bluu",
+            "type": "PRESET",
+            "parameterSetId": "credential"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "API call parameters bluu"
+        },
+        {
+            "name": "endpoint",
+            "label": "Preset endpoint bluu",
+            "type": "PRESET",
+            "parameterSetId": "endpoint"
+        },
+        {
+            "name": "parameter_columns",
+            "label": "Columns to use as parameters",
+            "type": "COLUMNS",
+            "columnRole": "input_A_role"
+        }
+    ],
+    "resourceKeys": []
+}
