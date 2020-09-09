@@ -21,6 +21,7 @@ extraction_key = endpoint.get("extraction_key", None)
 id_list = dataiku.Dataset(input_A_names[0])
 id_list_df = id_list.get_dataframe()
 results = []
+time_last_request = None
 
 for index, row in id_list_df.iterrows():
     updated_endpoint = copy.deepcopy(endpoint)
@@ -29,6 +30,7 @@ for index, row in id_list_df.iterrows():
             updated_endpoint.update({parameter_column: row[parameter_column]})
     logger.info("Creating client with credential={}, updated_endpoint={}".format(logger.filter_secrets(credential), updated_endpoint))
     client = RestAPIClient(credential, updated_endpoint)
+    client.time_last_request = time_last_request
     client.start_paging()
     while client.has_more_data():
         json_response = client.paginated_get(can_raise_exeption=False)
@@ -40,6 +42,7 @@ for index, row in id_list_df.iterrows():
                 raise Exception("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
         for result in data:
             results.append(result)
+    time_last_request = client.time_last_request
 
 output_names_stats = get_output_names_for_role('api_output')
 odf = pd.DataFrame(results)
