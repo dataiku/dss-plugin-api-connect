@@ -70,54 +70,10 @@
         },
         {
             "name": "extraction_key",
-            "label": "Key to extracted array",
+            "label": "Key to data array",
             "description": "",
             "defaultValue": null,
             "type": "STRING"
-        },
-        {
-            "type": "SEPARATOR",
-            "label": "Pagination"
-        },
-        {
-            "name": "pagination_type",
-            "label": "Pagination mechanism",
-            "description": "Consult the API's documentation",
-            "type": "SELECT",
-            "defaultValue": "na",
-            "selectChoices":[
-                {"value": "na", "label": "Not configured"},
-                {"value": "next_page", "label": "Next page URL provided"},
-                {"value": "offset", "label": "Offset pagination"}
-            ]
-        },
-        {
-            "name": "next_page_url_key",
-            "label": "Key to next page URL",
-            "description": "Dot separated json key path to next page URL",
-            "type": "STRING",
-            "defaultValue": null,
-            "visibilityCondition": "model.pagination_type=='next_page'"
-        },
-        {
-            "name": "top_key",
-            "label": "Key for top",
-            "description": "",
-            "type": "STRING",
-            "defaultValue": null,
-            "visibilityCondition": "model.pagination_type=='offset'"
-        },
-        {
-            "name": "skip_key",
-            "label": "Key for skip",
-            "description": "",
-            "type": "STRING",
-            "defaultValue": null,
-            "visibilityCondition": "model.pagination_type=='offset'"
-        },
-        {
-            "type": "SEPARATOR",
-            "label": "Data processing"
         },
         {
             "name": "advanced_settings",
@@ -139,18 +95,61 @@
         },
         {
             "name": "timeout",
-            "label": "Timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
             "type": "INT",
             "defaultValue": 3600,
             "visibilityCondition": "model.advanced_settings"
         },
         {
-            "name": "rate_limit",
-            "label": "Rate limit (requests/s)",
+            "name": "requests_per_minute",
+            "label": "Rate limit (requests/m)",
             "description": "-1 for no limit",
             "type": "INT",
             "defaultValue": -1,
             "visibilityCondition": "model.advanced_settings"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Pagination",
+            "visibilityCondition": "model.advanced_settings"
+        },
+        {
+            "name": "pagination_type",
+            "label": "Pagination mechanism",
+            "description": "Consult the API's documentation",
+            "type": "SELECT",
+            "defaultValue": "na",
+            "visibilityCondition": "model.advanced_settings",
+            "selectChoices":[
+                {"value": "na", "label": "Not configured"},
+                {"value": "next_page", "label": "Next page URL provided"},
+                {"value": "offset", "label": "Offset pagination"}
+            ]
+        },
+        {
+            "name": "next_page_url_key",
+            "label": "Key to next request URL",
+            "description": "Comma separated key path to next request URL",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.advanced_settings && model.pagination_type=='next_page'"
+        },
+        {
+            "name": "top_key",
+            "label": "Key for top",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.advanced_settings && model.pagination_type=='offset'"
+        },
+        {
+            "name": "skip_key",
+            "label": "Key for skip",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.advanced_settings && model.pagination_type=='offset'"
         }
     ]
 }

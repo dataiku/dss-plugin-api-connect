@@ -1,4 +1,5 @@
 import requests
+import time
 from pagination import Pagination
 from safe_logger import SafeLogger
 
@@ -37,18 +38,37 @@ class RestAPIClient(object):
         if login_type == "token":
             self.token = credential.get("token", "")
         self.params = self.get_params(self.endpoint_query_string, self.presets_variables)
+        self.ignore_ssl_check = endpoint.get("ignore_ssl_check", False)
+        if self.ignore_ssl_check:
+            self.requests_args.update({"verify": False})
+        else:
+            self.requests_args.update({"verify": True})
+        self.timeout = endpoint.get("timeout", -1)
+        if self.timeout > 0:
+            self.requests_args.update({"timeout": self.timeout})
+
         self.requests_args.update({"params": self.params})
         self.pagination = Pagination()
         next_page_url_key = endpoint.get("next_page_url_key", "").split(',')
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         self.pagination.configure_paging(skip_key=skip_key, limit_key=top_key, next_page_key=next_page_url_key, url=self.endpoint_url)
+        self.last_interaction = None
+        self.requests_per_minute = endpoint.get("requests_per_minute", -1)
+        if self.requests_per_minute > 0:
+            self.time_between_requests = 60 / self.requests_per_minute
+        else:
+            self.time_between_requests = None
+        self.time_last_request = None
 
     def get(self, url, can_raise_exeption=True, **kwargs):
         logger.info("Accessing endpoint {}".format(url))
+        self.enforce_throttling()
         response = requests.get(url, **kwargs)
+        self.time_last_request = time.time()
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
+            self.pagination.is_last_batch_empty = True
             if can_raise_exeption:
                 raise Exception(error_message)
             else:
@@ -84,3 +104,11 @@ class RestAPIClient(object):
 
     def start_paging(self):
         self.pagination.reset_paging(counting_key=self.extraction_key, url=self.endpoint_url)
+
+    def enforce_throttling(self):
+        if self.time_between_requests and self.time_last_request:
+            current_time = time.time()
+            time_since_last_resquests = current_time - self.time_last_request
+            if time_since_last_resquests < self.time_between_requests:
+                logger.info("Enforcing {}s throttling".format(self.time_between_requests - time_since_last_resquests))
+                time.sleep(self.time_between_requests - time_since_last_resquests)
