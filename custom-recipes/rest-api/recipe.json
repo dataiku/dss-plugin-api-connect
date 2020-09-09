@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Rest API",
-        "description": "Retrieve data from any rest API balaaaaa",
+        "description": "Retrieve data from any rest API",
         "icon": "icon-puzzle-piece"
     },
     "kind": "PYTHON",
@@ -29,21 +29,21 @@
     "params": [
         {
             "type": "SEPARATOR",
-            "label": "Authenticationbluu"
+            "label": "Authentication"
         },
         {
             "name": "credential",
-            "label": "Preset credentials bluu",
+            "label": "Preset credentials",
             "type": "PRESET",
             "parameterSetId": "credential"
         },
         {
             "type": "SEPARATOR",
-            "label": "API call parameters bluu"
+            "label": "API call parameters"
         },
         {
             "name": "endpoint",
-            "label": "Preset endpoint bluu",
+            "label": "Preset endpoint",
             "type": "PRESET",
             "parameterSetId": "endpoint"
         },
