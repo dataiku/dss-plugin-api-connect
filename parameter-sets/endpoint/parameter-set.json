@@ -19,7 +19,7 @@
         },
         {
             "name": "endpoint_verb",
-            "label": "HTML verb",
+            "label": "HTTP method",
             "description": "",
             "type": "SELECT",
             "defaultValue": "GET",
@@ -124,7 +124,8 @@
             "selectChoices":[
                 {"value": "na", "label": "Not configured"},
                 {"value": "next_page", "label": "Next page URL provided"},
-                {"value": "offset", "label": "Offset pagination"}
+                {"value": "offset", "label": "Offset pagination"},
+                {"value": "page", "label": "Page pagination"}
             ]
         },
         {
