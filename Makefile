@@ -5,4 +5,4 @@ plugin:
 	cat plugin.json|json_pp > /dev/null
 	rm -rf dist
 	mkdir dist
-	zip --exclude "*.pyc" -r dist/dss-plugin-${PLUGIN_ID}-${PLUGIN_VERSION}.zip parameter-sets python-lib python-connectors plugin.json
+	zip --exclude "*.pyc" -r dist/dss-plugin-${PLUGIN_ID}-${PLUGIN_VERSION}.zip custom-recipes parameter-sets python-lib python-connectors plugin.json
