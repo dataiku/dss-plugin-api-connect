@@ -13,7 +13,6 @@ input_A_names = get_input_names_for_role('input_A_role')
 config = get_recipe_config()
 logger.info("config={}".format(logger.filter_secrets(config)))
 
-parameter_columns = config.get("parameter_columns", [])
 credential = config.get("credential", {})
 endpoint = config.get("endpoint", {})
 extraction_key = endpoint.get("extraction_key", None)
@@ -23,11 +22,10 @@ id_list_df = id_list.get_dataframe()
 results = []
 time_last_request = None
 
-for index, row in id_list_df.iterrows():
+for row in id_list_df.itertuples():
     updated_endpoint = copy.deepcopy(endpoint)
-    for parameter_column in parameter_columns:
-        if parameter_column is not None:
-            updated_endpoint.update({parameter_column: row[parameter_column]})
+    for key, value in row._asdict().items():
+        updated_endpoint.update({key: value})
     logger.info("Creating client with credential={}, updated_endpoint={}".format(logger.filter_secrets(credential), updated_endpoint))
     client = RestAPIClient(credential, updated_endpoint)
     client.time_last_request = time_last_request
