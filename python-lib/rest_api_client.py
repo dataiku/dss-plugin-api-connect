@@ -96,7 +96,7 @@ class RestAPIClient(object):
         try:
             template = template.format(**kwargs)
         except KeyError as key:  # This has to go
-            template = ""
+            logger.error('Key {} not found for template "{}"'.format(key, template))
         return template
 
     def has_more_data(self):
