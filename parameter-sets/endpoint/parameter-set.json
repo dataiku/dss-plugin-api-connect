@@ -14,7 +14,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://service.com/user/{username}/details",
+            "description": "https://service.com/user/{{username}}/details",
             "type": "STRING"
         },
         {
@@ -40,7 +40,7 @@
             "defaultValue": [
                 {
                     "from": "Authentication",
-                    "to": "Bearer {token}"
+                    "to": "Bearer {{token}}"
                 }
             ]
         },
@@ -138,7 +138,15 @@
         },
         {
             "name": "top_key",
-            "label": "Key for top",
+            "label": "Key limiting elements per page",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.advanced_settings && (['page', 'offset'].indexOf(model.pagination_type)>-1)"
+        },
+        {
+            "name": "skip_key",
+            "label": "Key for element offset",
             "description": "",
             "type": "STRING",
             "defaultValue": null,
@@ -146,11 +154,11 @@
         },
         {
             "name": "skip_key",
-            "label": "Key for skip",
+            "label": "Key for page offset",
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.advanced_settings && model.pagination_type=='offset'"
+            "visibilityCondition": "model.advanced_settings && model.pagination_type=='page'"
         }
     ]
 }

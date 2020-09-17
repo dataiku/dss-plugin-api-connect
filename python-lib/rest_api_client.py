@@ -22,7 +22,8 @@ class RestAPIClient(object):
         self.presets_variables.update(self.user_defined_keys)
 
         endpoint_url = endpoint.get("endpoint_url", "")
-        self.endpoint_url = self.format_template(endpoint_url, **self.presets_variables)
+        self.endpoint_url = self.format_postman_template(endpoint_url, **self.presets_variables)
+        print("ALX:endpoint_url:{}->{} self.presets_variables={}".format(endpoint_url, self.endpoint_url, self.presets_variables))
 
         endpoint_headers = endpoint.get("endpoint_headers", "")
         self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
@@ -89,7 +90,7 @@ class RestAPIClient(object):
         for key_value in endpoint_query_string:
             key = key_value.get("from")
             value = key_value.get("to")
-            ret.update({key: self.format_template(value, **keywords)})
+            ret.update({key: self.format_postman_template(value, **keywords)})
         return ret
 
     def format_template(self, template, **kwargs):
@@ -97,6 +98,12 @@ class RestAPIClient(object):
             template = template.format(**kwargs)
         except KeyError as key:  # This has to go
             logger.error('Key {} not found for template "{}"'.format(key, template))
+        return template
+
+    def format_postman_template(self, template, **kwargs):
+        for key in kwargs:
+            token = "{{" + str(key) + "}}"
+            template = template.replace(token, str(kwargs.get(key)))
         return template
 
     def has_more_data(self):
