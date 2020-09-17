@@ -9,11 +9,12 @@ class Pagination(object):
         self.next_page_url = None
         self.remaining_records = None
         self.records_to_skip = None
-        self.pagination_style = ""
+        self.pagination_type = ""
         self.counting_key = None
         self.counter = None
         self.is_last_batch_empty = None
         self.is_first_batch = None
+        self.next_page_number = None
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None):
         config = {} if config is None else config
@@ -22,12 +23,14 @@ class Pagination(object):
         self.skip_key = config.get("skip_key", skip_key)
         self.limit_key = config.get("limit_key", limit_key)
         self.total_key = config.get("total_key", total_key)
+        self.pagination_type = config.get("pagination_type")
 
     def reset_paging(self, counting_key=None, url=None):
         self.remaining_records = 0
         self.records_to_skip = 0
         self.counting_key = counting_key
         self.counter = 0
+        self.next_page_number = 0
         self.next_page_url = url
         self.is_last_batch_empty = False
         self.is_first_batch = True
@@ -37,6 +40,9 @@ class Pagination(object):
 
     def update_next_page(self, data):
         self.is_first_batch = False
+        self.next_page_number = self.next_page_number + 1
+        #if counting records, path to array should be provided (or then just add 1)
+        #if counting pages, batch_size = 1
         if isinstance(data, list):
             batch_size = len(data)
             self.records_to_skip = self.records_to_skip + batch_size
@@ -93,8 +99,10 @@ class Pagination(object):
 
     def get_params(self):
         ret = {}
-        if self.skip_key and (self.records_to_skip > 0):
-            ret.update({self.skip_key: self.records_to_skip})
+        if self.skip_key and (self.records_to_skip > 0 or self.next_page_number > 0):
+            ret.update({
+                self.skip_key: self.next_page_number if self.pagination_type == "page" else self.records_to_skip
+            })
         return ret
 
     def get_next_page_url(self):
