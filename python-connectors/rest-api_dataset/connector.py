@@ -1,4 +1,5 @@
 from dataiku.connector import Connector
+from dataikuapi.utils import DataikuException
 from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
 
@@ -32,7 +33,7 @@ class RestAPIConnector(Connector):
             else:
                 data = json_response.get(self.extraction_key, None)
                 if data is None:
-                    raise Exception("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
+                    raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
             for result in data:
                 yield result
 
@@ -45,13 +46,13 @@ class RestAPIConnector(Connector):
 
         Note: the writer is responsible for clearing the partition, if relevant.
         """
-        raise Exception("Unimplemented")
+        raise DataikuException("Unimplemented")
 
     def get_partitioning(self):
         """
         Return the partitioning schema that the connector defines.
         """
-        raise Exception("Unimplemented")
+        raise DataikuException("Unimplemented")
 
     def list_partitions(self, partitioning):
         """Return the list of partitions for the partitioning scheme
@@ -64,7 +65,7 @@ class RestAPIConnector(Connector):
         Implementation is only required if the corresponding flag is set to True
         in the connector definition
         """
-        raise Exception("unimplemented")
+        raise DataikuException("unimplemented")
 
     def get_records_count(self, partitioning=None, partition_id=None):
         """
@@ -73,19 +74,19 @@ class RestAPIConnector(Connector):
         Implementation is only required if the corresponding flag is set to True
         in the connector definition
         """
-        raise Exception("unimplemented")
+        raise DataikuException("unimplemented")
 
 
 class CustomDatasetWriter(object):
     def __init__(self):
-        pass
+        return
 
     def write_row(self, row):
         """
         Row is a tuple with N + 1 elements matching the schema passed to get_writer.
         The last element is a dict of columns not found in the schema
         """
-        raise Exception("unimplemented")
+        raise DataikuException("unimplemented")
 
     def close(self):
-        pass
+        return
