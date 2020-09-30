@@ -12,7 +12,6 @@ class RestAPIConnector(Connector):
         Connector.__init__(self, config, plugin_config)  # pass the parameters to the base class
 
         logger.info("config={}".format(logger.filter_secrets(config)))
-        self.requests_args = {}
         endpoint = config.get("endpoint", {})
         credential = config.get("credential", {})
         self.client = RestAPIClient(credential, endpoint)
@@ -27,7 +26,7 @@ class RestAPIConnector(Connector):
                       partition_id=None, records_limit=-1):
         self.client.start_paging()
         while self.client.has_more_data():
-            json_response = self.client.paginated_get(**self.requests_args)
+            json_response = self.client.paginated_get()
             if self.extraction_key is None:
                 data = json_response
             else:
