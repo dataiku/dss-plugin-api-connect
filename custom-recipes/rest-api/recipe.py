@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
+from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 import pandas as pd
 import copy
@@ -37,7 +38,7 @@ for row in id_list_df.itertuples():
         else:
             data = json_response.get(extraction_key, [json_response])
             if data is None:
-                raise Exception("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
+                raise DataikuException("Extraction key '{}' was not found in the incoming data".format(extraction_key))
         for result in data:
             results.append(result)
     time_last_request = client.time_last_request
