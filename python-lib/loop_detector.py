@@ -1,3 +1,6 @@
+import copy
+
+
 class LoopDetector():
     def __init__(self):
         self.previous_url = None
@@ -10,6 +13,6 @@ class LoopDetector():
            and headers == self.previous_headers:
             return True
         self.previous_url = url
-        self.previous_params = params
-        self.previous_headers = headers
+        self.previous_params = copy.deepcopy(params)
+        self.previous_headers = copy.deepcopy(headers)
         return False
