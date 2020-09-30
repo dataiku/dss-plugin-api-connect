@@ -41,8 +41,6 @@ class Pagination(object):
     def update_next_page(self, data):
         self.is_first_batch = False
         self.next_page_number = self.next_page_number + 1
-        #if counting records, path to array should be provided (or then just add 1)
-        #if counting pages, batch_size = 1
         if isinstance(data, list):
             batch_size = len(data)
             self.records_to_skip = self.records_to_skip + batch_size

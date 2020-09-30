@@ -2,6 +2,8 @@ import requests
 import time
 from pagination import Pagination
 from safe_logger import SafeLogger
+from loop_detector import LoopDetector
+from dataikuapi.utils import DataikuException
 
 logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
 
@@ -23,7 +25,6 @@ class RestAPIClient(object):
 
         endpoint_url = endpoint.get("endpoint_url", "")
         self.endpoint_url = self.format_postman_template(endpoint_url, **self.presets_variables)
-        print("ALX:endpoint_url:{}->{} self.presets_variables={}".format(endpoint_url, self.endpoint_url, self.presets_variables))
 
         endpoint_headers = endpoint.get("endpoint_headers", "")
         self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
@@ -50,7 +51,7 @@ class RestAPIClient(object):
 
         self.requests_args.update({"params": self.params})
         self.pagination = Pagination()
-        next_page_url_key = endpoint.get("next_page_url_key", "").split(',')
+        next_page_url_key = endpoint.get("next_page_url_key", "").split('.')
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         self.pagination.configure_paging(skip_key=skip_key, limit_key=top_key, next_page_key=next_page_url_key, url=self.endpoint_url)
@@ -61,17 +62,20 @@ class RestAPIClient(object):
         else:
             self.time_between_requests = None
         self.time_last_request = None
+        self.loop_detector = LoopDetector()
 
     def get(self, url, can_raise_exeption=True, **kwargs):
-        logger.info("Accessing endpoint {}".format(url))
+        logger.info("Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.enforce_throttling()
+        if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
+            raise DataikuException("We are stuck in a loop. Check pagination parameters.")
         response = requests.get(url, **kwargs)
         self.time_last_request = time.time()
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True
             if can_raise_exeption:
-                raise Exception(error_message)
+                raise DataikuException(error_message)
             else:
                 return {"error": error_message}
         json_response = response.json()
