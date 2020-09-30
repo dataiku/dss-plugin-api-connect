@@ -132,7 +132,7 @@
         {
             "name": "next_page_url_key",
             "label": "Key to next request URL",
-            "description": "Comma separated key path to next request URL",
+            "description": "Dot separated key path to next request URL",
             "type": "STRING",
             "defaultValue": null,
             "visibilityCondition": "model.advanced_settings && model.pagination_type=='next_page'"
