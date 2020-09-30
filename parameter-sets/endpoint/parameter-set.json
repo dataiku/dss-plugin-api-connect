@@ -23,6 +23,7 @@
             "description": "",
             "type": "SELECT",
             "defaultValue": "GET",
+            "visibilityCondition": false,
             "selectChoices":[
                 {"value": "GET", "label": "GET"},
                 {"value": "POST", "label": "POST"},
@@ -35,21 +36,7 @@
             "name": "endpoint_query_string",
             "label": "Arguments (query string)",
             "description": "",
-            "type": "KEY_VALUE_LIST",
-            "visibilityCondition": "model.login_type == 'access_token'",
-            "defaultValue": [
-                {
-                    "from": "Authentication",
-                    "to": "Bearer {{token}}"
-                }
-            ]
-        },
-        {
-            "name": "endpoint_query_string",
-            "label": "Arguments (query string)",
-            "description": "",
-            "type": "KEY_VALUE_LIST",
-            "visibilityCondition": "model.login_type != 'access_token'"
+            "type": "KEY_VALUE_LIST"
         },
         {
             "name": "endpoint_body",
@@ -62,7 +49,21 @@
             "name": "endpoint_headers",
             "label": "Headers",
             "description": "",
-            "type": "KEY_VALUE_LIST"
+            "type": "KEY_VALUE_LIST",
+            "defaultValue": [
+                {
+                    "from": "Authentication",
+                    "to": "Bearer {{token}}"
+                },
+                {
+                    "from": "Content-Type",
+                    "to": "application/json"
+                },
+                {
+                    "from": "Accept",
+                    "to": "application/json"
+                }
+            ]
         },
         {
             "type": "SEPARATOR",
