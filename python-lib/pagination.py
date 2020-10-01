@@ -16,14 +16,14 @@ class Pagination(object):
         self.is_first_batch = None
         self.next_page_number = None
 
-    def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None):
+    def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
         config = {} if config is None else config
         self.next_page_key = config.get("next_page_key", next_page_key)
         self.next_page_key = None if self.next_page_key == [''] else self.next_page_key
         self.skip_key = config.get("skip_key", skip_key)
         self.limit_key = config.get("limit_key", limit_key)
         self.total_key = config.get("total_key", total_key)
-        self.pagination_type = config.get("pagination_type")
+        self.pagination_type = config.get("pagination_type", pagination_type)
 
     def reset_paging(self, counting_key=None, url=None):
         self.remaining_records = 0

@@ -57,7 +57,14 @@ class RestAPIClient(object):
         next_page_url_key = endpoint.get("next_page_url_key", "").split('.')
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
-        self.pagination.configure_paging(skip_key=skip_key, limit_key=top_key, next_page_key=next_page_url_key, url=self.endpoint_url)
+        pagination_type = endpoint.get("pagination_type", "na")
+        self.pagination.configure_paging(
+            skip_key=skip_key,
+            limit_key=top_key,
+            next_page_key=next_page_url_key,
+            url=self.endpoint_url,
+            pagination_type=pagination_type
+        )
         self.last_interaction = None
         self.requests_per_minute = endpoint.get("requests_per_minute", -1)
         if self.requests_per_minute > 0:
