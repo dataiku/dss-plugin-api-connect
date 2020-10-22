@@ -77,43 +77,32 @@
             "type": "STRING"
         },
         {
-            "name": "advanced_settings",
-            "label": "Display advanced settings",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
             "type": "SEPARATOR",
-            "label": "Advanced",
-            "visibilityCondition": "model.advanced_settings"
+            "label": "Advanced"
         },
         {
             "name": "ignore_ssl_check",
             "label": "Ignore SSL check",
             "type": "BOOLEAN",
-            "defaultValue": false,
-            "visibilityCondition": "model.advanced_settings"
+            "defaultValue": false
         },
         {
             "name": "timeout",
             "label": "Timeout (s)",
             "description": "-1 for no limit",
             "type": "INT",
-            "defaultValue": 3600,
-            "visibilityCondition": "model.advanced_settings"
+            "defaultValue": 3600
         },
         {
             "name": "requests_per_minute",
             "label": "Rate limit (requests/m)",
             "description": "-1 for no limit",
             "type": "INT",
-            "defaultValue": -1,
-            "visibilityCondition": "model.advanced_settings"
+            "defaultValue": -1
         },
         {
             "type": "SEPARATOR",
-            "label": "Pagination",
-            "visibilityCondition": "model.advanced_settings"
+            "label": "Pagination"
         },
         {
             "name": "pagination_type",
@@ -121,9 +110,8 @@
             "description": "Consult the API's documentation",
             "type": "SELECT",
             "defaultValue": "na",
-            "visibilityCondition": "model.advanced_settings",
             "selectChoices":[
-                {"value": "na", "label": "Not configured"},
+                {"value": "na", "label": "No pagination"},
                 {"value": "next_page", "label": "Next page URL provided"},
                 {"value": "offset", "label": "Offset pagination"},
                 {"value": "page", "label": "Page pagination"}
@@ -135,7 +123,7 @@
             "description": "Dot separated key path to next request URL",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.advanced_settings && model.pagination_type=='next_page'"
+            "visibilityCondition": "model.pagination_type=='next_page'"
         },
         {
             "name": "top_key",
@@ -143,7 +131,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.advanced_settings && (['page', 'offset'].indexOf(model.pagination_type)>-1)"
+            "visibilityCondition": "(['page', 'offset'].indexOf(model.pagination_type)>-1)"
         },
         {
             "name": "skip_key",
@@ -151,7 +139,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.advanced_settings && model.pagination_type=='offset'"
+            "visibilityCondition": "model.pagination_type=='offset'"
         },
         {
             "name": "skip_key",
@@ -159,7 +147,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "model.advanced_settings && model.pagination_type=='page'"
+            "visibilityCondition": "model.pagination_type=='page'"
         }
     ]
 }
