@@ -33,7 +33,7 @@ class RestAPIClient(object):
         self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
         self.requests_kwargs.update({"headers": self.endpoint_headers})
 
-        login_type = credential.get("login_type", "basic_login")
+        login_type = credential.get("login_type", "no_auth")
         self.extraction_key = endpoint.get("extraction_key", None)
         if login_type == "basic_login":
             self.username = credential.get("username", "")
