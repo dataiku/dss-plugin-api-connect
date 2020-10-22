@@ -34,13 +34,16 @@ for row in id_list_df.itertuples():
     while client.has_more_data():
         json_response = client.paginated_get(can_raise_exeption=False)
         if extraction_key is None:
-            data = json_response
+            base = row._asdict()
+            # Todo: check api_response key is free and add something overwise
+            base.update({"api_response": json_response})
+            results.append(base)
         else:
             data = json_response.get(extraction_key, [json_response])
             if data is None:
                 raise DataikuException("Extraction key '{}' was not found in the incoming data".format(extraction_key))
-        for result in data:
-            results.append(result)
+            for result in data:
+                results.append(result)
     time_last_request = client.time_last_request
 
 output_names_stats = get_output_names_for_role('api_output')

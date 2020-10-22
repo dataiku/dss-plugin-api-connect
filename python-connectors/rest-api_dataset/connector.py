@@ -28,13 +28,14 @@ class RestAPIConnector(Connector):
         while self.client.has_more_data():
             json_response = self.client.paginated_get()
             if self.extraction_key is None:
-                data = json_response
+                # Todo: check api_response key is free and add something overwise
+                yield {"api_response": json_response}
             else:
                 data = json_response.get(self.extraction_key, None)
                 if data is None:
                     raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
-            for result in data:
-                yield result
+                for result in data:
+                    yield result
 
     def get_writer(self, dataset_schema=None, dataset_partitioning=None,
                    partition_id=None):

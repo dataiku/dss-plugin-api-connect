@@ -52,7 +52,7 @@ class Pagination(object):
             if batch_size == 0:
                 self.is_last_batch_empty = True
         else:
-            batch_size = None
+            batch_size = 1
         if self.next_page_key and (len(self.next_page_key) > 1):
             self.next_page_url = self.get_from_path(data, self.next_page_key)
         if self.skip_key:
