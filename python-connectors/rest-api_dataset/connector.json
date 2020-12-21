@@ -29,6 +29,12 @@
             "label": "Preset endpoint",
             "type": "PRESET",
             "parameterSetId": "endpoint"
+        },
+        {
+            "name": "custom_key_values",
+            "label": "Custom keys / values",
+            "description": "Replace {{key}} by value in templates (optional)",
+            "type": "KEY_VALUE_LIST"
         }
     ]
 }

@@ -4,20 +4,24 @@ import re
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dataikuapi.utils import DataikuException
 
 logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
 
 
+class RestAPIClientError(ValueError):
+    pass
+
+
 class RestAPIClient(object):
 
-    def __init__(self, credential, endpoint):
+    def __init__(self, credential, endpoint, custom_key_values={}):
         logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
         self.presets_variables = {}
         self.presets_variables.update(endpoint)
         self.presets_variables.update(credential)
+        self.presets_variables.update(custom_key_values)
 
         #  requests_kwargs contains **kwargs used for requests
         self.requests_kwargs = {}
@@ -28,7 +32,8 @@ class RestAPIClient(object):
         self.presets_variables.update(self.user_defined_keys)
 
         endpoint_url = endpoint.get("endpoint_url", "")
-        self.endpoint_url = format_postman_template(endpoint_url, **self.presets_variables)
+        self.endpoint_url = format_template(endpoint_url, **self.presets_variables)
+        self.http_method = endpoint.get("http_method", "GET")
 
         endpoint_headers = endpoint.get("endpoint_headers", "")
         self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
@@ -81,18 +86,30 @@ class RestAPIClient(object):
         self.loop_detector = LoopDetector()
 
     def get(self, url, can_raise_exeption=True, **kwargs):
+        json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
+        return json_response
+
+    def request(self, method, url, can_raise_exeption=True, **kwargs):
         logger.info("Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.enforce_throttling()
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
-            raise DataikuException("We are stuck in a loop. Check pagination parameters.")
+            raise RestAPIClientError("We are stuck in a loop. Please check the pagination parameters.")
         kwargs = template_dict(kwargs, **self.presets_variables)
-        response = requests.get(url, **kwargs)
+        try:
+            response = requests.request(method, url, **kwargs)
+        except Exception as err:
+            self.pagination.is_last_batch_empty = True
+            error_message = "Error: {}".format(err)
+            if can_raise_exeption:
+                raise RestAPIClientError(error_message)
+            else:
+                return {"error": error_message}
         self.time_last_request = time.time()
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True
             if can_raise_exeption:
-                raise DataikuException(error_message)
+                raise RestAPIClientError(error_message)
             else:
                 return {"error": error_message}
         json_response = response.json()
@@ -111,17 +128,12 @@ class RestAPIClient(object):
         for key_value in endpoint_query_string:
             key = key_value.get("from")
             value = key_value.get("to")
-            ret.update({key: format_postman_template(value, **keywords)})
+            ret.update({key: format_template(value, **keywords)})
         return ret
 
-    def format_template(self, template, **kwargs):
-        try:
-            template = template.format(**kwargs)
-        except KeyError as key:  # This has to go
-            logger.error('Key {} not found for template "{}"'.format(key, template))
-        return template
-
     def has_more_data(self):
+        if not self.pagination.is_paging_started:
+            self.start_paging()
         return self.pagination.is_next_page()
 
     def start_paging(self):
@@ -142,12 +154,12 @@ def template_dict(dictionnary, **kwargs):
         if isinstance(ret[key], dict):
             ret[key] = template_dict(ret[key], **kwargs)
         if isinstance(ret[key], str):
-            ret[key] = format_postman_template(ret[key], **kwargs)
+            ret[key] = format_template(ret[key], **kwargs)
             return ret
     return ret
 
 
-def format_postman_template(template, **kwargs):
+def format_template(template, **kwargs):
     placeholders = re.findall(r'{([a-zA-Z\-\_]*)}', template)
     formated = template
     for placeholder in placeholders:

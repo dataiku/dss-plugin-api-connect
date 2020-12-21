@@ -14,6 +14,7 @@ class Pagination(object):
         self.counter = None
         self.is_last_batch_empty = None
         self.is_first_batch = None
+        self.is_paging_started = None
         self.next_page_number = None
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
@@ -34,6 +35,7 @@ class Pagination(object):
         self.next_page_url = url
         self.is_last_batch_empty = False
         self.is_first_batch = True
+        self.is_paging_started = True
 
     def set_counting_key(self, counting_key):
         self.counting_key = counting_key

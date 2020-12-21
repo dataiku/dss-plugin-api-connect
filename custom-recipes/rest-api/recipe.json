@@ -46,6 +46,25 @@
             "label": "Preset endpoint",
             "type": "PRESET",
             "parameterSetId": "endpoint"
+        },
+        {
+            "name": "parameter_columns",
+            "label": "Columns to use as parameters",
+            "description": "Unless renamed, selected columns row can be reused as {{column_name}} in templates",
+            "type": "COLUMNS",
+            "columnRole": "input_A_role"
+        },
+        {
+            "name": "parameter_renamings",
+            "label": "Columns renaming",
+            "description": "ColumName to ParameterName to reuse as {{ParameterName}} (optional)",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "custom_key_values",
+            "label": "Custom keys / values",
+            "description": "Replace {{key}} by value in templates (optional)",
+            "type": "KEY_VALUE_LIST"
         }
     ],
     "resourceKeys": []

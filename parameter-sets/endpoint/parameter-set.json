@@ -15,15 +15,14 @@
             "name": "endpoint_url",
             "label": "URL template",
             "description": "https://service.com/user/{{username}}/details",
-            "type": "STRING"
+            "type": "TEXTAREA"
         },
         {
-            "name": "endpoint_verb",
+            "name": "http_method",
             "label": "HTTP method",
             "description": "",
             "type": "SELECT",
             "defaultValue": "GET",
-            "visibilityCondition": false,
             "selectChoices":[
                 {"value": "GET", "label": "GET"},
                 {"value": "POST", "label": "POST"},
@@ -71,10 +70,17 @@
         },
         {
             "name": "extraction_key",
-            "label": "Key to data array",
+            "label": "Key to data array (optional)",
             "description": "",
             "defaultValue": null,
             "type": "STRING"
+        },
+        {
+            "name": "raw_output",
+            "label": "Raw JSON output",
+            "description": "",
+            "defaultValue": false,
+            "type": "BOOLEAN"
         },
         {
             "type": "SEPARATOR",
