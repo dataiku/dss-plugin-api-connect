@@ -30,9 +30,8 @@ class RestAPIConnector(Connector):
 
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
-        #self.client.start_paging()
         while self.client.has_more_data():
-            json_response = self.client.paginated_get()
+            json_response = self.client.paginated_api_call()
             if self.extraction_key is None:
                 # Todo: check api_response key is free and add something overwise
                 if isinstance(json_response, list):

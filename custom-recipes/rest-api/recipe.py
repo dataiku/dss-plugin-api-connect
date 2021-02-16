@@ -20,6 +20,8 @@ def is_error_message(jsons_response):
 
 input_A_names = get_input_names_for_role('input_A_role')
 config = get_recipe_config()
+dku_flow_variables = dataiku.get_flow_variables()
+
 logger.info("config={}".format(logger.filter_secrets(config)))
 
 credential = config.get("credential", {})
@@ -39,11 +41,20 @@ for parameter_column in parameter_columns:
         column_to_parameter[parameter_column] = parameter_column
 custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
 id_list = dataiku.Dataset(input_A_names[0])
+partitioning = id_list.get_config().get("partitioning")
+if partitioning:
+    dimensions_types = partitioning.get("dimensions", [])
+    dimensions = []
+    for dimension_type in dimensions_types:
+        dimensions.append(dimension_type.get("name"))
+    for dimension in dimensions:
+        dimension_src = "DKU_DST_{}".format(dimension)
+        if dimension_src in dku_flow_variables:
+            custom_key_values[dimension] = dku_flow_variables.get(dimension_src)
 id_list_df = id_list.get_dataframe()
 results = []
 time_last_request = None
 
-#for row in id_list_df.itertuples():
 for index, row in id_list_df.iterrows():
     updated_endpoint = copy.deepcopy(endpoint)
     if column_to_parameter == {}:
@@ -56,19 +67,15 @@ for index, row in id_list_df.iterrows():
     logger.info("Creating client with credential={}, updated_endpoint={}".format(logger.filter_secrets(credential), updated_endpoint))
     client = RestAPIClient(credential, updated_endpoint, custom_key_values=custom_key_values)
     client.time_last_request = time_last_request
-    #client.start_paging()
     while client.has_more_data():
         json_response = client.paginated_get(can_raise_exeption=False)
-        print("ALX:extraction_key={}".format(extraction_key))
         if extraction_key == "":
             base = row.to_dict()
-            print("ALX:base={}".format(base))
             # Todo: check api_response key is free and add something overwise
             if is_error_message(json_response):
                 base.update(json_response)
             else:
                 base.update({"api_response": json_response})
-                print("ALX:base after={}".format(base))
             results.append(base)
         else:
             data = json_response.get(extraction_key, [json_response])

@@ -65,6 +65,32 @@
             ]
         },
         {
+            "name": "body_format",
+            "label": "Body",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": null, "label": "None"},
+                {"value": "FORM_DATA", "label": "Form-data"},
+                {"value": "RAW", "label": "Raw"}
+            ]
+        },
+        {
+            "name": "text_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "TEXTAREA",
+            "visibilityCondition": "model.body_format=='RAW'"
+        },
+        {
+            "name": "key_value_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
+        },
+        {
             "type": "SEPARATOR",
             "label": "Data formating"
         },
