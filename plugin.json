@@ -5,7 +5,7 @@
         "label": "Rest API",
         "description": "",
         "author": "Dataiku (Alex Bourret)",
-        "icon": "icon-puzzle-piece",
+        "icon": "icon-rocket",
         "tags": ["Connector", "Cloud"],
         "url": "https://www.dataiku.com/product/plugins/rest-api/",
         "licenseInfo": "Apache Software License"

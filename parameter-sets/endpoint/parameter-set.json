@@ -2,7 +2,7 @@
     "meta" : {
         "label": "Endpoint definition",
         "description": "",
-        "icon": "icon-puzzle-piece"
+        "icon": "icon-rocket"
     },
     "defaultDefinableInline": true,
     "defaultDefinableAtProjectLevel": true,
@@ -14,7 +14,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://service.com/user/{{username}}/details",
+            "description": "https://{{subdomain}}.service.com/user/{{username}}/details",
             "type": "TEXTAREA"
         },
         {

@@ -1,8 +1,8 @@
 {
     "meta": {
-        "label": "Rest API",
-        "description": "Retrieve data from any rest API",
-        "icon": "icon-puzzle-piece"
+        "label": "Rest API Recipe",
+        "description": "Retrieve data from any Rest API based on your existing dataset",
+        "icon": "icon-rocket"
     },
     "kind": "PYTHON",
     "inputRoles": [
