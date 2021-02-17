@@ -30,24 +30,31 @@ class RestAPIConnector(Connector):
 
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
+        is_records_limit = records_limit > 0
+        record_count = 0
         while self.client.has_more_data():
             json_response = self.client.paginated_api_call()
             if self.extraction_key is None:
                 # Todo: check api_response key is free and add something overwise
                 if isinstance(json_response, list):
+                    record_count += len(json_response)
                     for row in json_response:
                         yield {"api_response": row}
                 else:
+                    record_count += 1
                     yield {"api_response": json_response}
             else:
                 data = json_response.get(self.extraction_key, None)
                 if data is None:
                     raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
+                record_count += len(data)
                 for result in data:
                     if self.raw_output:
-                        yield {"api_reply": result}
+                        yield {"api_response": result}
                     else:
                         yield result
+            if is_records_limit and record_count >= records_limit:
+                break
 
     def get_writer(self, dataset_schema=None, dataset_partitioning=None,
                    partition_id=None):
