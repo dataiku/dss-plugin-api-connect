@@ -25,7 +25,7 @@ def template_dict(dictionnary, **kwargs):
 
 def format_template(template, **kwargs):
     """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
-    placeholders = re.findall(r'{([a-zA-Z\-\_]*)}', template)
+    placeholders = re.findall(r'{{([a-zA-Z\-\_]*)}}', template)
     formated = template
     for placeholder in placeholders:
         replacement = kwargs.get(placeholder, "")
