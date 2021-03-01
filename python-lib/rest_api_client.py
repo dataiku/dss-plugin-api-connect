@@ -5,8 +5,32 @@ from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values
+from dku_constants import DKUConstants
+
 
 logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
+
+
+def template_dict(dictionnary, **kwargs):
+    """ Recurses into dictionnary and replace template {{keys}} with the matching values present in the kwargs dictionnary"""
+    ret = dict.copy(dictionnary)
+    for key in ret:
+        if isinstance(ret[key], dict):
+            ret[key] = template_dict(ret[key], **kwargs)
+        if isinstance(ret[key], str):
+            ret[key] = format_template(ret[key], **kwargs)
+            return ret
+    return ret
+
+
+def format_template(template, **kwargs):
+    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
+    placeholders = re.findall(r'{([a-zA-Z\-\_]*)}', template)
+    formated = template
+    for placeholder in placeholders:
+        replacement = kwargs.get(placeholder, "")
+        formated = formated.replace("{{{{{}}}}}".format(placeholder), str(replacement))
+    return formated
 
 
 class RestAPIClientError(ValueError):
@@ -33,7 +57,6 @@ class RestAPIClient(object):
         self.presets_variables.update(self.user_defined_keys)
 
         endpoint_url = endpoint.get("endpoint_url", "")
-        # todo: treat url as any request's kwarg so that template can all be applied in one go
         self.endpoint_url = format_template(endpoint_url, **self.presets_variables)
         self.http_method = endpoint.get("http_method", "GET")
 
@@ -42,27 +65,9 @@ class RestAPIClient(object):
 
         self.params = self.get_params(self.endpoint_query_string, self.presets_variables)
 
-        login_type = credential.get("login_type", "no_auth")
         self.extraction_key = endpoint.get("extraction_key", None)
-        if login_type == "basic_login":
-            self.username = credential.get("username", "")
-            self.password = credential.get("password", "")
-            self.auth = (self.username, self.password)
-            self.requests_kwargs.update({"auth": self.auth})
-        if login_type == "token":
-            self.token = credential.get("token", "")
-        if login_type == "oauth_2_token":
-            self.token = credential.get("token", "")
-            bearer_template = credential.get("bearer_template", "Bearer {{token}}")
-            self.endpoint_headers.update({"Authentication": bearer_template})
-        if login_type == "api_key":
-            self.api_key_name = credential.get("api_key_name", "")
-            self.api_key_value = credential.get("api_key_value", "")
-            self.api_key_destination = credential.get("api_key_destination", "header")
-            if self.api_key_destination == "header":
-                self.endpoint_headers.update({self.api_key_name: self.api_key_value})
-            else:
-                self.params.update({self.api_key_name: self.api_key_value})
+
+        self.set_login(credential)
 
         self.requests_kwargs.update({"headers": self.endpoint_headers})
         self.ignore_ssl_check = endpoint.get("ignore_ssl_check", False)
@@ -96,12 +101,34 @@ class RestAPIClient(object):
         self.time_last_request = None
         self.loop_detector = LoopDetector()
         body_format = endpoint.get("body_format", None)
-        if body_format == "RAW":
+        if body_format == DKUConstants.RAW_BODY_FORMAT:
             text_body = endpoint.get("text_body", "")
             self.requests_kwargs.update({"data": text_body})
-        elif body_format in ["FORM_DATA"]:
+        elif body_format in [DKUConstants.FORM_DATA_BODY_FORMAT]:
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
+
+    def set_login(self, credential):
+        login_type = credential.get("login_type", "no_auth")
+        if login_type == "basic_login":
+            self.username = credential.get("username", "")
+            self.password = credential.get("password", "")
+            self.auth = (self.username, self.password)
+            self.requests_kwargs.update({"auth": self.auth})
+        if login_type == "token":
+            self.token = credential.get("token", "")
+        if login_type == "oauth_2_token":
+            self.token = credential.get("token", "")
+            bearer_template = credential.get("bearer_template", "Bearer {{token}}")
+            self.endpoint_headers.update({"Authentication": bearer_template})
+        if login_type == "api_key":
+            self.api_key_name = credential.get("api_key_name", "")
+            self.api_key_value = credential.get("api_key_value", "")
+            self.api_key_destination = credential.get("api_key_destination", "header")
+            if self.api_key_destination == "header":
+                self.endpoint_headers.update({self.api_key_name: self.api_key_value})
+            else:
+                self.params.update({self.api_key_name: self.api_key_value})
 
     def get(self, url, can_raise_exeption=True, **kwargs):
         json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
@@ -148,27 +175,16 @@ class RestAPIClient(object):
 
     @staticmethod
     def get_params(endpoint_query_string, keywords):
+        templated_query_string = get_dku_key_values(endpoint_query_string)
         ret = {}
-        for key_value in endpoint_query_string:
-            key = key_value.get("from")
-            value = key_value.get("to")
-            ret.update({key: format_template(value, **keywords)})
-        return ret
-
-    @staticmethod
-    def get_dku_params(endpoint_query_string):
-        ret = {}
-        for key_value in endpoint_query_string:
-            key = key_value.get("from")
-            value = key_value.get("to")
-            if key is not None:
-                ret.update({key: value})
+        for key in templated_query_string:
+            ret.update({key: format_template(templated_query_string.get(key, ""), **keywords)})
         return ret
 
     def has_more_data(self):
         if not self.pagination.is_paging_started:
             self.start_paging()
-        return self.pagination.is_next_page()
+        return self.pagination.has_next_page()
 
     def start_paging(self):
         self.pagination.reset_paging(counting_key=self.extraction_key, url=self.endpoint_url)
@@ -180,25 +196,3 @@ class RestAPIClient(object):
             if time_since_last_resquests < self.time_between_requests:
                 logger.info("Enforcing {}s throttling".format(self.time_between_requests - time_since_last_resquests))
                 time.sleep(self.time_between_requests - time_since_last_resquests)
-
-
-def template_dict(dictionnary, **kwargs):
-    """ Recurses into dictionnary and replace template {{keys}} with the matching values present in the kwargs dictionnary"""
-    ret = dict.copy(dictionnary)
-    for key in ret:
-        if isinstance(ret[key], dict):
-            ret[key] = template_dict(ret[key], **kwargs)
-        if isinstance(ret[key], str):
-            ret[key] = format_template(ret[key], **kwargs)
-            return ret
-    return ret
-
-
-def format_template(template, **kwargs):
-    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
-    placeholders = re.findall(r'{([a-zA-Z\-\_]*)}', template)
-    formated = template
-    for placeholder in placeholders:
-        replacement = kwargs.get(placeholder, "")
-        formated = formated.replace("{{{{{}}}}}".format(placeholder), str(replacement))
-    return formated

@@ -19,8 +19,8 @@
     "outputRoles": [
         {
             "name": "api_output",
-            "label": "main output displayed name",
-            "description": "what main output means",
+            "label": "Main output displayed name",
+            "description": "",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
@@ -48,22 +48,27 @@
             "parameterSetId": "endpoint"
         },
         {
+            "type": "SEPARATOR",
+            "label": "Template variables",
+            "description": "URL, headers and parameters can be templated using {{variables}}"
+        },
+        {
             "name": "parameter_columns",
-            "label": "Columns to use as parameters",
-            "description": "Unless renamed, selected columns row can be reused as {{column_name}} in templates",
+            "label": "Columns to use as variables",
+            "description": "Unless renamed, these columns can be used as {{ColumnName}} variables in templates",
             "type": "COLUMNS",
             "columnRole": "input_A_role"
         },
         {
             "name": "parameter_renamings",
-            "label": "Columns renaming",
-            "description": "ColumName to ParameterName to reuse as {{ParameterName}} (optional)",
+            "label": "Variables columns renaming",
+            "description": "Rename 'My variable column' to 'my_variable', to use as {{my_variable}} (optional)",
             "type": "KEY_VALUE_LIST"
         },
         {
             "name": "custom_key_values",
             "label": "Custom keys / values",
-            "description": "Replace {{key}} by value in templates (optional)",
+            "description": "Replace the variable {{key}} by its value in templates (optional)",
             "type": "KEY_VALUE_LIST"
         }
     ],

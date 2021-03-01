@@ -79,7 +79,7 @@ class Pagination(object):
         else:
             return dictionary.get(path)
 
-    def is_next_page(self):
+    def has_next_page(self):
         if self.is_last_batch_empty:
             return False
         if self.is_first_batch:
@@ -108,9 +108,3 @@ class Pagination(object):
 
     def get_next_page_url(self):
         return self.next_page_url
-
-# 1. next link in page
-# 2. skip / max
-#   2.1 you know the total length
-#   2.2 you have to loop until getting an empty array
-# 3. you don't have link and no skip key -> one off
