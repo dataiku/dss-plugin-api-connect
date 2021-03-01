@@ -30,7 +30,7 @@
         {
             "name": "custom_key_values",
             "label": "Custom keys / values",
-            "description": "Replace {{key}} by value in templates (optional)",
+            "description": "Replace {{key}} by value in presets (optional)",
             "type": "KEY_VALUE_LIST"
         }
     ]
