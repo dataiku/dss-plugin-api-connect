@@ -8,7 +8,7 @@
     "inputRoles": [
         {
             "name": "input_A_role",
-            "label": "Dataset containing IDs",
+            "label": "Dataset containing variables",
             "description": "",
             "arity": "UNARY",
             "required": true,
