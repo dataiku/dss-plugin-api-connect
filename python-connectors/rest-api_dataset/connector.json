@@ -13,7 +13,7 @@
         },
         {
             "name": "credential",
-            "label": "Preset credentials",
+            "label": "Credential preset",
             "type": "PRESET",
             "parameterSetId": "credential"
         },
@@ -23,7 +23,7 @@
         },
         {
             "name": "endpoint",
-            "label": "Preset endpoint",
+            "label": "Endpoint preset",
             "type": "PRESET",
             "parameterSetId": "endpoint"
         },
