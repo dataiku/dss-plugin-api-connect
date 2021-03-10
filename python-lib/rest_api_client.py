@@ -25,6 +25,8 @@ def template_dict(dictionnary, **kwargs):
 
 def format_template(template, **kwargs):
     """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
+    if template is None:
+        return None
     placeholders = re.findall(r'{{([a-zA-Z\-\_]*)}}', template)
     formated = template
     for placeholder in placeholders:
@@ -178,7 +180,7 @@ class RestAPIClient(object):
         templated_query_string = get_dku_key_values(endpoint_query_string)
         ret = {}
         for key in templated_query_string:
-            ret.update({key: format_template(templated_query_string.get(key, ""), **keywords)})
+            ret.update({key: format_template(templated_query_string.get(key, ""), **keywords) or ""})
         return ret
 
     def has_more_data(self):
