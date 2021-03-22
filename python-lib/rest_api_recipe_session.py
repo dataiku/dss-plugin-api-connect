@@ -33,7 +33,7 @@ class RestApiRecipeSession:
             self.initial_parameter_columns = {}
             for column_name in self.column_to_parameter_dict:
                 parameter_name = self.column_to_parameter_dict[column_name]
-                self.initial_parameter_columns.update({parameter_name: input_parameters_row[column_name]})
+                self.initial_parameter_columns.update({parameter_name: input_parameters_row.get(column_name)})
             updated_endpoint_parameters = copy.deepcopy(self.endpoint_parameters)
             updated_endpoint_parameters.update(self.initial_parameter_columns)
             logger.info("Creating client with credential={}, updated_endpoint={}, custom_key_values={}".format(

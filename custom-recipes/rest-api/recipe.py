@@ -35,7 +35,7 @@ credential_parameters = config.get("credential", {})
 endpoint_parameters = config.get("endpoint", {})
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
-parameter_columns = config.get("parameter_columns", [])
+parameter_columns = [column for column in config.get("parameter_columns", []) if column]
 if len(parameter_columns) == 0:
     raise ValueError("There is no parameter column selected.")
 parameter_renamings = get_dku_key_values(config.get("parameter_renamings", {}))
