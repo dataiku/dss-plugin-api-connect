@@ -2,7 +2,7 @@ from dataiku.connector import Connector
 from dataikuapi.utils import DataikuException
 from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
-from dku_utils import get_dku_key_values
+from dku_utils import get_dku_key_values, get_endpoint_presets
 
 logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
 
@@ -13,7 +13,7 @@ class RestAPIConnector(Connector):
         Connector.__init__(self, config, plugin_config)  # pass the parameters to the base class
 
         logger.info("config={}".format(logger.filter_secrets(config)))
-        endpoint = config.get("endpoint", {})
+        endpoint = get_endpoint_presets(config)
         credential = config.get("credential", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
         self.client = RestAPIClient(credential, endpoint, custom_key_values)
@@ -49,10 +49,7 @@ class RestAPIConnector(Connector):
                     raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
                 record_count += len(data)
                 for result in data:
-                    if self.raw_output:
-                        yield {"api_response": result}
-                    else:
-                        yield result
+                    yield {"api_response": result} if self.raw_output else result
             if is_records_limit and record_count >= records_limit:
                 break
 
