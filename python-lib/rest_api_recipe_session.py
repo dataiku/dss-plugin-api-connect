@@ -60,10 +60,13 @@ class RestApiRecipeSession:
             page_rows.extend(self.format_page_rows(data_rows, is_raw_output))
         else:
             # Todo: check api_response key is free and add something overwise
-            if is_error_message(json_response):
-                base_row.update(json_response)
+            if is_raw_output:
+                if is_error_message(json_response):
+                    base_row.update(json_response)
+                else:
+                    base_row.update({"api_response": json_response})
             else:
-                base_row.update({"api_response": json_response})
+                base_row.update(json_response)
             page_rows.append(base_row)
         return page_rows
 
