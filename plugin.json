@@ -2,7 +2,7 @@
     "id": "api-connect",
     "version": "1.0.0",
     "meta": {
-        "label": "Rest API",
+        "label": "API Connect",
         "description": "",
         "author": "Dataiku (Alex Bourret)",
         "icon": "icon-rocket",
