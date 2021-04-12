@@ -8,7 +8,7 @@ from dku_utils import get_dku_key_values
 from dku_constants import DKUConstants
 
 
-logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 def template_dict(dictionnary, **kwargs):
@@ -141,7 +141,7 @@ class RestAPIClient(object):
         self.enforce_throttling()
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
-            raise RestAPIClientError("The rest-api plugin is stuck in a loop. Please check the pagination parameters.")
+            raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         try:
             response = requests.request(method, url, **kwargs)
         except Exception as err:

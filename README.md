@@ -1,8 +1,8 @@
-# REST-API Plugin
+# API-Connect Plugin
 
 This Dataiku DSS plugin provides read connectors and recipes that can be configured to interact with a wide range of REST API.
 
-Documentation: https://www.dataiku.com/product/plugins/rest-api/
+Documentation: https://www.dataiku.com/product/plugins/api-connect/
 
 
 ### Licence

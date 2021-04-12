@@ -7,7 +7,7 @@ from dku_utils import get_dku_key_values, get_endpoint_parameters
 from rest_api_recipe_session import RestApiRecipeSession
 
 
-logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 def get_partitioning_keys(id_list, dku_flow_variables):

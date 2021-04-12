@@ -1,5 +1,5 @@
 {
-    "id": "rest-api",
+    "id": "api-connect",
     "version": "1.0.0",
     "meta": {
         "label": "Rest API",
@@ -7,7 +7,7 @@
         "author": "Dataiku (Alex Bourret)",
         "icon": "icon-rocket",
         "tags": ["Connector", "Cloud"],
-        "url": "https://www.dataiku.com/product/plugins/rest-api/",
+        "url": "https://www.dataiku.com/product/plugins/api-connect/",
         "licenseInfo": "Apache Software License"
     }
 }
