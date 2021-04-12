@@ -2,8 +2,8 @@ def get_dku_key_values(endpoint_query_string):
     return {key_value.get("from"): key_value.get("to") for key_value in endpoint_query_string if key_value.get("from")}
 
 
-def get_endpoint_presets(configuration):
-    endpoint_presets = [
+def get_endpoint_parameters(configuration):
+    endpoint_parameters = [
         "endpoint_url",
         "http_method",
         "endpoint_query_string",
@@ -21,5 +21,5 @@ def get_endpoint_presets(configuration):
         "next_page_url_key",
         "top_key", "skip_key"
     ]
-    presets = {endpoint_preset: configuration.get(endpoint_preset) for endpoint_preset in endpoint_presets if configuration.get(endpoint_preset) is not None}
-    return presets
+    parameters = {endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None}
+    return parameters
