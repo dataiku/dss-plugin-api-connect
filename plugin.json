@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "meta": {
         "label": "API Connect",
-        "description": "",
+        "description": "Retrieve data from any API, even if you don't have the plugin for it...",
         "author": "Dataiku (Alex Bourret)",
         "icon": "icon-rocket",
         "tags": ["Connector", "Cloud"],
