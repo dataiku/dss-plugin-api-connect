@@ -3,7 +3,7 @@ import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
 import pandas as pd
 from safe_logger import SafeLogger
-from dku_utils import get_dku_key_values
+from dku_utils import get_dku_key_values, get_endpoint_parameters
 from rest_api_recipe_session import RestApiRecipeSession
 
 
@@ -32,7 +32,7 @@ dku_flow_variables = dataiku.get_flow_variables()
 logger.info("config={}".format(logger.filter_secrets(config)))
 
 credential_parameters = config.get("credential", {})
-endpoint_parameters = config.get("endpoint", {})
+endpoint_parameters = get_endpoint_parameters(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
 parameter_columns = [column for column in config.get("parameter_columns", []) if column]
