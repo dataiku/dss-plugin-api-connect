@@ -3,7 +3,7 @@ from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
 import copy
 
-logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 class RestApiRecipeSession:

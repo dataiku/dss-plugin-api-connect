@@ -4,7 +4,7 @@ from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
 from dku_utils import get_dku_key_values, get_endpoint_parameters
 
-logger = SafeLogger("rest-api plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 class RestAPIConnector(Connector):
