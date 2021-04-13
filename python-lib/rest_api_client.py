@@ -1,6 +1,5 @@
 import requests
 import time
-import re
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -27,11 +26,10 @@ def format_template(template, **kwargs):
     """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
     if template is None:
         return None
-    placeholders = re.findall(r'{{([0-9a-zA-Z\-\_]*)}}', template)
     formated = template
-    for placeholder in placeholders:
-        replacement = kwargs.get(placeholder, "")
-        formated = formated.replace("{{{{{}}}}}".format(placeholder), str(replacement))
+    for key in kwargs:
+        replacement = kwargs.get(key, "")
+        formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
     return formated
 
 
@@ -117,11 +115,10 @@ class RestAPIClient(object):
             self.password = credential.get("password", "")
             self.auth = (self.username, self.password)
             self.requests_kwargs.update({"auth": self.auth})
-        if login_type == "token":
-            self.token = credential.get("token", "")
-        if login_type == "oauth_2_token":
-            self.token = credential.get("token", "")
+        if login_type == "bearer_token":
+            token = credential.get("token", "")
             bearer_template = credential.get("bearer_template", "Bearer {{token}}")
+            bearer_template = bearer_template.replace("{{token}}", token)
             self.endpoint_headers.update({"Authentication": bearer_template})
         if login_type == "api_key":
             self.api_key_name = credential.get("api_key_name", "")
@@ -137,7 +134,7 @@ class RestAPIClient(object):
         return json_response
 
     def request(self, method, url, can_raise_exeption=True, **kwargs):
-        logger.info("Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
+        logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.enforce_throttling()
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):

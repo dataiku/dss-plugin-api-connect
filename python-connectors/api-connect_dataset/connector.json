@@ -69,10 +69,6 @@
             "type": "KEY_VALUE_LIST",
             "defaultValue": [
                 {
-                    "from": "Authentication",
-                    "to": "Bearer {{token}}"
-                },
-                {
                     "from": "Content-Type",
                     "to": "application/json"
                 },
