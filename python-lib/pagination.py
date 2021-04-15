@@ -51,7 +51,7 @@ class Pagination(object):
                 self.is_last_batch_empty = True
             return
         elif self.counting_key:
-            batch_size = len(data.get(self.counting_key))
+            batch_size = len(data.get(self.counting_key, []))
             if batch_size == 0:
                 self.is_last_batch_empty = True
         else:
