@@ -119,7 +119,7 @@ class RestAPIClient(object):
             token = credential.get("token", "")
             bearer_template = credential.get("bearer_template", "Bearer {{token}}")
             bearer_template = bearer_template.replace("{{token}}", token)
-            self.endpoint_headers.update({"Authentication": bearer_template})
+            self.endpoint_headers.update({"Authorization": bearer_template})
         if login_type == "api_key":
             self.api_key_name = credential.get("api_key_name", "")
             self.api_key_value = credential.get("api_key_value", "")
