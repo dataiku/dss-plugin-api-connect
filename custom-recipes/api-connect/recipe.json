@@ -45,7 +45,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://{{subdomain}}.service.com/user/{{username}}/details",
+            "description": "https://{{my_variable}}.service.com/user/{{username}}/details",
             "type": "TEXTAREA"
         },
         {
@@ -133,7 +133,7 @@
         {
             "name": "parameter_renamings",
             "label": "Variables columns renaming",
-            "description": "Rename 'My variable column' to 'my_variable', to use as {{my_variable}} (optional)",
+            "description": "Rename 'My variable column' to 'my_variable', to use as {{my_variable}}, and avoid name colisions (optional)",
             "type": "KEY_VALUE_LIST"
         },
         {
@@ -146,7 +146,7 @@
 
         {
             "type": "SEPARATOR",
-            "label": "Data formating"
+            "label": "Data extraction"
         },
         {
             "name": "extraction_key",
@@ -161,30 +161,6 @@
             "description": "",
             "defaultValue": true,
             "type": "BOOLEAN"
-        },
-        {
-            "type": "SEPARATOR",
-            "label": "Advanced"
-        },
-        {
-            "name": "ignore_ssl_check",
-            "label": "Ignore SSL check",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
-            "name": "timeout",
-            "label": "Timeout (s)",
-            "description": "-1 for no limit",
-            "type": "INT",
-            "defaultValue": 3600
-        },
-        {
-            "name": "requests_per_minute",
-            "label": "Rate limit (requests/m)",
-            "description": "-1 for no limit",
-            "type": "INT",
-            "defaultValue": -1
         },
         {
             "type": "SEPARATOR",
@@ -234,6 +210,30 @@
             "type": "STRING",
             "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='page'"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced"
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": 3600
+        },
+        {
+            "name": "requests_per_minute",
+            "label": "Rate limit (requests/m)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
         }
     ],
     "resourceKeys": []
