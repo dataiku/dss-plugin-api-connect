@@ -45,7 +45,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://{{subdomain_variable}}.service.com/user/{{username}}/details",
+            "description": "https://{{subdomain}}.service.com/user/{{username}}/details",
             "type": "TEXTAREA"
         },
         {
