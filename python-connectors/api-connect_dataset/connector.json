@@ -32,7 +32,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://{{subdomain}}.service.com/user/{{username}}/details or https://{{variable}}.service.com/user/{{username}}/details",
+            "description": "https://{{variable}}.exmpl.com/usr/{{username}}/details",
             "type": "TEXTAREA"
         },
         {
@@ -129,15 +129,20 @@
         {
             "name": "pagination_type",
             "label": "Pagination mechanism",
-            "description": "Consult the API's documentation",
+            "description": "Refer to the API's documentation",
             "type": "SELECT",
             "defaultValue": "na",
             "selectChoices":[
                 {"value": "na", "label": "No pagination"},
                 {"value": "next_page", "label": "Next page URL provided"},
                 {"value": "offset", "label": "Offset pagination"},
-                {"value": "page", "label": "Page pagination"}
+                {"value": "page", "label": "Per page"}
             ]
+        },
+        {
+            "type": "SEPARATOR",
+            "description": "&#9888; Requires a key to data array",
+            "visibilityCondition": "model.pagination_type=='page'"
         },
         {
             "name": "next_page_url_key",
@@ -153,7 +158,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "(['page', 'offset'].indexOf(model.pagination_type)>-1)"
+            "visibilityCondition": "(['offset'].indexOf(model.pagination_type)>-1)"
         },
         {
             "name": "skip_key",
