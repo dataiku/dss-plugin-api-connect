@@ -1,3 +1,9 @@
+from safe_logger import SafeLogger
+
+
+logger = SafeLogger("api-connect plugin Pagination")
+
+
 class Pagination(object):
 
     def __init__(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None):
@@ -81,21 +87,36 @@ class Pagination(object):
 
     def has_next_page(self):
         if self.is_last_batch_empty:
+            logger.info("has_next_page:last was batch empty -> False")
             return False
         if self.is_first_batch:
+            logger.info("has_next_page:is first batch -> True")
             return True
         else:
             if not self.next_page_key and not self.skip_key:
+                logger.info("has_next_page:no key for next page nor skip -> False")
                 return False
             if self.next_page_key and not self.next_page_url:
+                logger.info("has_next_page:no next_page_url -> False")
                 return False
 
         if self.counter == 0:
+            logger.info("has_next_page:counter = 0 -> True")
             return True
         if self.next_page_key:
             ret = (self.next_page_url is not None) and (self.next_page_url != "")
+            logger.info("has_next_page:next_page_key={} next_page_url={} -> {}".format(
+                self.next_page_key,
+                self.next_page_url,
+                ret
+            ))
         else:
             ret = self.counter < self.remaining_records
+            logger.info("has_next_page:counter={},  remaining_records={} -> {}".format(
+                self.counter,
+                self.remaining_records,
+                ret
+            ))
         return ret
 
     def get_params(self):
