@@ -52,6 +52,7 @@ class RestApiRecipeSession:
     def retrieve_next_page(self, is_raw_output):
         page_rows = []
         base_row = copy.deepcopy(self.initial_parameter_columns)
+        logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_get(can_raise_exeption=False)
         if self.extraction_key:
             data_rows = json_response.get(self.extraction_key, [json_response])

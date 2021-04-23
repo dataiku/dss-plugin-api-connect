@@ -186,6 +186,7 @@ class RestAPIClient(object):
         return self.pagination.has_next_page()
 
     def start_paging(self):
+        logger.info("Start paging with counting key '{}'".format(self.extraction_key))
         self.pagination.reset_paging(counting_key=self.extraction_key, url=self.endpoint_url)
 
     def enforce_throttling(self):

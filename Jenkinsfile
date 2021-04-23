@@ -5,17 +5,6 @@ pipeline {
         PLUGIN_INTEGRATION_TEST_INSTANCE="/home/jenkins-agent/instance_config.json"
     }
    stages {
-      stage('Run Unit Tests') {
-         steps {
-            sh 'echo "Running unit tests"'
-            catchError(stageResult: 'FAILURE') {
-            sh """
-               make unit-tests
-               """
-            }
-            sh 'echo "Done with unit tests"'
-         }
-      }
       stage('Run Integration Tests') {
          steps {
             sh 'echo "Running integration tests"'

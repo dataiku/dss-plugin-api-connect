@@ -32,7 +32,7 @@
         {
             "name": "endpoint_url",
             "label": "URL template",
-            "description": "https://{{subdomain}}.service.com/user/{{username}}/details",
+            "description": "https://{{subdomain}}.service.com/user/{{username}}/details or https://{{variable}}.service.com/user/{{username}}/details",
             "type": "TEXTAREA"
         },
         {
@@ -106,7 +106,7 @@
         },
         {
             "type": "SEPARATOR",
-            "label": "Data formating"
+            "label": "Data extraction"
         },
         {
             "name": "extraction_key",
@@ -121,30 +121,6 @@
             "description": "",
             "defaultValue": true,
             "type": "BOOLEAN"
-        },
-        {
-            "type": "SEPARATOR",
-            "label": "Advanced"
-        },
-        {
-            "name": "ignore_ssl_check",
-            "label": "Ignore SSL check",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
-            "name": "timeout",
-            "label": "Timeout (s)",
-            "description": "-1 for no limit",
-            "type": "INT",
-            "defaultValue": 3600
-        },
-        {
-            "name": "requests_per_minute",
-            "label": "Rate limit (requests/m)",
-            "description": "-1 for no limit",
-            "type": "INT",
-            "defaultValue": -1
         },
         {
             "type": "SEPARATOR",
@@ -194,7 +170,30 @@
             "type": "STRING",
             "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='page'"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced"
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": 3600
+        },
+        {
+            "name": "requests_per_minute",
+            "label": "Rate limit (requests/m)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
         }
-
     ]
 }
