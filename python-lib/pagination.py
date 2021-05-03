@@ -38,7 +38,10 @@ class Pagination(object):
         self.records_to_skip = 0
         self.counting_key = counting_key
         self.counter = 0
-        self.next_page_number = 0
+        if self.pagination_type == "page":
+            self.next_page_number = 1
+        else:
+            self.next_page_number = 0
         self.next_page_url = url
         self.is_last_batch_empty = False
         self.is_first_batch = True
@@ -49,6 +52,7 @@ class Pagination(object):
 
     def update_next_page(self, data):
         self.is_first_batch = False
+        self.counter += 1
         self.next_page_number = self.next_page_number + 1
         if isinstance(data, list):
             batch_size = len(data)
@@ -92,32 +96,22 @@ class Pagination(object):
         if self.is_first_batch:
             logger.info("has_next_page:is first batch -> True")
             return True
-        else:
-            if not self.next_page_key and not self.skip_key:
-                logger.info("has_next_page:no key for next page nor skip -> False")
-                return False
-            if self.next_page_key and not self.next_page_url:
-                logger.info("has_next_page:no next_page_url -> False")
-                return False
-
-        if self.counter == 0:
-            logger.info("has_next_page:counter = 0 -> True")
-            return True
-        if self.next_page_key:
+        if self.pagination_type == "next_page":
             ret = (self.next_page_url is not None) and (self.next_page_url != "")
             logger.info("has_next_page:next_page_key={} next_page_url={} -> {}".format(
                 self.next_page_key,
                 self.next_page_url,
                 ret
             ))
-        else:
-            ret = self.counter < self.remaining_records
-            logger.info("has_next_page:counter={},  remaining_records={} -> {}".format(
-                self.counter,
-                self.remaining_records,
-                ret
-            ))
-        return ret
+            return ret
+        if self.pagination_type in ["page", "offset"]:
+            if self.counting_key:
+                #  There is a counting key and we already know the last batch was not empty
+                return True
+            else:
+                #  No way to know if the last batch was empty so we stop here
+                return False
+        return False
 
     def get_params(self):
         ret = {}
