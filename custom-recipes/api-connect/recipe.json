@@ -182,7 +182,7 @@
         {
             "type": "SEPARATOR",
             "description": "&#9888;'Per page' mode requires the 'Key to data array' to be defined",
-            "visibilityCondition": "model.pagination_type=='page'"
+            "visibilityCondition": "model.pagination_type=='page' && !model.extraction_key"
         },
         {
             "name": "next_page_url_key",
@@ -198,7 +198,7 @@
             "description": "",
             "type": "STRING",
             "defaultValue": null,
-            "visibilityCondition": "(['offset'].indexOf(model.pagination_type)>-1)"
+            "visibilityCondition": "model.pagination_type == 'offset'"
         },
         {
             "name": "skip_key",

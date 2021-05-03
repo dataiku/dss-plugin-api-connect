@@ -52,7 +52,7 @@ class Pagination(object):
 
     def update_next_page(self, data):
         self.is_first_batch = False
-        self.counter = self.counter + 1
+        self.counter += 1
         self.next_page_number = self.next_page_number + 1
         if isinstance(data, list):
             batch_size = len(data)
