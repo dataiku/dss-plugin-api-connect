@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.0.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.2) - Bugfix release - 2021-05-25
+
+- Fixed recipe ignoring the selected http_method
+
 ## [Version 1.0.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.1) - Bugfix release - 2021-05-03
 
 - Fixed the "Per page" pagination mode

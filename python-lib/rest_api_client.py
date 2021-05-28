@@ -160,16 +160,11 @@ class RestAPIClient(object):
         self.pagination.update_next_page(json_response)
         return json_response
 
-    def paginated_get(self, can_raise_exeption=True):
+    def paginated_api_call(self, can_raise_exeption=True):
         pagination_params = self.pagination.get_params()
         params = self.requests_kwargs.get("params")
         params.update(pagination_params)
         self.requests_kwargs.update({"params": params})
-        return self.get(self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
-
-    def paginated_api_call(self, can_raise_exeption=True):
-        if self.http_method == "GET":
-            return self.paginated_get(can_raise_exeption=True)
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
 
     @staticmethod
