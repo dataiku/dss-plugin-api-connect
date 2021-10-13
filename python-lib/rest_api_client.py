@@ -157,7 +157,7 @@ class RestAPIClient(object):
             else:
                 return {"error": error_message}
         json_response = response.json()
-        self.pagination.update_next_page(json_response)
+        self.pagination.update_next_page(json_response, response.links)
         return json_response
 
     def paginated_api_call(self, can_raise_exeption=True):
