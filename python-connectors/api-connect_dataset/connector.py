@@ -2,7 +2,10 @@ from dataiku.connector import Connector
 from dataikuapi.utils import DataikuException
 from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
-from dku_utils import get_dku_key_values, get_endpoint_parameters
+from dku_utils import get_dku_key_values, get_endpoint_parameters, parse_keys_for_json
+from dku_constants import DKUConstants
+import json
+
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
@@ -41,18 +44,32 @@ class RestAPIConnector(Connector):
                 # Todo: check api_response key is free and add something overwise
                 if isinstance(json_response, list):
                     record_count += len(json_response)
-                    for row in json_response:
-                        yield {"api_response": row}
+                    if self.raw_output:
+                        for row in json_response:
+                            yield {
+                                DKUConstants.API_RESPONSE_KEY: json.dumps(row)
+                            }
+                    else:
+                        for row in json_response:
+                            yield parse_keys_for_json(row)
                 else:
                     record_count += 1
-                    yield {"api_response": json_response}
+                    yield {
+                        DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)
+                    }
             else:
                 data = json_response.get(self.extraction_key, None)
                 if data is None:
                     raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
                 record_count += len(data)
-                for result in data:
-                    yield {"api_response": result} if self.raw_output else result
+                if self.raw_output:
+                    for result in data:
+                        yield {
+                            DKUConstants.API_RESPONSE_KEY: json.dumps(result)
+                        }
+                else:
+                    for result in data:
+                        yield parse_keys_for_json(result)
             if is_records_limit and record_count >= records_limit:
                 break
 
