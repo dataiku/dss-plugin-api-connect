@@ -22,6 +22,7 @@ class RestAPIConnector(Connector):
             extraction_key = None
         self.extraction_key = extraction_key
         self.raw_output = endpoint_parameters.get("raw_output", None)
+        self.maximum_number_rows = config.get("maximum_number_rows", -1)
 
     def get_read_schema(self):
         # In this example, we don't specify a schema here, so DSS will infer the schema
@@ -30,7 +31,9 @@ class RestAPIConnector(Connector):
 
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
-        is_records_limit = records_limit > 0
+        is_records_limit = (records_limit > 0) or (self.maximum_number_rows > 0)
+        if self.maximum_number_rows > 0:
+            records_limit = self.maximum_number_rows
         record_count = 0
         while self.client.has_more_data():
             json_response = self.client.paginated_api_call()

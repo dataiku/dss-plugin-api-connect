@@ -199,6 +199,13 @@
             "description": "-1 for no limit",
             "type": "INT",
             "defaultValue": -1
+        },
+        {
+            "name": "maximum_number_rows",
+            "label": "Maximum number of rows",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
         }
     ]
 }
