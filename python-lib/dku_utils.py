@@ -39,3 +39,13 @@ def parse_keys_for_json(items):
         else:
             ret.update({key: value})
     return ret
+
+
+def get_value_from_path(dictionary, path, default_reply=None):
+    ret = dictionary
+    for key in path:
+        if key in ret:
+            ret = ret.get(key)
+        else:
+            return default_reply
+    return ret

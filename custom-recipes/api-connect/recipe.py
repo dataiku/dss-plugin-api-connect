@@ -40,6 +40,7 @@ if len(parameter_columns) == 0:
     raise ValueError("There is no parameter column selected.")
 parameter_renamings = get_dku_key_values(config.get("parameter_renamings", {}))
 custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
+display_metadata = config.get("display_metadata", False)
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
@@ -51,7 +52,8 @@ recipe_session = RestApiRecipeSession(
     endpoint_parameters,
     extraction_key,
     parameter_columns,
-    parameter_renamings
+    parameter_renamings,
+    display_metadata
 )
 results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
 

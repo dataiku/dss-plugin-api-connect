@@ -227,6 +227,13 @@
             "defaultValue": false
         },
         {
+            "name": "display_metadata",
+            "label": "Display metadata",
+            "description": "Status code, request time...",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "name": "timeout",
             "label": "Timeout (s)",
             "description": "-1 for no limit",

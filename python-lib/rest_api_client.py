@@ -107,6 +107,7 @@ class RestAPIClient(object):
         elif body_format in [DKUConstants.FORM_DATA_BODY_FORMAT]:
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
+        self.metadata = {}
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
@@ -140,7 +141,10 @@ class RestAPIClient(object):
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         try:
+            request_start_time = time.time()
             response = requests.request(method, url, **kwargs)
+            request_finish_time = time.time()
+            self.set_metadata("request_duration", request_finish_time - request_start_time)
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
@@ -149,6 +153,7 @@ class RestAPIClient(object):
             else:
                 return {"error": error_message}
         self.time_last_request = time.time()
+        self.set_metadata("status_code", response.status_code)
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True
@@ -156,6 +161,9 @@ class RestAPIClient(object):
                 raise RestAPIClientError(error_message)
             else:
                 return {"error": error_message}
+        if response.status_code in [204]:
+            self.pagination.update_next_page({}, response.links)
+            return self.empty_json_response()
         json_response = response.json()
         self.pagination.update_next_page(json_response, response.links)
         return json_response
@@ -166,6 +174,12 @@ class RestAPIClient(object):
         params.update(pagination_params)
         self.requests_kwargs.update({"params": params})
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
+
+    def empty_json_response(self):
+        return {self.extraction_key: {}} if self.extraction_key else {}
+
+    def set_metadata(self, metadata_name, value):
+        self.metadata["dku_{}".format(metadata_name)] = value
 
     @staticmethod
     def get_params(endpoint_query_string, keywords):
@@ -191,3 +205,6 @@ class RestAPIClient(object):
             if time_since_last_resquests < self.time_between_requests:
                 logger.info("Enforcing {}s throttling".format(self.time_between_requests - time_since_last_resquests))
                 time.sleep(self.time_between_requests - time_since_last_resquests)
+
+    def get_metadata(self):
+        return self.metadata
