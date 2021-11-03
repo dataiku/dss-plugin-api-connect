@@ -5,6 +5,7 @@ from safe_logger import SafeLogger
 from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values
 from dku_constants import DKUConstants
+import json
 
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
@@ -144,7 +145,6 @@ class RestAPIClient(object):
             request_start_time = time.time()
             response = requests.request(method, url, **kwargs)
             request_finish_time = time.time()
-            self.set_metadata("request_duration", request_finish_time - request_start_time)
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
@@ -152,8 +152,10 @@ class RestAPIClient(object):
                 raise RestAPIClientError(error_message)
             else:
                 return {"error": error_message}
+        self.set_metadata("request_duration", request_finish_time - request_start_time)
         self.time_last_request = time.time()
         self.set_metadata("status_code", response.status_code)
+        self.set_metadata("response_headers", "{}".format(response.headers))
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True
