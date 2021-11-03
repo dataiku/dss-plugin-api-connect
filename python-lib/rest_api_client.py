@@ -5,7 +5,6 @@ from safe_logger import SafeLogger
 from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values
 from dku_constants import DKUConstants
-import json
 
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])

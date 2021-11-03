@@ -41,6 +41,7 @@ if len(parameter_columns) == 0:
 parameter_renamings = get_dku_key_values(config.get("parameter_renamings", {}))
 custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
 display_metadata = config.get("display_metadata", False)
+maximum_number_rows = config.get("maximum_number_rows", -1)
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
@@ -53,7 +54,8 @@ recipe_session = RestApiRecipeSession(
     extraction_key,
     parameter_columns,
     parameter_renamings,
-    display_metadata
+    display_metadata,
+    maximum_number_rows=maximum_number_rows
 )
 results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
 
