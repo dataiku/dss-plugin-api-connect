@@ -1,4 +1,5 @@
 import json
+import copy
 
 
 def get_dku_key_values(endpoint_query_string):
@@ -41,11 +42,11 @@ def parse_keys_for_json(items):
     return ret
 
 
-def get_value_from_path(dictionary, path, default_reply=None):
-    ret = dictionary
+def get_value_from_path(dictionary, path):
+    ret = copy.deepcopy(dictionary)
     for key in path:
-        if key in ret:
+        if key in ret and isinstance(ret, dict):
             ret = ret.get(key)
         else:
-            return default_reply
+            raise ValueError("The extraction path {} was not found in the incoming data".format(path))
     return ret
