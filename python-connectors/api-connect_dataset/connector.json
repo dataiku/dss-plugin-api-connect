@@ -110,8 +110,8 @@
         },
         {
             "name": "extraction_key",
-            "label": "Key to data array (optional)",
-            "description": "",
+            "label": "Path to data array (optional)",
+            "description": "Dot separated key path",
             "defaultValue": null,
             "type": "STRING"
         },
