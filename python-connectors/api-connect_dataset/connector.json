@@ -110,8 +110,8 @@
         },
         {
             "name": "extraction_key",
-            "label": "Key to data array (optional)",
-            "description": "",
+            "label": "Path to data array (optional)",
+            "description": "Dot separated key path",
             "defaultValue": null,
             "type": "STRING"
         },
@@ -183,6 +183,13 @@
         {
             "name": "ignore_ssl_check",
             "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "display_metadata",
+            "label": "Display metadata",
+            "description": "Status code, request time...",
             "type": "BOOLEAN",
             "defaultValue": false
         },

@@ -1,13 +1,18 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
+from dku_utils import parse_keys_for_json
+from dku_constants import DKUConstants
 import copy
+import json
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 class RestApiRecipeSession:
-    def __init__(self, custom_key_values, credential_parameters, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings):
+    def __init__(self, custom_key_values, credential_parameters, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
+                 display_metadata=False,
+                 maximum_number_rows=-1):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
         self.endpoint_parameters = endpoint_parameters
@@ -15,6 +20,9 @@ class RestApiRecipeSession:
         self.client = None
         self.initial_parameter_columns = None
         self.column_to_parameter_dict = self.get_column_to_parameter_dict(parameter_columns, parameter_renamings)
+        self.display_metadata = display_metadata
+        self.maximum_number_rows = maximum_number_rows
+        self.is_row_limit = (self.maximum_number_rows > 0)
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -30,6 +38,7 @@ class RestApiRecipeSession:
         results = []
         time_last_request = None
         for index, input_parameters_row in input_parameters_dataframe.iterrows():
+            rows_count = 0
             self.initial_parameter_columns = {}
             for column_name in self.column_to_parameter_dict:
                 parameter_name = self.column_to_parameter_dict[column_name]
@@ -46,42 +55,64 @@ class RestApiRecipeSession:
             while self.client.has_more_data():
                 page_results = self.retrieve_next_page(is_raw_output)
                 results.extend(page_results)
+                rows_count += len(page_results)
+                if self.is_row_limit and rows_count >= self.maximum_number_rows:
+                    break
             time_last_request = self.client.time_last_request
         return results
 
     def retrieve_next_page(self, is_raw_output):
         page_rows = []
-        base_row = copy.deepcopy(self.initial_parameter_columns)
         logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_api_call(can_raise_exeption=False)
+        metadata = self.client.get_metadata() if self.display_metadata else {}
+        is_api_returning_dict = True
         if self.extraction_key:
             data_rows = json_response.get(self.extraction_key, [json_response])
             if data_rows is None:
                 raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
-            page_rows.extend(self.format_page_rows(data_rows, is_raw_output))
+            page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
         else:
             # Todo: check api_response key is free and add something overwise
+            base_row = copy.deepcopy(metadata)
             if is_raw_output:
                 if is_error_message(json_response):
-                    base_row.update(json_response)
+                    base_row.update(parse_keys_for_json(json_response))
                 else:
-                    base_row.update({"api_response": json_response})
+                    base_row.update({
+                        DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)
+                    })
             else:
-                base_row.update(json_response)
-            page_rows.append(base_row)
+                if isinstance(json_response, dict):
+                    base_row.update(parse_keys_for_json(json_response))
+                elif isinstance(json_response, list):
+                    is_api_returning_dict = False
+                    for row in json_response:
+                        base_row = copy.deepcopy(metadata)
+                        base_row.update(parse_keys_for_json(row))
+                        base_row.update(self.initial_parameter_columns)
+                        page_rows.append(base_row)
+
+            if is_api_returning_dict:
+                base_row.update(self.initial_parameter_columns)
+                page_rows.append(base_row)
         return page_rows
 
-    def format_page_rows(self, data_rows, is_raw_output):
+    def format_page_rows(self, data_rows, is_raw_output, metadata=None):
         page_rows = []
+        metadata = metadata or {}
         for data_row in data_rows:
             base_row = copy.deepcopy(self.initial_parameter_columns)
+            base_row.update(metadata)
             if is_raw_output:
                 if is_error_message(data_row):
-                    base_row.update(data_row)
+                    base_row.update(parse_keys_for_json(data_row))
                 else:
-                    base_row.update({"api_response": data_row})
+                    base_row.update({
+                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
+                    })
             else:
-                base_row.update(data_row)
+                base_row.update(parse_keys_for_json(data_row))
             page_rows.append(base_row)
         return page_rows
 
