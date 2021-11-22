@@ -110,8 +110,8 @@
         },
         {
             "name": "extraction_key",
-            "label": "Key to data array (optional)",
-            "description": "",
+            "label": "Path to data array (optional)",
+            "description": "Dot separated key path",
             "defaultValue": null,
             "type": "STRING"
         },
@@ -187,6 +187,13 @@
             "defaultValue": false
         },
         {
+            "name": "display_metadata",
+            "label": "Display metadata",
+            "description": "Status code, request time...",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "name": "timeout",
             "label": "Timeout (s)",
             "description": "-1 for no limit",
@@ -196,6 +203,13 @@
         {
             "name": "requests_per_minute",
             "label": "Rate limit (requests/m)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
+        },
+        {
+            "name": "maximum_number_rows",
+            "label": "Maximum number of rows",
             "description": "-1 for no limit",
             "type": "INT",
             "defaultValue": -1

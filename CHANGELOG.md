@@ -1,5 +1,14 @@
 # Changelog
 
+
+## [Version 1.0.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.3) - Bugfix and feature release - 2021-11-23
+
+- Fixes error raised on HTTP 204 status codes
+- Adds requests performance indicator to output datasets
+- Data extraction key is replaced by a path
+- Fixes JSON formatting issues
+- Implements RFC5988 for pagination
+
 ## [Version 1.0.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.2) - Bugfix release - 2021-05-25
 
 - Fixed recipe ignoring the selected http_method
