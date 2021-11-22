@@ -1,0 +1,123 @@
+{
+    "meta" : {
+        "label": "API connect step",
+        "description": "Call any API as step of a scenario",
+        "icon": "icon-rocket"
+    },
+    "params": [
+        {
+            "type": "SEPARATOR",
+            "label": "Authentication"
+        },
+        {
+            "name": "credential",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "credential"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "API call parameters"
+        },
+        {
+            "name": "custom_key_values",
+            "label": "Custom keys / values",
+            "description": "Replace {{key}} by value in presets (optional)",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+
+        {
+            "name": "endpoint_url",
+            "label": "URL template",
+            "description": "https://{{variable}}.exmpl.com/usr/{{username}}/details",
+            "type": "TEXTAREA"
+        },
+        {
+            "name": "http_method",
+            "label": "HTTP method",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": "GET",
+            "selectChoices":[
+                {"value": "GET", "label": "GET"},
+                {"value": "POST", "label": "POST"},
+                {"value": "PUT", "label": "PUT"},
+                {"value": "PATCH", "label": "PATCH"},
+                {"value": "DELETE", "label": "DELETE"}
+            ]
+        },
+        {
+            "name": "endpoint_query_string",
+            "label": "Query Params",
+            "description": "Will add ?key1=val1&key2=val2 to the URL",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "endpoint_body",
+            "label": "Body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+        {
+            "name": "endpoint_headers",
+            "label": "Headers",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "defaultValue": [
+                {
+                    "from": "Content-Type",
+                    "to": "application/json"
+                },
+                {
+                    "from": "Accept",
+                    "to": "application/json"
+                }
+            ]
+        },
+        {
+            "name": "body_format",
+            "label": "Body",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": null, "label": "None"},
+                {"value": "FORM_DATA", "label": "Form-data"},
+                {"value": "RAW", "label": "Raw"}
+            ]
+        },
+        {
+            "name": "text_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "TEXTAREA",
+            "visibilityCondition": "model.body_format=='RAW'"
+        },
+        {
+            "name": "key_value_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced"
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": 3600
+        }
+    ]
+}
