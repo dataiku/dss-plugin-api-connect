@@ -42,11 +42,17 @@ def parse_keys_for_json(items):
     return ret
 
 
-def get_value_from_path(dictionary, path):
+def get_value_from_path(dictionary, path, default=None, can_raise=True):
     ret = copy.deepcopy(dictionary)
     for key in path:
         if key in ret and isinstance(ret, dict):
             ret = ret.get(key)
         else:
-            raise ValueError("The extraction path {} was not found in the incoming data".format(path))
+            error_message = "The extraction path {} was not found in the incoming data".format(path)
+            if can_raise:
+                raise ValueError(error_message)
+            elif default:
+                return default  # [{"error": error_message}]
+            else:
+                return None
     return ret
