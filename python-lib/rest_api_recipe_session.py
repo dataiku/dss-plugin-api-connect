@@ -106,7 +106,6 @@ class RestApiRecipeSession:
     def format_page_rows(self, data_rows, is_raw_output, metadata=None):
         page_rows = []
         metadata = metadata or {}
-        print("ALX:data_rows={}".format(data_rows))
         for data_row in data_rows:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
@@ -124,7 +123,6 @@ class RestApiRecipeSession:
 
 
 def is_error_message(jsons_response):
-    print("ALX:is_error_message:jsons_response={}".format(jsons_response))
     if "error" in jsons_response and len(jsons_response) == 1:
         return True
     else:
