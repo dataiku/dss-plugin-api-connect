@@ -1,4 +1,5 @@
 from safe_logger import SafeLogger
+from dku_utils import get_value_from_path
 
 
 logger = SafeLogger("api-connect plugin Pagination")
@@ -66,8 +67,11 @@ class Pagination(object):
                 self.is_last_batch_empty = True
             return
         elif self.counting_key:
-            batch_size = len(data.get(self.counting_key, []))
-            if batch_size == 0:
+            extracted_data = get_value_from_path(data, self.counting_key.split("."), can_raise=False)
+            if extracted_data:
+                batch_size = len(extracted_data)
+            else:
+                batch_size = 0
                 self.is_last_batch_empty = True
         else:
             batch_size = 1

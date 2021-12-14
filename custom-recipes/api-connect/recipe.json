@@ -5,6 +5,7 @@
         "icon": "icon-rocket"
     },
     "kind": "PYTHON",
+    "selectableFromDataset": "input_A_role",
     "inputRoles": [
         {
             "name": "input_A_role",

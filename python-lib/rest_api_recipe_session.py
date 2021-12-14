@@ -1,7 +1,7 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json
+from dku_utils import parse_keys_for_json, get_value_from_path
 from dku_constants import DKUConstants
 import copy
 import json
@@ -23,6 +23,7 @@ class RestApiRecipeSession:
         self.display_metadata = display_metadata
         self.maximum_number_rows = maximum_number_rows
         self.is_row_limit = (self.maximum_number_rows > 0)
+        self.can_raise = False
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -68,9 +69,13 @@ class RestApiRecipeSession:
         metadata = self.client.get_metadata() if self.display_metadata else {}
         is_api_returning_dict = True
         if self.extraction_key:
-            data_rows = json_response.get(self.extraction_key, [json_response])
+            data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
             if data_rows is None:
-                raise DataikuException("Extraction key '{}' was not found in the incoming data".format(self.extraction_key))
+                error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
+                if self.can_raise:
+                    raise DataikuException(error_message)
+                else:
+                    return [{"error": error_message}]
             page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
         else:
             # Todo: check api_response key is free and add something overwise
