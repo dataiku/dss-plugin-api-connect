@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [Version 1.0.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.4) - Bugfix release - 2021-12-14
+
+- Fix use of "Next page pagination" in combination with extraction path
+- Extraction path added to recipe
+
 ## [Version 1.0.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.3) - Bugfix and feature release - 2021-11-23
 
 - Fixes error raised on HTTP 204 status codes
