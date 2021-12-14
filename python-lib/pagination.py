@@ -69,10 +69,9 @@ class Pagination(object):
         elif self.counting_key:
             extracted_data = get_value_from_path(data, self.counting_key.split("."), can_raise=False)
             if extracted_data:
-                batch_size = len(get_value_from_path(data, self.counting_key.split("."), can_raise=False))
+                batch_size = len(extracted_data)
             else:
                 batch_size = 0
-            if batch_size == 0:
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
