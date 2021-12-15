@@ -19,6 +19,7 @@ def get_endpoint_parameters(configuration):
         "extraction_key",
         "raw_output",
         "ignore_ssl_check",
+        "redirect_auth_header",
         "timeout",
         "requests_per_minute",
         "pagination_type",
