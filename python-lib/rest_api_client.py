@@ -1,5 +1,6 @@
 import requests
 import time
+import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -175,7 +176,10 @@ class RestAPIClient(object):
         # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
         response = requests.request(method, url, **kwargs)
         if self.redirect_auth_header and not response.url.startswith(url):
-            response = requests.request(method, response.url, **kwargs)
+            redirection_kwargs = copy.deepcopy(kwargs)
+            redirection_kwargs.pop("params", None)  # params are contained in the redirected url
+            logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
+            response = requests.request(method, response.url, **redirection_kwargs)
         return response
 
     def paginated_api_call(self, can_raise_exeption=True):
