@@ -18,7 +18,6 @@ def template_dict(dictionnary, **kwargs):
             ret[key] = template_dict(ret[key], **kwargs)
         if isinstance(ret[key], str):
             ret[key] = format_template(ret[key], **kwargs)
-            return ret
     return ret
 
 
