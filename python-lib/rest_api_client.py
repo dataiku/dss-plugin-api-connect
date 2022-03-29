@@ -1,5 +1,6 @@
 import requests
 import time
+import sys
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -16,7 +17,7 @@ def template_dict(dictionnary, **kwargs):
     for key in ret:
         if isinstance(ret[key], dict):
             ret[key] = template_dict(ret[key], **kwargs)
-        if isinstance(ret[key], str):
+        if is_string(ret[key]):
             ret[key] = format_template(ret[key], **kwargs)
             return ret
     return ret
@@ -31,6 +32,14 @@ def format_template(template, **kwargs):
         replacement = kwargs.get(key, "")
         formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
     return formated
+
+
+def is_string(item):
+    python_version = sys.version_info
+    if python_version >= (3, 0, 0):
+        return isinstance(item, str)
+    else:
+        return isinstance(item, str) or isinstance(item, unicode)
 
 
 class RestAPIClientError(ValueError):
