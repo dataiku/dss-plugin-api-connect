@@ -1,6 +1,5 @@
 import requests
 import time
-import sys
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -33,12 +32,9 @@ def format_template(template, **kwargs):
     return formated
 
 
-def is_string(item):
-    python_version = sys.version_info
-    if python_version >= (3, 0, 0):
-        return isinstance(item, str)
-    else:
-        return isinstance(item, str) or isinstance(item, unicode)
+def is_string(data):
+    data_type = type(data).__name__
+    return data_type in ["str", "unicode"]
 
 
 class RestAPIClientError(ValueError):
