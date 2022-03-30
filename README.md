@@ -7,4 +7,6 @@ Documentation: https://www.dataiku.com/product/plugins/api-connect/
 
 ### Licence
 
+Copyright 2021-2022 Dataiku SAS
+
 This plugin is distributed under the Apache License version 2.0
