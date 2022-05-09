@@ -1,5 +1,6 @@
 import requests
 import time
+import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -74,6 +75,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"verify": False})
         else:
             self.requests_kwargs.update({"verify": True})
+        self.redirect_auth_header = endpoint.get("redirect_auth_header", False)
         self.timeout = endpoint.get("timeout", -1)
         if self.timeout > 0:
             self.requests_kwargs.update({"timeout": self.timeout})
@@ -141,7 +143,7 @@ class RestAPIClient(object):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         try:
             request_start_time = time.time()
-            response = requests.request(method, url, **kwargs)
+            response = self.request_with_redirect_retry(method, url, **kwargs)
             request_finish_time = time.time()
         except Exception as err:
             self.pagination.is_last_batch_empty = True
@@ -167,6 +169,17 @@ class RestAPIClient(object):
         json_response = response.json()
         self.pagination.update_next_page(json_response, response.links)
         return json_response
+
+    def request_with_redirect_retry(self, method, url, **kwargs):
+        # In case of redirection to another domain, the authorization header is not kept
+        # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
+        response = requests.request(method, url, **kwargs)
+        if self.redirect_auth_header and not response.url.startswith(url):
+            redirection_kwargs = copy.deepcopy(kwargs)
+            redirection_kwargs.pop("params", None)  # params are contained in the redirected url
+            logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
+            response = requests.request(method, response.url, **redirection_kwargs)
+        return response
 
     def paginated_api_call(self, can_raise_exeption=True):
         pagination_params = self.pagination.get_params()
