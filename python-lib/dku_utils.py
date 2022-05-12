@@ -57,3 +57,30 @@ def get_value_from_path(dictionary, path, default=None, can_raise=True):
             else:
                 return None
     return ret
+
+
+def template_dict(dictionnary, **kwargs):
+    """ Recurses into dictionnary and replace template {{keys}} with the matching values present in the kwargs dictionnary"""
+    ret = dict.copy(dictionnary)
+    for key in ret:
+        if isinstance(ret[key], dict):
+            ret[key] = template_dict(ret[key], **kwargs)
+        if is_string(ret[key]):
+            ret[key] = format_template(ret[key], **kwargs)
+    return ret
+
+
+def format_template(template, **kwargs):
+    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
+    if template is None:
+        return None
+    formated = template
+    for key in kwargs:
+        replacement = kwargs.get(key, "")
+        formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
+    return formated
+
+
+def is_string(data):
+    data_type = type(data).__name__
+    return data_type in ["str", "unicode"]

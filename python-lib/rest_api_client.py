@@ -4,33 +4,11 @@ import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values
+from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
 
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
-
-
-def template_dict(dictionnary, **kwargs):
-    """ Recurses into dictionnary and replace template {{keys}} with the matching values present in the kwargs dictionnary"""
-    ret = dict.copy(dictionnary)
-    for key in ret:
-        if isinstance(ret[key], dict):
-            ret[key] = template_dict(ret[key], **kwargs)
-        if isinstance(ret[key], str):
-            ret[key] = format_template(ret[key], **kwargs)
-    return ret
-
-
-def format_template(template, **kwargs):
-    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
-    if template is None:
-        return None
-    formated = template
-    for key in kwargs:
-        replacement = kwargs.get(key, "")
-        formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
-    return formated
 
 
 class RestAPIClientError(ValueError):
