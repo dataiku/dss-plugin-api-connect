@@ -23,6 +23,7 @@ class Pagination(object):
         self.is_first_batch = None
         self.is_paging_started = None
         self.next_page_number = None
+        self.params_must_be_blanked = False
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
         config = {} if config is None else config
@@ -60,6 +61,7 @@ class Pagination(object):
         self.next_page_number = self.next_page_number + 1
         if next_page_url:
             self.next_page_url = next_page_url
+            self.params_must_be_blanked = True
         if isinstance(data, list):
             batch_size = len(data)
             self.records_to_skip = self.records_to_skip + batch_size

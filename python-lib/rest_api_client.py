@@ -1,35 +1,14 @@
 import requests
 import time
+import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values
+from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
 
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
-
-
-def template_dict(dictionnary, **kwargs):
-    """ Recurses into dictionnary and replace template {{keys}} with the matching values present in the kwargs dictionnary"""
-    ret = dict.copy(dictionnary)
-    for key in ret:
-        if isinstance(ret[key], dict):
-            ret[key] = template_dict(ret[key], **kwargs)
-        if isinstance(ret[key], str):
-            ret[key] = format_template(ret[key], **kwargs)
-    return ret
-
-
-def format_template(template, **kwargs):
-    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
-    if template is None:
-        return None
-    formated = template
-    for key in kwargs:
-        replacement = kwargs.get(key, "")
-        formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
-    return formated
 
 
 class RestAPIClientError(ValueError):
@@ -74,6 +53,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"verify": False})
         else:
             self.requests_kwargs.update({"verify": True})
+        self.redirect_auth_header = endpoint.get("redirect_auth_header", False)
         self.timeout = endpoint.get("timeout", -1)
         if self.timeout > 0:
             self.requests_kwargs.update({"timeout": self.timeout})
@@ -141,7 +121,7 @@ class RestAPIClient(object):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         try:
             request_start_time = time.time()
-            response = requests.request(method, url, **kwargs)
+            response = self.request_with_redirect_retry(method, url, **kwargs)
             request_finish_time = time.time()
         except Exception as err:
             self.pagination.is_last_batch_empty = True
@@ -168,11 +148,25 @@ class RestAPIClient(object):
         self.pagination.update_next_page(json_response, response.links)
         return json_response
 
+    def request_with_redirect_retry(self, method, url, **kwargs):
+        # In case of redirection to another domain, the authorization header is not kept
+        # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
+        response = requests.request(method, url, **kwargs)
+        if self.redirect_auth_header and not response.url.startswith(url):
+            redirection_kwargs = copy.deepcopy(kwargs)
+            redirection_kwargs.pop("params", None)  # params are contained in the redirected url
+            logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
+            response = requests.request(method, response.url, **redirection_kwargs)
+        return response
+
     def paginated_api_call(self, can_raise_exeption=True):
-        pagination_params = self.pagination.get_params()
-        params = self.requests_kwargs.get("params")
-        params.update(pagination_params)
-        self.requests_kwargs.update({"params": params})
+        if self.pagination.params_must_be_blanked:
+            self.requests_kwargs["params"] = {}
+        else:
+            pagination_params = self.pagination.get_params()
+            params = self.requests_kwargs.get("params")
+            params.update(pagination_params)
+            self.requests_kwargs.update({"params": params})
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
 
     def empty_json_response(self):
