@@ -169,7 +169,7 @@ class RestAPIClient(object):
         return json_response
 
     def paginated_api_call(self, can_raise_exeption=True):
-        if self.pagination.params_must_be_blanked:
+        if self.pagination.next_page_url:
             self.requests_kwargs["params"] = {}
         else:
             pagination_params = self.pagination.get_params()
