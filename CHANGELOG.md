@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [Version 1.0.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.6) - Feature and bugfix release - 2022-05-19
+
+- Add "Follow authorization header" option
+- Fix for RFC5988 pagination
+
 ## [Version 1.0.5](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.5) - Bugfix release - 2022-03-30
 
 - Fix use of "Next page pagination" with short extraction path
