@@ -1,6 +1,10 @@
 # Changelog
 
 
+## [Version 1.0.7](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.7) - Bugfix release - 2022-08-30
+
+- Handling Offset pagination on APIs returning an array
+
 ## [Version 1.0.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.6) - Feature and bugfix release - 2022-05-19
 
 - Add "Follow authorization header" option
