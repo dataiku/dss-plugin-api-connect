@@ -24,6 +24,7 @@ class Pagination(object):
         self.is_paging_started = None
         self.next_page_number = None
         self.params_must_be_blanked = False
+        self.data_is_list = None
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
         config = {} if config is None else config
@@ -62,7 +63,9 @@ class Pagination(object):
         if next_page_url:
             self.next_page_url = next_page_url
             self.params_must_be_blanked = True
+        self.data_is_list = False
         if isinstance(data, list):
+            self.data_is_list = True
             batch_size = len(data)
             self.records_to_skip = self.records_to_skip + batch_size
             if batch_size == 0:
@@ -120,6 +123,8 @@ class Pagination(object):
                 #  There is a counting key and we already know the last batch was not empty
                 return True
             else:
+                if self.data_is_list:
+                    return True
                 #  No way to know if the last batch was empty so we stop here
                 return False
         return False
