@@ -119,8 +119,9 @@ class RestAPIClient(object):
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
+        request_start_time = time.time()
+        self.time_last_request = request_start_time
         try:
-            request_start_time = time.time()
             response = self.request_with_redirect_retry(method, url, **kwargs)
             request_finish_time = time.time()
         except Exception as err:
@@ -131,7 +132,6 @@ class RestAPIClient(object):
             else:
                 return {"error": error_message}
         self.set_metadata("request_duration", request_finish_time - request_start_time)
-        self.time_last_request = time.time()
         self.set_metadata("status_code", response.status_code)
         self.set_metadata("response_headers", "{}".format(response.headers))
         if response.status_code >= 400:
