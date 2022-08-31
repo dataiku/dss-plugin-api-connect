@@ -87,6 +87,7 @@ class RestAPIClient(object):
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
+        self.call_number = 0
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
@@ -167,6 +168,8 @@ class RestAPIClient(object):
             params = self.requests_kwargs.get("params")
             params.update(pagination_params)
             self.requests_kwargs.update({"params": params})
+        self.call_number = self.call_number + 1
+        logger.info("API call number #{}".format(self.call_number))
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
 
     def empty_json_response(self):
