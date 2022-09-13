@@ -1,5 +1,6 @@
 import json
 import copy
+from jsonpath_ng.ext import parse
 
 
 def get_dku_key_values(endpoint_query_string):
@@ -84,3 +85,12 @@ def format_template(template, **kwargs):
 def is_string(data):
     data_type = type(data).__name__
     return data_type in ["str", "unicode"]
+
+
+def extract_key_using_json_path(json_dictionary, json_path):
+    matches = parse(json_path).find(json_dictionary)
+    if matches:
+        res = matches[0].value
+        return res
+    else:
+        return None

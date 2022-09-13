@@ -60,7 +60,7 @@ class RestAPIClient(object):
 
         self.requests_kwargs.update({"params": self.params})
         self.pagination = Pagination()
-        next_page_url_key = endpoint.get("next_page_url_key", "").split('.')
+        next_page_url_key = endpoint.get("next_page_url_key", "")
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
