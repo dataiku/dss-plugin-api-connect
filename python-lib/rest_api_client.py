@@ -92,10 +92,16 @@ class RestAPIClient(object):
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
         if login_type == "basic_login":
-            self.username = credential.get("username", "")
-            self.password = credential.get("password", "")
-            self.auth = (self.username, self.password)
-            self.requests_kwargs.update({"auth": self.auth})
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = (username, password)
+            self.requests_kwargs.update({"auth": auth})
+        if login_type == "ntlm":
+            from requests_ntlm import HttpNtlmAuth
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = HttpNtlmAuth(username, password)
+            self.requests_kwargs.update({"auth": auth})
         if login_type == "bearer_token":
             token = credential.get("token", "")
             bearer_template = credential.get("bearer_template", "Bearer {{token}}")
