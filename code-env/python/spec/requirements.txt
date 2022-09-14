@@ -1,1 +1,1 @@
-jsonpath_ng
+jsonpath-ng==1.5.3
