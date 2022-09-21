@@ -60,7 +60,7 @@ class RestAPIClient(object):
 
         self.requests_kwargs.update({"params": self.params})
         self.pagination = Pagination()
-        next_page_url_key = endpoint.get("next_page_url_key", "").split('.')
+        next_page_url_key = endpoint.get("next_page_url_key", "")
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
@@ -87,14 +87,21 @@ class RestAPIClient(object):
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
+        self.call_number = 0
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
         if login_type == "basic_login":
-            self.username = credential.get("username", "")
-            self.password = credential.get("password", "")
-            self.auth = (self.username, self.password)
-            self.requests_kwargs.update({"auth": self.auth})
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = (username, password)
+            self.requests_kwargs.update({"auth": auth})
+        if login_type == "ntlm":
+            from requests_ntlm import HttpNtlmAuth
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = HttpNtlmAuth(username, password)
+            self.requests_kwargs.update({"auth": auth})
         if login_type == "bearer_token":
             token = credential.get("token", "")
             bearer_template = credential.get("bearer_template", "Bearer {{token}}")
@@ -119,8 +126,9 @@ class RestAPIClient(object):
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
+        request_start_time = time.time()
+        self.time_last_request = request_start_time
         try:
-            request_start_time = time.time()
             response = self.request_with_redirect_retry(method, url, **kwargs)
             request_finish_time = time.time()
         except Exception as err:
@@ -131,7 +139,6 @@ class RestAPIClient(object):
             else:
                 return {"error": error_message}
         self.set_metadata("request_duration", request_finish_time - request_start_time)
-        self.time_last_request = time.time()
         self.set_metadata("status_code", response.status_code)
         self.set_metadata("response_headers", "{}".format(response.headers))
         if response.status_code >= 400:
@@ -167,6 +174,8 @@ class RestAPIClient(object):
             params = self.requests_kwargs.get("params")
             params.update(pagination_params)
             self.requests_kwargs.update({"params": params})
+        self.call_number = self.call_number + 1
+        logger.info("API call number #{}".format(self.call_number))
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
 
     def empty_json_response(self):

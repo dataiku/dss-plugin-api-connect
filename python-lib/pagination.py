@@ -1,5 +1,5 @@
 from safe_logger import SafeLogger
-from dku_utils import get_value_from_path
+from dku_utils import get_value_from_path, extract_key_using_json_path
 
 
 logger = SafeLogger("api-connect plugin Pagination")
@@ -24,6 +24,7 @@ class Pagination(object):
         self.is_paging_started = None
         self.next_page_number = None
         self.params_must_be_blanked = False
+        self.data_is_list = None
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
         config = {} if config is None else config
@@ -31,7 +32,7 @@ class Pagination(object):
         self.pagination_type = config.get("pagination_type", pagination_type)
         if self.pagination_type == "next_page":
             self.next_page_key = config.get("next_page_key", next_page_key)
-            self.next_page_key = None if self.next_page_key == [''] else self.next_page_key
+            self.next_page_key = None if self.next_page_key == '' else self.next_page_key
         elif self.pagination_type in ["offset", "page"]:
             self.skip_key = config.get("skip_key", skip_key)
 
@@ -62,7 +63,9 @@ class Pagination(object):
         if next_page_url:
             self.next_page_url = next_page_url
             self.params_must_be_blanked = True
+        self.data_is_list = False
         if isinstance(data, list):
+            self.data_is_list = True
             batch_size = len(data)
             self.records_to_skip = self.records_to_skip + batch_size
             if batch_size == 0:
@@ -77,8 +80,8 @@ class Pagination(object):
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
-        if self.next_page_key and (len(self.next_page_key) > 0):
-            self.next_page_url = self.get_from_path(data, self.next_page_key)
+        if self.next_page_key:
+            self.next_page_url = extract_key_using_json_path(data, self.next_page_key)
         if self.skip_key:
             self.skip = data.get(self.skip_key)
         if self.limit_key:
@@ -88,17 +91,6 @@ class Pagination(object):
         self.records_to_skip = self.records_to_skip + batch_size
         if self.total:
             self.remaining_records = self.total - self.records_to_skip
-
-    def get_from_path(self, dictionary, path):
-        if isinstance(path, list):
-            edge = dictionary
-            for key in path:
-                edge = edge.get(key)
-                if edge is None:
-                    return None
-            return edge
-        else:
-            return dictionary.get(path)
 
     def has_next_page(self):
         if self.is_last_batch_empty:
@@ -120,7 +112,11 @@ class Pagination(object):
                 #  There is a counting key and we already know the last batch was not empty
                 return True
             else:
-                #  No way to know if the last batch was empty so we stop here
+                if self.data_is_list:
+                    # for lists is_last_batch_empty is set correctly and handled by the code above
+                    return True
+                # Without a counting_key we have no mean to know if the last batch was empty.
+                # To avoid infinite loop we stop pagination here
                 return False
         return False
 

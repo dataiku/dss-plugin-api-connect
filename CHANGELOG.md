@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [Version 1.1.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.0) - Feature and bugfix release - 2022-09-15
+
+- Handling Offset pagination on APIs returning an array
+- Fix throttling calculation
+- Allow dots in `Key to next request URL`
+- Add NTLM authentication
+
 ## [Version 1.0.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.0.6) - Feature and bugfix release - 2022-05-19
 
 - Add "Follow authorization header" option
