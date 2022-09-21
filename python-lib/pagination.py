@@ -124,8 +124,10 @@ class Pagination(object):
                 return True
             else:
                 if self.data_is_list:
+                    # for lists is_last_batch_empty is set correctly and handled by the code above
                     return True
-                #  No way to know if the last batch was empty so we stop here
+                # Without a counting_key we have no mean to know if the last batch was empty.
+                # To avoid infinite loop we stop pagination here
                 return False
         return False
 
