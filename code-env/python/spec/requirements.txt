@@ -1,1 +1,2 @@
 jsonpath-ng==1.5.3
+requests_ntlm==1.1.0
