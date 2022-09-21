@@ -33,3 +33,6 @@ def test_run_api_connect_redirection(user_dss_clients):
 
 def test_run_api_connect_check_sc_84465(user_dss_clients):
     dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="CHECKSC84465")
+
+def test_run_api_connect_ntlm_authentication(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="NTLMAUTHENTICATION")

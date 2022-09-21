@@ -60,7 +60,7 @@ class RestAPIClient(object):
 
         self.requests_kwargs.update({"params": self.params})
         self.pagination = Pagination()
-        next_page_url_key = endpoint.get("next_page_url_key", "").split('.')
+        next_page_url_key = endpoint.get("next_page_url_key", "")
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
@@ -92,10 +92,16 @@ class RestAPIClient(object):
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
         if login_type == "basic_login":
-            self.username = credential.get("username", "")
-            self.password = credential.get("password", "")
-            self.auth = (self.username, self.password)
-            self.requests_kwargs.update({"auth": self.auth})
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = (username, password)
+            self.requests_kwargs.update({"auth": auth})
+        if login_type == "ntlm":
+            from requests_ntlm import HttpNtlmAuth
+            username = credential.get("username", "")
+            password = credential.get("password", "")
+            auth = HttpNtlmAuth(username, password)
+            self.requests_kwargs.update({"auth": auth})
         if login_type == "bearer_token":
             token = credential.get("token", "")
             bearer_template = credential.get("bearer_template", "Bearer {{token}}")
