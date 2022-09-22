@@ -63,6 +63,7 @@ class RestAPIClient(object):
         next_page_url_key = endpoint.get("next_page_url_key", "")
         is_next_page_url_relative = endpoint.get("is_next_page_url_relative", False)
         next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
+        next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
