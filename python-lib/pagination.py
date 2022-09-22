@@ -9,6 +9,7 @@ class Pagination(object):
 
     def __init__(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None):
         self.next_page_key = None
+        self.next_page_url_base = None
         self.skip_key = None
         self.limit_key = None
         self.total_key = None
@@ -26,13 +27,16 @@ class Pagination(object):
         self.params_must_be_blanked = False
         self.data_is_list = None
 
-    def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, url=None, pagination_type="na"):
+    def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, next_page_url_base=None, url=None, pagination_type="na"):
         config = {} if config is None else config
         self.limit_key = config.get("limit_key", limit_key)
         self.pagination_type = config.get("pagination_type", pagination_type)
         if self.pagination_type == "next_page":
             self.next_page_key = config.get("next_page_key", next_page_key)
             self.next_page_key = None if self.next_page_key == '' else self.next_page_key
+            if next_page_url_base:
+                next_page_url_base = next_page_url_base.strip('/')
+            self.next_page_url_base = next_page_url_base
         elif self.pagination_type in ["offset", "page"]:
             self.skip_key = config.get("skip_key", skip_key)
 
@@ -81,7 +85,11 @@ class Pagination(object):
         else:
             batch_size = 1
         if self.next_page_key:
-            self.next_page_url = extract_key_using_json_path(data, self.next_page_key)
+            next_page_path = extract_key_using_json_path(data, self.next_page_key)
+            if self.next_page_url_base and next_page_path:
+                self.next_page_url = "/".join([self.next_page_url_base, next_page_path])
+            else:
+                self.next_page_url = next_page_path
         if self.skip_key:
             self.skip = data.get(self.skip_key)
         if self.limit_key:
