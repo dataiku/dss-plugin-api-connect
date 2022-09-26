@@ -204,7 +204,7 @@
         {
             "name": "next_page_url_base",
             "label": "Base URL to next page",
-            "description": "https://mysite.com/bla/",
+            "description": "https://mysite.com/path/",
             "type": "STRING",
             "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='next_page' && (model.is_next_page_url_relative==true)"
