@@ -24,7 +24,7 @@ def get_endpoint_parameters(configuration):
         "timeout",
         "requests_per_minute",
         "pagination_type",
-        "next_page_url_key",
+        "next_page_url_key", "is_next_page_url_relative", "next_page_url_base",
         "top_key", "skip_key", "maximum_number_rows"
     ]
     parameters = {endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None}

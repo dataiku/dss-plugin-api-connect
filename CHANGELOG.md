@@ -1,5 +1,8 @@
 # Changelog
 
+## [Version 1.1.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.1) - Feature release - 2022-09-22
+
+- Handling relative URLs in paginated APIs
 
 ## [Version 1.1.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.0) - Feature and bugfix release - 2022-09-15
 

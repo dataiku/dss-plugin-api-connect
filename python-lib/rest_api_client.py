@@ -61,13 +61,19 @@ class RestAPIClient(object):
         self.requests_kwargs.update({"params": self.params})
         self.pagination = Pagination()
         next_page_url_key = endpoint.get("next_page_url_key", "")
+        is_next_page_url_relative = endpoint.get("is_next_page_url_relative", False)
+        next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
+        next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
         top_key = endpoint.get("top_key")
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
+        if pagination_type=="next_page" and is_next_page_url_relative and not next_page_url_base:
+            raise RestAPIClientError("Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set")
         self.pagination.configure_paging(
             skip_key=skip_key,
             limit_key=top_key,
             next_page_key=next_page_url_key,
+            next_page_url_base=next_page_url_base,
             url=self.endpoint_url,
             pagination_type=pagination_type
         )
