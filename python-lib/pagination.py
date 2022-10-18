@@ -23,7 +23,7 @@ class Pagination(object):
         self.next_page_number = None
         self.params_must_be_blanked = False
         self.data_is_list = None
-        self.update_next_page = None
+        self.update_next_page = self.update_next_page_default
 
     def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, next_page_url_base=None, url=None, pagination_type="na"):
         config = {} if config is None else config
@@ -45,6 +45,8 @@ class Pagination(object):
             self.update_next_page = self.update_next_page_offset
         elif self.pagination_type == "page":
             self.update_next_page = self.update_next_page_per_page
+        else:
+            self.update_next_page = self.update_next_page_default
 
     def reset_paging(self, counting_key=None, url=None):
         self.remaining_records = 0
@@ -150,6 +152,9 @@ class Pagination(object):
             logger.info("update_next_page:next_page_url_base={}, next_page_path={}, next_page_url={}".format(
                 self.next_page_url_base, next_page_path, self.next_page_url
             ))
+
+    def update_next_page_default(self, data, response_links=None):
+        return
 
     def has_next_page(self):
         if self.is_last_batch_empty:
