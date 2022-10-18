@@ -39,6 +39,9 @@ class Pagination(object):
             self.next_page_url_base = next_page_url_base
         elif self.pagination_type in ["offset", "page"]:
             self.skip_key = config.get("skip_key", skip_key)
+        logger.info("configure_paging: self.limit_key='{}', self.pagination_type='{}', self.next_page_key='{}', self.next_page_url_base='{}', self.skip_key='{}'".format(
+            self.limit_key, self.pagination_type, self.next_page_key, self.next_page_url_base, self.skip_key
+            ))
 
     def reset_paging(self, counting_key=None, url=None):
         self.remaining_records = 0
@@ -53,9 +56,11 @@ class Pagination(object):
         self.is_last_batch_empty = False
         self.is_first_batch = True
         self.is_paging_started = True
+        logger.info("reset_paging:next_page_url={}, counting_key={}, next_page_number={}".format(self.next_page_url, self.counting_key, self.next_page_number))
 
     def set_counting_key(self, counting_key):
         self.counting_key = counting_key
+        logger.info("set_counting_key: counting_key set to {}".format(self.counting_key))
 
     def update_next_page(self, data, response_links=None):
         response_links = response_links or {}
@@ -67,6 +72,9 @@ class Pagination(object):
         if next_page_url:
             self.next_page_url = next_page_url
             self.params_must_be_blanked = True
+        logger.info("update_next_page:next_link={}, next_page_url={}, params_must_be_blanked={}, next_page_number={}, counter={}".format(
+            next_link, self.next_page_url, self.params_must_be_blanked, self.next_page_number, self.counter
+        ))
         self.data_is_list = False
         if isinstance(data, list):
             self.data_is_list = True
@@ -74,6 +82,9 @@ class Pagination(object):
             self.records_to_skip = self.records_to_skip + batch_size
             if batch_size == 0:
                 self.is_last_batch_empty = True
+            logger.info("update_next_page:update_next_page:data is list:batch_size={}, records_to_skip={}, is_last_batch_empty={}".format(
+                batch_size, self.records_to_skip, self.is_last_batch_empty
+            ))
             return
         elif self.counting_key:
             extracted_data = get_value_from_path(data, self.counting_key.split("."), can_raise=False)
@@ -90,15 +101,25 @@ class Pagination(object):
                 self.next_page_url = "/".join([self.next_page_url_base, next_page_path])
             else:
                 self.next_page_url = next_page_path
+            logger.info("update_next_page:next_page_url_base={}, next_page_path={}, next_page_url={}".format(
+                self.next_page_url_base, next_page_path, self.next_page_url
+            ))
         if self.skip_key:
             self.skip = data.get(self.skip_key)
+            logger.info("update_next_page:skip=data[{}]={}".format(self.skip_key, self.skip))
         if self.limit_key:
             self.limit = data.get(self.limit_key)
+            logger.info("update_next_page:limit=data[{}]={}".format(self.limit_key, self.limit))
         if self.total_key:
             self.total = data.get(self.total_key)
+            logger.info("update_next_page:total=data[{}]={}".format(self.total_key, self.total))
         self.records_to_skip = self.records_to_skip + batch_size
+        logger.info("update_next_page:records_to_skip={}, batch_size={}".format(self.records_to_skip, batch_size))
         if self.total:
             self.remaining_records = self.total - self.records_to_skip
+            logger.info("update_next_page:remaining_records={}, total={}, records_to_skip={}".format(
+                self.remaining_records, self.total, self.records_to_skip
+            ))
 
     def has_next_page(self):
         if self.is_last_batch_empty:
@@ -118,14 +139,18 @@ class Pagination(object):
         if self.pagination_type in ["page", "offset"]:
             if self.counting_key:
                 #  There is a counting key and we already know the last batch was not empty
+                logger.info("has_next_page:pagination_type={}, counting_key={} -> True".format(self.pagination_type, self.counting_key))
                 return True
             else:
                 if self.data_is_list:
                     # for lists is_last_batch_empty is set correctly and handled by the code above
+                    logger.info("has_next_page:pagination_type={}, data_is_list={} -> True".format(self.pagination_type, self.data_is_list))
                     return True
                 # Without a counting_key we have no mean to know if the last batch was empty.
                 # To avoid infinite loop we stop pagination here
+                logger.info("has_next_page:pagination_type={} -> False".format(self.pagination_type))
                 return False
+        logger.info("has_next_page:pagination_type={} -> False".format(self.pagination_type))
         return False
 
     def get_params(self):
