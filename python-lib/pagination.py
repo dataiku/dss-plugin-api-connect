@@ -154,7 +154,9 @@ class Pagination(object):
             ))
 
     def update_next_page_default(self, data, response_links=None):
-        return
+        self.is_first_batch = False
+        self.counter += 1
+        self.next_page_number = self.next_page_number + 1
 
     def has_next_page(self):
         if self.is_last_batch_empty:
