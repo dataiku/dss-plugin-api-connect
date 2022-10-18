@@ -160,7 +160,7 @@ class RestAPIClient(object):
         try:
             json_response = response.json()
         except Exception as err:
-            self.pagination.update_next_page({}, response.links)
+            self.pagination.update_next_page({}, None)
             error_message = "Error '{}' when decoding JSON".format(str(err)[:100])
             logger.error(error_message)
             logger.error("response.content={}".format(response.content))
