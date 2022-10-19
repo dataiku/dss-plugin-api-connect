@@ -1,5 +1,12 @@
 # Changelog
 
+## [Version 1.1.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.2) - Bugfix release - 2022-10-19
+
+- Fix for last page of RFC5988 pagination triggering loop condtion
+- Fix for RFC5988 pagination taking priority on other modes
+- Improved pagination logs
+- Improved error message upon receiving non JSON material
+
 ## [Version 1.1.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.1) - Feature release - 2022-09-22
 
 - Handling relative URLs in paginated APIs
