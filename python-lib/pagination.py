@@ -7,12 +7,11 @@ logger = SafeLogger("api-connect plugin Pagination")
 
 class Pagination(object):
 
-    def __init__(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None):
+    def __init__(self):
         self.next_page_key = None
         self.next_page_url_base = None
         self.skip_key = None
         self.next_page_url = None
-        self.remaining_records = None
         self.records_to_skip = None
         self.pagination_type = ""
         self.counting_key = None
@@ -25,7 +24,8 @@ class Pagination(object):
         self.data_is_list = None
         self.update_next_page = self.update_next_page_default
 
-    def configure_paging(self, config=None, skip_key=None, limit_key=None, total_key=None, next_page_key=None, next_page_url_base=None, url=None, pagination_type="na"):
+    def configure_paging(self, config=None, skip_key=None,
+                         next_page_key=None, next_page_url_base=None, pagination_type="na"):
         config = {} if config is None else config
         self.pagination_type = config.get("pagination_type", pagination_type)
         if self.pagination_type == "next_page":
@@ -49,7 +49,6 @@ class Pagination(object):
             self.update_next_page = self.update_next_page_default
 
     def reset_paging(self, counting_key=None, url=None):
-        self.remaining_records = 0
         self.records_to_skip = 0
         self.counting_key = counting_key
         self.counter = 0
@@ -70,7 +69,7 @@ class Pagination(object):
     def update_next_page_offset(self, data, response_links=None):
         self.is_first_batch = False
         self.counter += 1
-        self.next_page_number = self.next_page_number + 1
+        #self.next_page_number = self.next_page_number + 1
         self.data_is_list = False
         if isinstance(data, list):
             self.data_is_list = True
@@ -91,26 +90,28 @@ class Pagination(object):
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
-        if self.skip_key:
-            self.skip = data.get(self.skip_key)
-            logger.info("update_next_page_offset:skip=data[{}]={}".format(self.skip_key, self.skip))
+        #if self.skip_key:
+        #    self.skip = data.get(self.skip_key)
+        #    logger.info("update_next_page_offset:skip=data[{}]={}".format(self.skip_key, self.skip))
         self.records_to_skip = self.records_to_skip + batch_size
-        logger.info("update_next_page_offset:records_to_skip={}, batch_size={}".format(self.records_to_skip, batch_size))
-
+        logger.info("update_next_page_offset:data_is_list={}, records_to_skip={}, batch_size={}, is_last_batch_empty={}".format(
+            self.data_is_list, self.records_to_skip, batch_size, self.is_last_batch_empty
+        ))
 
     def update_next_page_per_page(self, data, response_links=None):
         self.is_first_batch = False
         self.counter += 1
         self.next_page_number = self.next_page_number + 1
         self.data_is_list = False
+
         if isinstance(data, list):
             self.data_is_list = True
             batch_size = len(data)
-            self.records_to_skip = self.records_to_skip + batch_size
+            #self.records_to_skip = self.records_to_skip + batch_size
             if batch_size == 0:
                 self.is_last_batch_empty = True
-            logger.info("update_next_page_per_page:data is list:batch_size={}, records_to_skip={}, is_last_batch_empty={}".format(
-                batch_size, self.records_to_skip, self.is_last_batch_empty
+            logger.info("update_next_page_per_page:data is list:batch_size={}, next_page_number={}, is_last_batch_empty={}".format(
+               batch_size, self.next_page_number, self.is_last_batch_empty
             ))
             return
         elif self.counting_key:
@@ -122,27 +123,20 @@ class Pagination(object):
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
-        if self.skip_key:
-            self.skip = data.get(self.skip_key)
-            logger.info("update_next_page_per_page:skip=data[{}]={}".format(self.skip_key, self.skip))
-        self.records_to_skip = self.records_to_skip + batch_size
-        logger.info("update_next_page_per_page:records_to_skip={}, batch_size={}".format(self.records_to_skip, batch_size))
-
+        #if self.skip_key:
+        #    self.skip = data.get(self.skip_key)
+        #    logger.info("update_next_page_per_page:skip=data[{}]={}".format(self.skip_key, self.skip))
+        #self.records_to_skip = self.records_to_skip + batch_size
+        logger.info("update_next_page_per_page:data_is_list={}, next_page_number={}, batch_size={}, is_last_batch_empty={}".format(
+            self.data_is_list, self.next_page_number, batch_size, self.is_last_batch_empty
+        ))
 
     def update_next_page_link(self, data, response_links=None):
-        self.next_page_url = None
-        response_links = response_links or {}
-        next_link = response_links.get('next', {})
-        next_page_url = next_link.get("url")
         self.is_first_batch = False
         self.counter += 1
-        if next_page_url:
-            self.next_page_url = next_page_url
-            self.params_must_be_blanked = True
-        logger.info("update_next_page_link:next_link={}, next_page_url={}, params_must_be_blanked={}, next_page_number={}, counter={}".format(
-            next_link, self.next_page_url, self.params_must_be_blanked, self.next_page_number, self.counter
-        ))
+        self.next_page_url = None
         self.data_is_list = False
+
         if self.next_page_key:
             next_page_path = extract_key_using_json_path(data, self.next_page_key)
             if self.next_page_url_base and next_page_path:
@@ -152,11 +146,19 @@ class Pagination(object):
             logger.info("update_next_page_link:next_page_url_base={}, next_page_path={}, next_page_url={}".format(
                 self.next_page_url_base, next_page_path, self.next_page_url
             ))
+        else:
+            response_links = response_links or {}
+            next_link = response_links.get('next', {})
+            next_page_url = next_link.get("url")
+            if next_page_url:
+                self.next_page_url = next_page_url
+                self.params_must_be_blanked = True
+            logger.info("update_next_page_link:next_link={}, next_page_url={}, params_must_be_blanked={}, next_page_number={}, counter={}".format(
+                next_link, self.next_page_url, self.params_must_be_blanked, self.next_page_number, self.counter
+            ))
 
     def update_next_page_default(self, data, response_links=None):
         self.is_first_batch = False
-        self.counter += 1
-        self.next_page_number = self.next_page_number + 1
 
     def has_next_page(self):
         if self.is_last_batch_empty:
