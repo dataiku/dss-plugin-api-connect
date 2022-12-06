@@ -69,7 +69,6 @@ class Pagination(object):
     def update_next_page_offset(self, data, response_links=None):
         self.is_first_batch = False
         self.counter += 1
-        #self.next_page_number = self.next_page_number + 1
         self.data_is_list = False
         if isinstance(data, list):
             self.data_is_list = True
@@ -90,9 +89,6 @@ class Pagination(object):
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
-        #if self.skip_key:
-        #    self.skip = data.get(self.skip_key)
-        #    logger.info("update_next_page_offset:skip=data[{}]={}".format(self.skip_key, self.skip))
         self.records_to_skip = self.records_to_skip + batch_size
         logger.info("update_next_page_offset:data_is_list={}, records_to_skip={}, batch_size={}, is_last_batch_empty={}".format(
             self.data_is_list, self.records_to_skip, batch_size, self.is_last_batch_empty
@@ -107,7 +103,6 @@ class Pagination(object):
         if isinstance(data, list):
             self.data_is_list = True
             batch_size = len(data)
-            #self.records_to_skip = self.records_to_skip + batch_size
             if batch_size == 0:
                 self.is_last_batch_empty = True
             logger.info("update_next_page_per_page:data is list:batch_size={}, next_page_number={}, is_last_batch_empty={}".format(
@@ -123,10 +118,6 @@ class Pagination(object):
                 self.is_last_batch_empty = True
         else:
             batch_size = 1
-        #if self.skip_key:
-        #    self.skip = data.get(self.skip_key)
-        #    logger.info("update_next_page_per_page:skip=data[{}]={}".format(self.skip_key, self.skip))
-        #self.records_to_skip = self.records_to_skip + batch_size
         logger.info("update_next_page_per_page:data_is_list={}, next_page_number={}, batch_size={}, is_last_batch_empty={}".format(
             self.data_is_list, self.next_page_number, batch_size, self.is_last_batch_empty
         ))
