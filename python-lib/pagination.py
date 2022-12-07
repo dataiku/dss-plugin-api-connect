@@ -66,29 +66,27 @@ class Pagination(object):
         self.counting_key = counting_key
         logger.info("set_counting_key: counting_key set to {}".format(self.counting_key))
 
-    def update_next_page_offset(self, data, response_links=None):
-        self.is_first_batch = False
-        self.counter += 1
+    def compute_batch_size(self, data):
         self.data_is_list = False
         if isinstance(data, list):
             self.data_is_list = True
             batch_size = len(data)
-            self.records_to_skip = self.records_to_skip + batch_size
-            if batch_size == 0:
-                self.is_last_batch_empty = True
-            logger.info("update_next_page_offset:data is list:batch_size={}, records_to_skip={}, is_last_batch_empty={}".format(
-                batch_size, self.records_to_skip, self.is_last_batch_empty
-            ))
-            return
         elif self.counting_key:
             extracted_data = get_value_from_path(data, self.counting_key.split("."), can_raise=False)
             if extracted_data:
                 batch_size = len(extracted_data)
             else:
                 batch_size = 0
-                self.is_last_batch_empty = True
         else:
             batch_size = 1
+        if batch_size == 0:
+            self.is_last_batch_empty = True
+        return batch_size
+
+    def update_next_page_offset(self, data, response_links=None):
+        self.is_first_batch = False
+        self.counter += 1
+        batch_size = self.compute_batch_size(data)
         self.records_to_skip = self.records_to_skip + batch_size
         logger.info("update_next_page_offset:data_is_list={}, records_to_skip={}, batch_size={}, is_last_batch_empty={}".format(
             self.data_is_list, self.records_to_skip, batch_size, self.is_last_batch_empty
@@ -98,26 +96,7 @@ class Pagination(object):
         self.is_first_batch = False
         self.counter += 1
         self.next_page_number = self.next_page_number + 1
-        self.data_is_list = False
-
-        if isinstance(data, list):
-            self.data_is_list = True
-            batch_size = len(data)
-            if batch_size == 0:
-                self.is_last_batch_empty = True
-            logger.info("update_next_page_per_page:data is list:batch_size={}, next_page_number={}, is_last_batch_empty={}".format(
-               batch_size, self.next_page_number, self.is_last_batch_empty
-            ))
-            return
-        elif self.counting_key:
-            extracted_data = get_value_from_path(data, self.counting_key.split("."), can_raise=False)
-            if extracted_data:
-                batch_size = len(extracted_data)
-            else:
-                batch_size = 0
-                self.is_last_batch_empty = True
-        else:
-            batch_size = 1
+        batch_size = self.compute_batch_size(data)
         logger.info("update_next_page_per_page:data_is_list={}, next_page_number={}, batch_size={}, is_last_batch_empty={}".format(
             self.data_is_list, self.next_page_number, batch_size, self.is_last_batch_empty
         ))
