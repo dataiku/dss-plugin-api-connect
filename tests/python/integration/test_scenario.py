@@ -41,3 +41,7 @@ def test_run_api_connect_ntlm_authentication(user_dss_clients):
 
 def test_run_api_connect_relative_url_pagination(user_dss_clients):
     dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="RELATIVEURLPAGINATION")
+
+
+def test_run_api_connect_check_sc_110446(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="CHECKSC110446")
