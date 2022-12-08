@@ -124,6 +124,8 @@ class RestApiRecipeSession:
 
 
 def is_error_message(jsons_response):
+    if type(jsons_response) not in [dict, list]:
+        return False
     if "error" in jsons_response and len(jsons_response) == 1:
         return True
     else:
