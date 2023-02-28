@@ -1,5 +1,10 @@
 # Changelog
 
+## [Version 1.1.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.3) - Feature and bugfix release - 2023-02-28
+
+- Add Brotli compression
+- Faster recurring calls
+
 ## [Version 1.1.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.2) - Bugfix release - 2022-10-19
 
 - Fix for last page of RFC5988 pagination triggering loop condtion
