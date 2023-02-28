@@ -8,7 +8,7 @@ from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
 
 
-logger = SafeLogger("api-connect plugin", forbidden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
 
 
 class RestAPIClientError(ValueError):

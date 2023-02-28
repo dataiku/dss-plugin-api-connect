@@ -6,7 +6,7 @@ from dku_constants import DKUConstants
 import copy
 import json
 
-logger = SafeLogger("api-connect plugin", forbidden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
 
 
 class RestApiRecipeSession:
