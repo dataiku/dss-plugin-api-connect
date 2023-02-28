@@ -91,6 +91,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
         self.call_number = 0
+        self.session = requests.Session()
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
@@ -171,12 +172,12 @@ class RestAPIClient(object):
     def request_with_redirect_retry(self, method, url, **kwargs):
         # In case of redirection to another domain, the authorization header is not kept
         # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
-        response = requests.request(method, url, **kwargs)
+        response = self.session.request(method, url, **kwargs)
         if self.redirect_auth_header and not response.url.startswith(url):
             redirection_kwargs = copy.deepcopy(kwargs)
             redirection_kwargs.pop("params", None)  # params are contained in the redirected url
             logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
-            response = requests.request(method, response.url, **redirection_kwargs)
+            response = self.session.request(method, response.url, **redirection_kwargs)
         return response
 
     def paginated_api_call(self, can_raise_exeption=True):
