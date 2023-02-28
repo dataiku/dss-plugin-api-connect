@@ -7,7 +7,7 @@ from dku_constants import DKUConstants
 import json
 
 
-logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=["token", "password"])
 
 
 class RestAPIConnector(Connector):
