@@ -17,7 +17,7 @@ class RestAPIClientError(ValueError):
 
 class RestAPIClient(object):
 
-    def __init__(self, credential, endpoint, custom_key_values={}):
+    def __init__(self, credential, endpoint, custom_key_values={}, session=None):
         logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
@@ -91,7 +91,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
         self.call_number = 0
-        self.session = requests.Session()
+        self.session = session or requests.Session()
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
@@ -132,19 +132,23 @@ class RestAPIClient(object):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         request_start_time = time.time()
         self.time_last_request = request_start_time
+        error_message = None
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
-            request_finish_time = time.time()
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
-            else:
-                return {"error": error_message}
+
+        request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
         self.set_metadata("status_code", response.status_code)
         self.set_metadata("response_headers", "{}".format(response.headers))
+
+        if error_message:
+            return {"error": error_message}
+
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True

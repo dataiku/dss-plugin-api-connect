@@ -5,6 +5,8 @@ from dku_utils import parse_keys_for_json, get_value_from_path
 from dku_constants import DKUConstants
 import copy
 import json
+import requests
+
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
@@ -38,6 +40,7 @@ class RestApiRecipeSession:
     def process_dataframe(self, input_parameters_dataframe, is_raw_output):
         results = []
         time_last_request = None
+        session = requests.Session()
         for index, input_parameters_row in input_parameters_dataframe.iterrows():
             rows_count = 0
             self.initial_parameter_columns = {}
@@ -52,7 +55,7 @@ class RestApiRecipeSession:
                 updated_endpoint_parameters,
                 self.custom_key_values
             ))
-            self.client = RestAPIClient(self.credential_parameters, updated_endpoint_parameters, custom_key_values=self.custom_key_values)
+            self.client = RestAPIClient(self.credential_parameters, updated_endpoint_parameters, custom_key_values=self.custom_key_values, session=session)
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():
                 page_results = self.retrieve_next_page(is_raw_output)
@@ -76,7 +79,7 @@ class RestApiRecipeSession:
                 if self.can_raise:
                     raise DataikuException(error_message)
                 else:
-                    return [{"error": error_message}]
+                    return self.format_page_rows([{"error": error_message}], is_raw_output, metadata)
             page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
         else:
             # Todo: check api_response key is free and add something overwise
