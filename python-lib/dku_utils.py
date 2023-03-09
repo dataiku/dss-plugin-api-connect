@@ -1,6 +1,10 @@
 import json
 import copy
 from jsonpath_ng.ext import parse
+from safe_logger import SafeLogger
+
+
+logger = SafeLogger("api-connect plugin utils")
 
 
 def get_dku_key_values(endpoint_query_string):
@@ -96,3 +100,31 @@ def extract_key_using_json_path(json_dictionary, json_path):
         return res
     else:
         return None
+
+
+def is_reponse_xml(response):
+    content_types = response.headers.get("Content-Type", "").split(";")
+    for content_type in content_types:
+        if content_type in ["text/xml", "text/plain"]:
+            return True
+    return False
+
+
+def xml_to_json(content):
+    import xmltodict
+    json_response = None
+    json_response = xmltodict.parse(content)
+    return json_response
+
+
+def decode_csv_data(data):
+    import csv
+    import io
+    json_data = None
+    try:
+        reader = csv.DictReader(io.StringIO(data))
+        json_data = list(reader)
+    except Exception as error:
+        logger.error("Could not extract csv data. Error={}".format(error))
+        json_data = data
+    return json_data

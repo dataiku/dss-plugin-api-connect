@@ -1,7 +1,7 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path
+from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data
 from dku_constants import DKUConstants
 import copy
 import json
@@ -110,6 +110,8 @@ class RestApiRecipeSession:
     def format_page_rows(self, data_rows, is_raw_output, metadata=None):
         page_rows = []
         metadata = metadata or {}
+        if isinstance(data_rows, str):
+            data_rows = decode_csv_data(data_rows)
         for data_row in data_rows:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
