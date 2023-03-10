@@ -133,6 +133,7 @@ class RestAPIClient(object):
         request_start_time = time.time()
         self.time_last_request = request_start_time
         error_message = None
+        response = None
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
         except Exception as err:
