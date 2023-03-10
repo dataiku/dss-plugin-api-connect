@@ -143,8 +143,8 @@ class RestAPIClient(object):
 
         request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
-        self.set_metadata("status_code", response.status_code)
-        self.set_metadata("response_headers", "{}".format(response.headers))
+        self.set_metadata("status_code", get_status_code(response))
+        self.set_metadata("response_headers", "{}".format(get_headers(response)))
 
         if error_message:
             return {"error": error_message}
@@ -240,3 +240,15 @@ class RestAPIClient(object):
 
         self.pagination.update_next_page(json_response, response.links)
         return json_response
+
+
+def get_status_code(response):
+    if isinstance(response, requests.Response):
+        return response.status_code
+    return None
+
+
+def get_headers(response):
+    if isinstance(response, requests.Response):
+        return response.headers
+    return None
