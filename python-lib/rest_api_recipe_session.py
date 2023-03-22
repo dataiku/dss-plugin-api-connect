@@ -6,6 +6,7 @@ from dku_constants import DKUConstants
 import copy
 import json
 import requests
+import collections
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -80,7 +81,8 @@ class RestApiRecipeSession:
                     raise DataikuException(error_message)
                 else:
                     return self.format_page_rows([{"error": error_message}], is_raw_output, metadata)
-            page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
+            formated_page_row = self.format_page_rows(data_rows, is_raw_output, metadata)
+            page_rows.extend(formated_page_row)
         else:
             # Todo: check api_response key is free and add something overwise
             base_row = copy.deepcopy(metadata)
@@ -110,20 +112,34 @@ class RestApiRecipeSession:
     def format_page_rows(self, data_rows, is_raw_output, metadata=None):
         page_rows = []
         metadata = metadata or {}
-        if isinstance(data_rows, str):
+        if type(data_rows) in [str, bytes]:
             data_rows = decode_csv_data(data_rows)
-        for data_row in data_rows:
+        if type(data_rows) in [list]:
+            for data_row in data_rows:
+                base_row = copy.deepcopy(self.initial_parameter_columns)
+                base_row.update(metadata)
+                if is_raw_output:
+                    if is_error_message(data_row):
+                        base_row.update(parse_keys_for_json(data_row))
+                    else:
+                        base_row.update({
+                            DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
+                        })
+                else:
+                    base_row.update(parse_keys_for_json(data_row))
+                page_rows.append(base_row)
+        if type(data_rows) in [dict, collections.OrderedDict]:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
             if is_raw_output:
-                if is_error_message(data_row):
-                    base_row.update(parse_keys_for_json(data_row))
+                if is_error_message(data_rows):
+                    base_row.update(parse_keys_for_json(data_rows))
                 else:
                     base_row.update({
-                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
+                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_rows)
                     })
             else:
-                base_row.update(parse_keys_for_json(data_row))
+                base_row.update(parse_keys_for_json(data_rows))
             page_rows.append(base_row)
         return page_rows
 

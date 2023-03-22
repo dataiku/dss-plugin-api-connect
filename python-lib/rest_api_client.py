@@ -234,10 +234,7 @@ class RestAPIClient(object):
                 self.pagination.update_next_page({}, None)
                 error_message = "Error '{}' when decoding JSON".format(str(err)[:100])
                 logger.error(error_message)
-                logger.error("response.content={}".format(response.content))
-                if can_raise_exeption:
-                    raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
-                return {"error": error_message}
+                return response.content
 
         self.pagination.update_next_page(json_response, response.links)
         return json_response

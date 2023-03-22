@@ -121,6 +121,8 @@ def decode_csv_data(data):
     import csv
     import io
     json_data = None
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
     try:
         reader = csv.DictReader(io.StringIO(data))
         json_data = list(reader)
