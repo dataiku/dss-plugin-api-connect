@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.1.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.3) - Bugfix release - 2023-04-18
+
+- Updated code-env descriptor for DSS 12
+
 ## [Version 1.1.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.2) - Bugfix release - 2022-10-19
 
 - Fix for last page of RFC5988 pagination triggering loop condtion
