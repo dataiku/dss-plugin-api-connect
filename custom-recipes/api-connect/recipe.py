@@ -24,7 +24,8 @@ def get_partitioning_keys(id_list, dku_flow_variables):
                 partitioning_keys[dimension] = dku_flow_variables.get(dimension_src)
     return partitioning_keys
 
-logger.info('API-Connect plugin recipe v1.1.2')
+
+logger.info('API-Connect plugin recipe v1.1.3')
 
 input_A_names = get_input_names_for_role('input_A_role')
 config = get_recipe_config()
