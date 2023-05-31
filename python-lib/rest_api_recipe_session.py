@@ -70,7 +70,7 @@ class RestApiRecipeSession:
         page_rows = []
         logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_api_call(can_raise_exeption=False)
-        metadata = self.client.get_metadata() if self.display_metadata else {}
+        metadata = self.client.get_metadata() if self.display_metadata else {DKUConstants.REPONSE_ERROR_KEY: None}
         is_api_returning_dict = True
         if self.extraction_key:
             data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
@@ -79,7 +79,7 @@ class RestApiRecipeSession:
                 if self.can_raise:
                     raise DataikuException(error_message)
                 else:
-                    return self.format_page_rows([{"error": error_message}], is_raw_output, metadata)
+                    return self.format_page_rows([{DKUConstants.REPONSE_ERROR_KEY: error_message}], is_raw_output, metadata)
             page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
         else:
             # Todo: check api_response key is free and add something overwise
@@ -115,6 +115,9 @@ class RestApiRecipeSession:
             base_row.update(metadata)
             if is_raw_output:
                 if is_error_message(data_row):
+                    base_row.update({
+                        DKUConstants.API_RESPONSE_KEY: None
+                    })
                     base_row.update(parse_keys_for_json(data_row))
                 else:
                     base_row.update({
@@ -129,7 +132,7 @@ class RestApiRecipeSession:
 def is_error_message(jsons_response):
     if type(jsons_response) not in [dict, list]:
         return False
-    if "error" in jsons_response and len(jsons_response) == 1:
+    if DKUConstants.REPONSE_ERROR_KEY in jsons_response and len(jsons_response) == 1:
         return True
     else:
         return False

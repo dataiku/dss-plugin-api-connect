@@ -89,7 +89,7 @@ class RestAPIClient(object):
         elif body_format in [DKUConstants.FORM_DATA_BODY_FORMAT]:
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
-        self.metadata = {}
+        self.metadata = {DKUConstants.REPONSE_ERROR_KEY: None}
         self.call_number = 0
         self.session = session or requests.Session()
 
@@ -147,7 +147,7 @@ class RestAPIClient(object):
         self.set_metadata("response_headers", "{}".format(response.headers))
 
         if error_message:
-            return {"error": error_message}
+            return {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
@@ -155,7 +155,7 @@ class RestAPIClient(object):
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
             else:
-                return {"error": error_message}
+                return {DKUConstants.REPONSE_ERROR_KEY: error_message}
         if response.status_code in [204]:
             self.pagination.update_next_page({}, response.links)
             return self.empty_json_response()
@@ -168,7 +168,7 @@ class RestAPIClient(object):
             logger.error("response.content={}".format(response.content))
             if can_raise_exeption:
                 raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
-            return {"error": error_message}
+            return {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
         self.pagination.update_next_page(json_response, response.links)
         return json_response
