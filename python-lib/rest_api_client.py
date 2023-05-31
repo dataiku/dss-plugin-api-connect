@@ -8,7 +8,7 @@ from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
 
 
-logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
 
 
 class RestAPIClientError(ValueError):
@@ -17,7 +17,7 @@ class RestAPIClientError(ValueError):
 
 class RestAPIClient(object):
 
-    def __init__(self, credential, endpoint, custom_key_values={}):
+    def __init__(self, credential, endpoint, custom_key_values={}, session=None):
         logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
@@ -91,6 +91,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
         self.call_number = 0
+        self.session = session or requests.Session()
 
     def set_login(self, credential):
         login_type = credential.get("login_type", "no_auth")
@@ -131,19 +132,23 @@ class RestAPIClient(object):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         request_start_time = time.time()
         self.time_last_request = request_start_time
+        error_message = None
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
-            request_finish_time = time.time()
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
-            else:
-                return {"error": error_message}
+
+        request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
         self.set_metadata("status_code", response.status_code)
         self.set_metadata("response_headers", "{}".format(response.headers))
+
+        if error_message:
+            return {"error": error_message}
+
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
             self.pagination.is_last_batch_empty = True
@@ -171,12 +176,12 @@ class RestAPIClient(object):
     def request_with_redirect_retry(self, method, url, **kwargs):
         # In case of redirection to another domain, the authorization header is not kept
         # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
-        response = requests.request(method, url, **kwargs)
+        response = self.session.request(method, url, **kwargs)
         if self.redirect_auth_header and not response.url.startswith(url):
             redirection_kwargs = copy.deepcopy(kwargs)
             redirection_kwargs.pop("params", None)  # params are contained in the redirected url
             logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
-            response = requests.request(method, response.url, **redirection_kwargs)
+            response = self.session.request(method, response.url, **redirection_kwargs)
         return response
 
     def paginated_api_call(self, can_raise_exeption=True):

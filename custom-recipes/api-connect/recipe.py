@@ -5,9 +5,10 @@ import pandas as pd
 from safe_logger import SafeLogger
 from dku_utils import get_dku_key_values, get_endpoint_parameters
 from rest_api_recipe_session import RestApiRecipeSession
+from dku_constants import DKUConstants
 
 
-logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
 
 
 def get_partitioning_keys(id_list, dku_flow_variables):
@@ -24,7 +25,8 @@ def get_partitioning_keys(id_list, dku_flow_variables):
                 partitioning_keys[dimension] = dku_flow_variables.get(dimension_src)
     return partitioning_keys
 
-logger.info('API-Connect plugin recipe v1.1.2')
+
+logger.info('API-Connect plugin recipe v{}'.format(DKUConstants.PLUGIN_VERSION))
 
 input_A_names = get_input_names_for_role('input_A_role')
 config = get_recipe_config()
