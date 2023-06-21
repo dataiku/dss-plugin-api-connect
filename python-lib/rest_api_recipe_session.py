@@ -71,7 +71,9 @@ class RestApiRecipeSession:
         page_rows = []
         logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_api_call(can_raise_exeption=False)
-        metadata = self.client.get_metadata() if self.display_metadata else {}
+        metadata = self.client.get_metadata() if self.display_metadata else {
+            DKUConstants.REPONSE_ERROR_KEY: json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
+        }
         is_api_returning_dict = True
         if self.extraction_key:
             data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
@@ -79,10 +81,11 @@ class RestApiRecipeSession:
                 error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
                 if self.can_raise:
                     raise DataikuException(error_message)
+                elif DKUConstants.REPONSE_ERROR_KEY in metadata:
+                    return [metadata]
                 else:
-                    return self.format_page_rows([{"error": error_message}], is_raw_output, metadata)
-            formated_page_row = self.format_page_rows(data_rows, is_raw_output, metadata)
-            page_rows.extend(formated_page_row)
+                    return self.format_page_rows([{DKUConstants.REPONSE_ERROR_KEY: error_message}], is_raw_output, metadata)
+            page_rows.extend(self.format_page_rows(data_rows, is_raw_output, metadata))
         else:
             # Todo: check api_response key is free and add something overwise
             base_row = copy.deepcopy(metadata)
@@ -132,8 +135,11 @@ class RestApiRecipeSession:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
             if is_raw_output:
-                if is_error_message(data_rows):
-                    base_row.update(parse_keys_for_json(data_rows))
+                if is_error_message(data_row):
+                    base_row.update({
+                        DKUConstants.API_RESPONSE_KEY: None
+                    })
+                    base_row.update(parse_keys_for_json(data_row))
                 else:
                     base_row.update({
                         DKUConstants.API_RESPONSE_KEY: json.dumps(data_rows)
@@ -147,7 +153,7 @@ class RestApiRecipeSession:
 def is_error_message(jsons_response):
     if type(jsons_response) not in [dict, list]:
         return False
-    if "error" in jsons_response and len(jsons_response) == 1:
+    if DKUConstants.REPONSE_ERROR_KEY in jsons_response and len(jsons_response) == 1:
         return True
     else:
         return False

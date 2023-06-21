@@ -1,9 +1,23 @@
 # Changelog
 
-## [Version 1.1.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.3) - Feature and bugfix release - 2023-02-28
+## [Version 1.2.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.0) - Feature and bugfix release - 2023-05-31
 
 - Add Brotli compression
 - Faster recurring calls
+- dku_error column kept at all time in API-Connect recipe output schema
+- Add XML to JSON conversion
+- Add CSV decoding
+- Updated code-env descriptor for DSS 12
+
+## [Version 1.1.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.4) - Feature and bugfix release - 2023-02-28
+
+- Add Brotli compression
+- Faster recurring calls
+- dku_error column kept at all time in API-Connect recipe output schema
+
+## [Version 1.1.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.3) - Bugfix release - 2023-04-18
+
+- Updated code-env descriptor for DSS 12
 
 ## [Version 1.1.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.2) - Bugfix release - 2022-10-19
 
