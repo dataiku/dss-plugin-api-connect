@@ -51,8 +51,6 @@ def parse_keys_for_json(items):
 
 
 def get_value_from_path(dictionary, path, default=None, can_raise=True):
-    if not path:
-        return dictionary
     ret = copy.deepcopy(dictionary)
     for key in path:
         if isinstance(ret, dict) and (key in ret):

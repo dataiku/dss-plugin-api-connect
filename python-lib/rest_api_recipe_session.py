@@ -70,9 +70,9 @@ class RestApiRecipeSession:
     def retrieve_next_page(self, is_raw_output):
         page_rows = []
         logger.info("retrieve_next_page: Calling next page")
-        json_response = self.client.paginated_api_call(can_raise_exeption=False)
+        json_response = self.client.paginated_api_call()
         metadata = self.client.get_metadata() if self.display_metadata else {
-            DKUConstants.REPONSE_ERROR_KEY: json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
+            DKUConstants.REPONSE_ERROR_KEY: None if type(json_response) != 'dict' else json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
         }
         is_api_returning_dict = True
         if self.extraction_key:
