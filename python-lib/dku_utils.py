@@ -51,6 +51,8 @@ def parse_keys_for_json(items):
 
 
 def get_value_from_path(dictionary, path, default=None, can_raise=True):
+    if not path:
+        return dictionary
     ret = copy.deepcopy(dictionary)
     for key in path:
         if isinstance(ret, dict) and (key in ret):
@@ -113,7 +115,11 @@ def is_reponse_xml(response):
 def xml_to_json(content):
     import xmltodict
     json_response = None
-    json_response = xmltodict.parse(content)
+    try:
+        json_response = xmltodict.parse(content)
+    except Exception as error:
+        logger.error("XML to JSON conversion failed, processing as STRING ({})".format(error))
+        json_response = content
     return json_response
 
 
