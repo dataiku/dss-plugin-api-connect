@@ -38,6 +38,24 @@
             "parameterSetId": "credential"
         },
         {
+            "type": "SEPARATOR",
+            "label": "Proxy"
+        },
+        {
+            "name": "http_proxy",
+            "label": "Overload the http_proxy environement variable (optional)",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "name": "https_proxy",
+            "label": "Overload the https_proxy environement variable (optional)",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
             "name": "no_proxy",
             "label": "Value to be passed to the no-proxy parameter (optional)",
             "description": "",
