@@ -10,19 +10,31 @@ logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 class RestApiRecipeSession:
-    def __init__(self, custom_key_values, credential_parameters, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
-                 display_metadata=False,
-                 maximum_number_rows=-1):
+    def __init__(
+        self,
+        custom_key_values,
+        credential_parameters,
+        noproxy_parameters,
+        endpoint_parameters,
+        extraction_key,
+        parameter_columns,
+        parameter_renamings,
+        display_metadata=False,
+        maximum_number_rows=-1,
+    ):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
+        self.noproxy_parameters = noproxy_parameters
         self.endpoint_parameters = endpoint_parameters
         self.extraction_key = extraction_key
         self.client = None
         self.initial_parameter_columns = None
-        self.column_to_parameter_dict = self.get_column_to_parameter_dict(parameter_columns, parameter_renamings)
+        self.column_to_parameter_dict = self.get_column_to_parameter_dict(
+            parameter_columns, parameter_renamings
+        )
         self.display_metadata = display_metadata
         self.maximum_number_rows = maximum_number_rows
-        self.is_row_limit = (self.maximum_number_rows > 0)
+        self.is_row_limit = self.maximum_number_rows > 0
         self.can_raise = False
 
     @staticmethod
@@ -30,7 +42,9 @@ class RestApiRecipeSession:
         column_to_parameter_dict = {}
         for parameter_column in parameter_columns:
             if parameter_column in parameter_renamings:
-                column_to_parameter_dict[parameter_column] = parameter_renamings[parameter_column]
+                column_to_parameter_dict[parameter_column] = parameter_renamings[
+                    parameter_column
+                ]
             else:
                 column_to_parameter_dict[parameter_column] = parameter_column
         return column_to_parameter_dict
@@ -43,16 +57,25 @@ class RestApiRecipeSession:
             self.initial_parameter_columns = {}
             for column_name in self.column_to_parameter_dict:
                 parameter_name = self.column_to_parameter_dict[column_name]
-                self.initial_parameter_columns.update({parameter_name: input_parameters_row.get(column_name)})
+                self.initial_parameter_columns.update(
+                    {parameter_name: input_parameters_row.get(column_name)}
+                )
             updated_endpoint_parameters = copy.deepcopy(self.endpoint_parameters)
             updated_endpoint_parameters.update(self.initial_parameter_columns)
-            logger.info("Processing row #{}, creating client with credential={}, updated_endpoint={}, custom_key_values={}".format(
-                index + 1,
-                logger.filter_secrets(self.credential_parameters),
+            logger.info(
+                "Processing row #{}, creating client with credential={}, updated_endpoint={}, custom_key_values={}".format(
+                    index + 1,
+                    logger.filter_secrets(self.credential_parameters),
+                    updated_endpoint_parameters,
+                    self.custom_key_values,
+                )
+            )
+            self.client = RestAPIClient(
+                self.credential_parameters,
+                self.noproxy_parameters,
                 updated_endpoint_parameters,
-                self.custom_key_values
-            ))
-            self.client = RestAPIClient(self.credential_parameters, updated_endpoint_parameters, custom_key_values=self.custom_key_values)
+                custom_key_values=self.custom_key_values,
+            )
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():
                 page_results = self.retrieve_next_page(is_raw_output)
@@ -70,9 +93,13 @@ class RestApiRecipeSession:
         metadata = self.client.get_metadata() if self.display_metadata else {}
         is_api_returning_dict = True
         if self.extraction_key:
-            data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
+            data_rows = get_value_from_path(
+                json_response, self.extraction_key.split("."), can_raise=False
+            )
             if data_rows is None:
-                error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
+                error_message = "Extraction key '{}' was not found in the incoming data".format(
+                    self.extraction_key
+                )
                 if self.can_raise:
                     raise DataikuException(error_message)
                 else:
@@ -85,9 +112,9 @@ class RestApiRecipeSession:
                 if is_error_message(json_response):
                     base_row.update(parse_keys_for_json(json_response))
                 else:
-                    base_row.update({
-                        DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)
-                    })
+                    base_row.update(
+                        {DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)}
+                    )
             else:
                 if isinstance(json_response, dict):
                     base_row.update(parse_keys_for_json(json_response))
@@ -114,9 +141,9 @@ class RestApiRecipeSession:
                 if is_error_message(data_row):
                     base_row.update(parse_keys_for_json(data_row))
                 else:
-                    base_row.update({
-                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
-                    })
+                    base_row.update(
+                        {DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)}
+                    )
             else:
                 base_row.update(parse_keys_for_json(data_row))
             page_rows.append(base_row)
