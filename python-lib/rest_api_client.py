@@ -16,7 +16,7 @@ class RestAPIClientError(ValueError):
 
 
 class RestAPIClient(object):
-    def __init__(self, credential, noproxy, endpoint, custom_key_values={}):
+    def __init__(self, credential, httpproxy, httpsproxy, noproxy, endpoint, custom_key_values={}):
         logger.info(
             "Initialising RestAPIClient, credential={}, endpoint={}".format(
                 logger.filter_secrets(credential), endpoint
@@ -29,6 +29,16 @@ class RestAPIClient(object):
         self.presets_variables.update(credential)
         #self.presets_variables.update(noproxy)
         self.presets_variables.update(custom_key_values)
+
+        # Update http_proxy parameters
+        if httpproxy != "":
+            if httpproxy not in os.environ["HTTP_PROXY"]:
+                os.environ["HTTP_PROXY"] += f",{httpproxy}"
+
+        # Update https_proxy parameters
+        if httpsproxy != "":
+            if httpsproxy not in os.environ["HTTPS_PROXY"]:
+                os.environ["HTTPS_PROXY"] += f",{httpsproxy}"
 
         # Update no_proxy parameters
         if noproxy != "":
