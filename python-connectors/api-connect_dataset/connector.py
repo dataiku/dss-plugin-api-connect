@@ -24,10 +24,12 @@ class RestAPIConnector(Connector):
         logger.info("config={}".format(logger.filter_secrets(config)))
         endpoint_parameters = get_endpoint_parameters(config)
         credential = config.get("credential", {})
+        http_proxy = config.get("http_proxy", {})
+        https_proxy = config.get("https_proxy", {})
         no_proxy = config.get("no_proxy", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
         self.client = RestAPIClient(
-            credential, no_proxy, endpoint_parameters, custom_key_values
+            credential, http_proxy, https_proxy, no_proxy, endpoint_parameters, custom_key_values
         )
         extraction_key = endpoint_parameters.get("extraction_key", None)
         self.extraction_key = extraction_key or ""
