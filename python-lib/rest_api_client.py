@@ -27,7 +27,7 @@ class RestAPIClient(object):
         self.presets_variables = {}
         self.presets_variables.update(endpoint)
         self.presets_variables.update(credential)
-        self.presets_variables.update(noproxy)
+        #self.presets_variables.update(noproxy)
         self.presets_variables.update(custom_key_values)
 
         # Update no_proxy parameters
