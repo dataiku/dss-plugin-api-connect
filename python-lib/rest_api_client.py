@@ -37,6 +37,8 @@ class RestAPIClient(object):
                     os.environ["http_proxy"] += f",{httpproxy}"
             except KeyError:
                 os.environ["http_proxy"] = httpproxy
+            except TypeError:
+                pass
 
         # Update https_proxy parameters
         if httpsproxy != "":
@@ -45,6 +47,8 @@ class RestAPIClient(object):
                     os.environ["https_proxy"] += f",{httpsproxy}"
             except KeyError:
                 os.environ["https_proxy"] = httpsproxy
+            except TypeError:
+                pass
         # Update no_proxy parameters
         if noproxy != "":
             try:
@@ -52,6 +56,8 @@ class RestAPIClient(object):
                     os.environ["no_proxy"] += f",{noproxy}"
             except KeyError:
                 os.environ["no_proxy"] = noproxy
+            except TypeError:
+                pass
 
         #  requests_kwargs contains **kwargs used for requests
         self.requests_kwargs = {}
