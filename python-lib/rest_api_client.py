@@ -33,18 +33,18 @@ class RestAPIClient(object):
         # Update http_proxy parameters
         if httpproxy != "":
             try:
-                if httpproxy not in os.environ["HTTP_PROXY"]:
-                    os.environ["HTTP_PROXY"] += f",{httpproxy}"
+                if httpproxy not in os.environ["http_proxy"]:
+                    os.environ["http_proxy"] += f",{httpproxy}"
             except KeyError:
-                os.environ["HTTP_PROXY"] += f",{httpproxy}"
+                os.environ["http_proxy"] += f",{httpproxy}"
 
         # Update https_proxy parameters
         if httpsproxy != "":
             try:
-                if httpsproxy not in os.environ["HTTPS_PROXY"]:
-                    os.environ["HTTPS_PROXY"] += f",{httpsproxy}"
+                if httpsproxy not in os.environ["https_proxy"]:
+                    os.environ["https_proxy"] += f",{httpsproxy}"
             except KeyError:
-                os.environ["HTTPS_PROXY"] += f",{httpsproxy}"
+                os.environ["https_proxy"] += f",{httpsproxy}"
         # Update no_proxy parameters
         if noproxy != "":
             try:
