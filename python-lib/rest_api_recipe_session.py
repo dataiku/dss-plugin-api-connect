@@ -14,6 +14,8 @@ class RestApiRecipeSession:
         self,
         custom_key_values,
         credential_parameters,
+        httpproxy_parameters,
+        httpsproxy_parameters,
         noproxy_parameters,
         endpoint_parameters,
         extraction_key,
@@ -24,6 +26,8 @@ class RestApiRecipeSession:
     ):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
+        self.httpproxy_parameters = httpproxy_parameters
+        self.httpsproxy_parameters = httpsproxy_parameters
         self.noproxy_parameters = noproxy_parameters
         self.endpoint_parameters = endpoint_parameters
         self.extraction_key = extraction_key
@@ -72,6 +76,8 @@ class RestApiRecipeSession:
             )
             self.client = RestAPIClient(
                 self.credential_parameters,
+                self.httpproxy_parameters,
+                self.httpsproxy_parameters,
                 self.noproxy_parameters,
                 updated_endpoint_parameters,
                 custom_key_values=self.custom_key_values,
