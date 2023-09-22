@@ -39,6 +39,8 @@ dku_flow_variables = dataiku.get_flow_variables()
 logger.info("config={}".format(logger.filter_secrets(config)))
 
 credential_parameters = config.get("credential", {})
+httpproxy_parameters = config.get("http_proxy", {})
+httpsproxy_parameters = config.get("https_proxy", {})
 noproxy_parameters = config.get("no_proxy", {})
 endpoint_parameters = get_endpoint_parameters(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
@@ -58,6 +60,8 @@ input_parameters_dataframe = input_parameters_dataset.get_dataframe()
 recipe_session = RestApiRecipeSession(
     custom_key_values,
     credential_parameters,
+    httpproxy_parameters,
+    httpsproxy_parameters,
     noproxy_parameters,
     endpoint_parameters,
     extraction_key,
