@@ -16,7 +16,6 @@
             "acceptsDataset": true
         }
     ],
-
     "outputRoles": [
         {
             "name": "api_output",
@@ -40,9 +39,33 @@
         },
         {
             "type": "SEPARATOR",
+            "label": "Proxy"
+        },
+        {
+            "name": "http_proxy",
+            "label": "Overload the http_proxy environement variable (optional)",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "name": "https_proxy",
+            "label": "Overload the https_proxy environement variable (optional)",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "name": "no_proxy",
+            "label": "Value to be passed to the no-proxy parameter (optional)",
+            "description": "",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "type": "SEPARATOR",
             "label": "API call parameters"
         },
-
         {
             "name": "endpoint_url",
             "label": "URL template",
@@ -55,12 +78,27 @@
             "description": "",
             "type": "SELECT",
             "defaultValue": "GET",
-            "selectChoices":[
-                {"value": "GET", "label": "GET"},
-                {"value": "POST", "label": "POST"},
-                {"value": "PUT", "label": "PUT"},
-                {"value": "PATCH", "label": "PATCH"},
-                {"value": "DELETE", "label": "DELETE"}
+            "selectChoices": [
+                {
+                    "value": "GET",
+                    "label": "GET"
+                },
+                {
+                    "value": "POST",
+                    "label": "POST"
+                },
+                {
+                    "value": "PUT",
+                    "label": "PUT"
+                },
+                {
+                    "value": "PATCH",
+                    "label": "PATCH"
+                },
+                {
+                    "value": "DELETE",
+                    "label": "DELETE"
+                }
             ]
         },
         {
@@ -98,10 +136,19 @@
             "description": "",
             "type": "SELECT",
             "defaultValue": null,
-            "selectChoices":[
-                {"value": null, "label": "None"},
-                {"value": "FORM_DATA", "label": "Form-data"},
-                {"value": "RAW", "label": "Raw"}
+            "selectChoices": [
+                {
+                    "value": null,
+                    "label": "None"
+                },
+                {
+                    "value": "FORM_DATA",
+                    "label": "Form-data"
+                },
+                {
+                    "value": "RAW",
+                    "label": "Raw"
+                }
             ]
         },
         {
@@ -118,7 +165,6 @@
             "type": "KEY_VALUE_LIST",
             "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
         },
-
         {
             "type": "SEPARATOR",
             "label": "Template variables",
@@ -144,7 +190,6 @@
             "type": "KEY_VALUE_LIST",
             "visibilityCondition": false
         },
-
         {
             "type": "SEPARATOR",
             "label": "Data extraction"
@@ -173,11 +218,23 @@
             "description": "Refer to the API's documentation",
             "type": "SELECT",
             "defaultValue": "na",
-            "selectChoices":[
-                {"value": "na", "label": "No pagination"},
-                {"value": "next_page", "label": "Next page URL provided"},
-                {"value": "offset", "label": "Offset pagination"},
-                {"value": "page", "label": "Per page"}
+            "selectChoices": [
+                {
+                    "value": "na",
+                    "label": "No pagination"
+                },
+                {
+                    "value": "next_page",
+                    "label": "Next page URL provided"
+                },
+                {
+                    "value": "offset",
+                    "label": "Offset pagination"
+                },
+                {
+                    "value": "page",
+                    "label": "Per page"
+                }
             ]
         },
         {

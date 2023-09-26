@@ -2,7 +2,12 @@ from dataiku.connector import Connector
 from dataikuapi.utils import DataikuException
 from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
-from dku_utils import get_dku_key_values, get_endpoint_parameters, parse_keys_for_json, get_value_from_path
+from dku_utils import (
+    get_dku_key_values,
+    get_endpoint_parameters,
+    parse_keys_for_json,
+    get_value_from_path,
+)
 from dku_constants import DKUConstants
 import json
 
@@ -11,18 +16,24 @@ logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
 
 class RestAPIConnector(Connector):
-
     def __init__(self, config, plugin_config):
-        Connector.__init__(self, config, plugin_config)  # pass the parameters to the base class
-        logger.info('API-Connect plugin connector v1.1.3')
+        Connector.__init__(
+            self, config, plugin_config
+        )  # pass the parameters to the base class
+        logger.info("API-Connect plugin connector v1.1.3")
         logger.info("config={}".format(logger.filter_secrets(config)))
         endpoint_parameters = get_endpoint_parameters(config)
         credential = config.get("credential", {})
+        http_proxy = config.get("http_proxy", {})
+        https_proxy = config.get("https_proxy", {})
+        no_proxy = config.get("no_proxy", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
-        self.client = RestAPIClient(credential, endpoint_parameters, custom_key_values)
+        self.client = RestAPIClient(
+            credential, http_proxy, https_proxy, no_proxy, endpoint_parameters, custom_key_values
+        )
         extraction_key = endpoint_parameters.get("extraction_key", None)
-        self.extraction_key = extraction_key or ''
-        self.extraction_path = self.extraction_key.split('.')
+        self.extraction_key = extraction_key or ""
+        self.extraction_path = self.extraction_key.split(".")
         self.raw_output = endpoint_parameters.get("raw_output", None)
         self.maximum_number_rows = config.get("maximum_number_rows", -1)
         self.display_metadata = config.get("display_metadata", False)
@@ -32,8 +43,13 @@ class RestAPIConnector(Connector):
         # from the columns actually returned by the generate_rows method
         return None
 
-    def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
-                      partition_id=None, records_limit=-1):
+    def generate_rows(
+        self,
+        dataset_schema=None,
+        dataset_partitioning=None,
+        partition_id=None,
+        records_limit=-1,
+    ):
         is_records_limit = (records_limit > 0) or (self.maximum_number_rows > 0)
         if self.maximum_number_rows > 0:
             records_limit = self.maximum_number_rows
@@ -58,15 +74,14 @@ class RestAPIConnector(Connector):
     def format_output(self, item, metadata=None):
         output = metadata or {}
         if self.raw_output:
-            output.update({
-                DKUConstants.API_RESPONSE_KEY: json.dumps(item)
-            })
+            output.update({DKUConstants.API_RESPONSE_KEY: json.dumps(item)})
         else:
             output.update(parse_keys_for_json(item))
         return output
 
-    def get_writer(self, dataset_schema=None, dataset_partitioning=None,
-                   partition_id=None):
+    def get_writer(
+        self, dataset_schema=None, dataset_partitioning=None, partition_id=None
+    ):
         """
         Returns a writer object to write in the dataset (or in a partition).
 

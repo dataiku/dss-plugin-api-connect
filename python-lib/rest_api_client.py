@@ -6,7 +6,7 @@ from safe_logger import SafeLogger
 from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
-
+import os
 
 logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
 
@@ -16,22 +16,57 @@ class RestAPIClientError(ValueError):
 
 
 class RestAPIClient(object):
-
-    def __init__(self, credential, endpoint, custom_key_values={}):
-        logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
+    def __init__(self, credential, httpproxy, httpsproxy, noproxy, endpoint, custom_key_values={}):
+        logger.info(
+            "Initialising RestAPIClient, credential={}, endpoint={}".format(
+                logger.filter_secrets(credential), endpoint
+            )
+        )
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
         self.presets_variables = {}
         self.presets_variables.update(endpoint)
         self.presets_variables.update(credential)
+        #self.presets_variables.update(noproxy)
         self.presets_variables.update(custom_key_values)
+
+        # Update http_proxy parameters
+        if httpproxy != "":
+            try:
+                if httpproxy not in os.environ["http_proxy"]:
+                    os.environ["http_proxy"] += f",{httpproxy}"
+            except KeyError:
+                os.environ["http_proxy"] = httpproxy
+            except TypeError:
+                pass
+
+        # Update https_proxy parameters
+        if httpsproxy != "":
+            try:
+                if httpsproxy not in os.environ["https_proxy"]:
+                    os.environ["https_proxy"] += f",{httpsproxy}"
+            except KeyError:
+                os.environ["https_proxy"] = httpsproxy
+            except TypeError:
+                pass
+        # Update no_proxy parameters
+        if noproxy != "":
+            try:
+                if noproxy not in os.environ["no_proxy"]:
+                    os.environ["no_proxy"] += f",{noproxy}"
+            except KeyError:
+                os.environ["no_proxy"] = noproxy
+            except TypeError:
+                pass
 
         #  requests_kwargs contains **kwargs used for requests
         self.requests_kwargs = {}
 
         self.endpoint_query_string = endpoint.get("endpoint_query_string", [])
         user_defined_keys = credential.get("user_defined_keys", [])
-        self.user_defined_keys = self.get_params(user_defined_keys, self.presets_variables)
+        self.user_defined_keys = self.get_params(
+            user_defined_keys, self.presets_variables
+        )
         self.presets_variables.update(self.user_defined_keys)
 
         endpoint_url = endpoint.get("endpoint_url", "")
@@ -39,9 +74,13 @@ class RestAPIClient(object):
         self.http_method = endpoint.get("http_method", "GET")
 
         endpoint_headers = endpoint.get("endpoint_headers", "")
-        self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
+        self.endpoint_headers = self.get_params(
+            endpoint_headers, self.presets_variables
+        )
 
-        self.params = self.get_params(self.endpoint_query_string, self.presets_variables)
+        self.params = self.get_params(
+            self.endpoint_query_string, self.presets_variables
+        )
 
         self.extraction_key = endpoint.get("extraction_key", None)
 
@@ -62,17 +101,29 @@ class RestAPIClient(object):
         self.pagination = Pagination()
         next_page_url_key = endpoint.get("next_page_url_key", "")
         is_next_page_url_relative = endpoint.get("is_next_page_url_relative", False)
-        next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
-        next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
+        next_page_url_base = (
+            endpoint.get("next_page_url_base", None)
+            if is_next_page_url_relative
+            else None
+        )
+        next_page_url_base = format_template(
+            next_page_url_base, **self.presets_variables
+        )
         skip_key = endpoint.get("skip_key")
         pagination_type = endpoint.get("pagination_type", "na")
-        if pagination_type == "next_page" and is_next_page_url_relative and not next_page_url_base:
-            raise RestAPIClientError("Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set")
+        if (
+            pagination_type == "next_page"
+            and is_next_page_url_relative
+            and not next_page_url_base
+        ):
+            raise RestAPIClientError(
+                "Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set"
+            )
         self.pagination.configure_paging(
             skip_key=skip_key,
             next_page_key=next_page_url_key,
             next_page_url_base=next_page_url_base,
-            pagination_type=pagination_type
+            pagination_type=pagination_type,
         )
         self.last_interaction = None
         self.requests_per_minute = endpoint.get("requests_per_minute", -1)
@@ -101,6 +152,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"auth": auth})
         if login_type == "ntlm":
             from requests_ntlm import HttpNtlmAuth
+
             username = credential.get("username", "")
             password = credential.get("password", "")
             auth = HttpNtlmAuth(username, password)
@@ -120,15 +172,23 @@ class RestAPIClient(object):
                 self.params.update({self.api_key_name: self.api_key_value})
 
     def get(self, url, can_raise_exeption=True, **kwargs):
-        json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
+        json_response = self.request(
+            "GET", url, can_raise_exeption=can_raise_exeption, **kwargs
+        )
         return json_response
 
     def request(self, method, url, can_raise_exeption=True, **kwargs):
-        logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
+        logger.info(
+            "Accessing endpoint {} with params={}".format(url, kwargs.get("params"))
+        )
         self.enforce_throttling()
         kwargs = template_dict(kwargs, **self.presets_variables)
-        if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
-            raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
+        if self.loop_detector.is_stuck_in_loop(
+            url, kwargs.get("params", {}), kwargs.get("headers", {})
+        ):
+            raise RestAPIClientError(
+                "The api-connect plugin is stuck in a loop. Please check the pagination parameters."
+            )
         request_start_time = time.time()
         self.time_last_request = request_start_time
         try:
@@ -145,7 +205,9 @@ class RestAPIClient(object):
         self.set_metadata("status_code", response.status_code)
         self.set_metadata("response_headers", "{}".format(response.headers))
         if response.status_code >= 400:
-            error_message = "Error {}: {}".format(response.status_code, response.content)
+            error_message = "Error {}: {}".format(
+                response.status_code, response.content
+            )
             self.pagination.is_last_batch_empty = True
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
@@ -162,7 +224,9 @@ class RestAPIClient(object):
             logger.error(error_message)
             logger.error("response.content={}".format(response.content))
             if can_raise_exeption:
-                raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
+                raise RestAPIClientError(
+                    "The API did not return JSON as expected. {}".format(error_message)
+                )
             return {"error": error_message}
 
         self.pagination.update_next_page(json_response, response.links)
@@ -174,8 +238,14 @@ class RestAPIClient(object):
         response = requests.request(method, url, **kwargs)
         if self.redirect_auth_header and not response.url.startswith(url):
             redirection_kwargs = copy.deepcopy(kwargs)
-            redirection_kwargs.pop("params", None)  # params are contained in the redirected url
-            logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
+            redirection_kwargs.pop(
+                "params", None
+            )  # params are contained in the redirected url
+            logger.warning(
+                "Redirection ! Accessing endpoint {} with initial authorization headers".format(
+                    response.url
+                )
+            )
             response = requests.request(method, response.url, **redirection_kwargs)
         return response
 
@@ -189,7 +259,12 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"params": params})
         self.call_number = self.call_number + 1
         logger.info("API call number #{}".format(self.call_number))
-        return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
+        return self.request(
+            self.http_method,
+            self.pagination.get_next_page_url(),
+            can_raise_exeption,
+            **self.requests_kwargs,
+        )
 
     def empty_json_response(self):
         return {self.extraction_key: {}} if self.extraction_key else {}
@@ -202,7 +277,14 @@ class RestAPIClient(object):
         templated_query_string = get_dku_key_values(endpoint_query_string)
         ret = {}
         for key in templated_query_string:
-            ret.update({key: format_template(templated_query_string.get(key, ""), **keywords) or ""})
+            ret.update(
+                {
+                    key: format_template(
+                        templated_query_string.get(key, ""), **keywords
+                    )
+                    or ""
+                }
+            )
         return ret
 
     def has_more_data(self):
@@ -212,14 +294,20 @@ class RestAPIClient(object):
 
     def start_paging(self):
         logger.info("Start paging with counting key '{}'".format(self.extraction_key))
-        self.pagination.reset_paging(counting_key=self.extraction_key, url=self.endpoint_url)
+        self.pagination.reset_paging(
+            counting_key=self.extraction_key, url=self.endpoint_url
+        )
 
     def enforce_throttling(self):
         if self.time_between_requests and self.time_last_request:
             current_time = time.time()
             time_since_last_resquests = current_time - self.time_last_request
             if time_since_last_resquests < self.time_between_requests:
-                logger.info("Enforcing {}s throttling".format(self.time_between_requests - time_since_last_resquests))
+                logger.info(
+                    "Enforcing {}s throttling".format(
+                        self.time_between_requests - time_since_last_resquests
+                    )
+                )
                 time.sleep(self.time_between_requests - time_since_last_resquests)
 
     def get_metadata(self):
