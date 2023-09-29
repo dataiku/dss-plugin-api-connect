@@ -136,8 +136,12 @@ class RestAPIClient(object):
         request_start_time = time.time()
         self.time_last_request = request_start_time
         error_message = None
+        status_code = None
+        response_headers = None
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
+            status_code = response.status_code
+            response_headers = response.headers
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
@@ -146,8 +150,8 @@ class RestAPIClient(object):
 
         request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
-        self.set_metadata("status_code", response.status_code)
-        self.set_metadata("response_headers", "{}".format(response.headers))
+        self.set_metadata("status_code", status_code)
+        self.set_metadata("response_headers", "{}".format(response_headers))
 
         if error_message:
             return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
