@@ -14,7 +14,7 @@ logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_
 class RestApiRecipeSession:
     def __init__(self, custom_key_values, credential_parameters, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
                  display_metadata=False,
-                 maximum_number_rows=-1):
+                 maximum_number_rows=-1, behaviour_when_error=None):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
         self.endpoint_parameters = endpoint_parameters
@@ -25,7 +25,8 @@ class RestApiRecipeSession:
         self.display_metadata = display_metadata
         self.maximum_number_rows = maximum_number_rows
         self.is_row_limit = (self.maximum_number_rows > 0)
-        self.can_raise = False
+        self.behaviour_when_error = behaviour_when_error or "add-error-column"
+        self.can_raise = self.behaviour_when_error == "raise"
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -55,7 +56,13 @@ class RestApiRecipeSession:
                 updated_endpoint_parameters,
                 self.custom_key_values
             ))
-            self.client = RestAPIClient(self.credential_parameters, updated_endpoint_parameters, custom_key_values=self.custom_key_values, session=session)
+            self.client = RestAPIClient(
+                self.credential_parameters,
+                updated_endpoint_parameters,
+                custom_key_values=self.custom_key_values,
+                session=session,
+                behaviour_when_error=self.behaviour_when_error
+            )
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():
                 page_results = self.retrieve_next_page(is_raw_output)
@@ -69,14 +76,17 @@ class RestApiRecipeSession:
     def retrieve_next_page(self, is_raw_output):
         page_rows = []
         logger.info("retrieve_next_page: Calling next page")
-        json_response = self.client.paginated_api_call(can_raise_exeption=False)
-        metadata = self.client.get_metadata() if self.display_metadata else {
+        json_response = self.client.paginated_api_call(can_raise_exeption=self.can_raise)
+        default_dict = {
             DKUConstants.REPONSE_ERROR_KEY: json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
-        }
+        } if self.behaviour_when_error == "keep-error-column" else {}
+        metadata = self.client.get_metadata() if self.display_metadata else default_dict
         is_api_returning_dict = True
         if self.extraction_key:
             data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
             if data_rows is None:
+                if self.behaviour_when_error == "ignore":
+                    return []
                 error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
                 if self.can_raise:
                     raise DataikuException(error_message)

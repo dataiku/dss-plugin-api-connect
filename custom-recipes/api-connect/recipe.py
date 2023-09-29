@@ -35,6 +35,7 @@ dku_flow_variables = dataiku.get_flow_variables()
 logger.info("config={}".format(logger.filter_secrets(config)))
 
 credential_parameters = config.get("credential", {})
+behaviour_when_error = config.get("behaviour_when_error", "add-error-column")
 endpoint_parameters = get_endpoint_parameters(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
@@ -58,7 +59,8 @@ recipe_session = RestApiRecipeSession(
     parameter_columns,
     parameter_renamings,
     display_metadata,
-    maximum_number_rows=maximum_number_rows
+    maximum_number_rows=maximum_number_rows,
+    behaviour_when_error=behaviour_when_error
 )
 results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
 
