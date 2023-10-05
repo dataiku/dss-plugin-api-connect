@@ -6,6 +6,7 @@
 - Faster recurring calls
 - Updated code-env descriptor for DSS 12
 
+
 ## [Version 1.1.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.4) - Feature and bugfix release - 2023-02-28
 
 - Add Brotli compression
