@@ -84,7 +84,7 @@ class RestApiRecipeSession:
         is_api_returning_dict = True
         if self.extraction_key:
             data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
-            if data_rows is None:
+            if data_rows is None or type(data_rows) != list:
                 if self.behaviour_when_error == "ignore":
                     return []
                 error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
