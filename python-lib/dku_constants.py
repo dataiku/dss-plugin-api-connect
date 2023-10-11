@@ -4,3 +4,4 @@ class DKUConstants(object):
     FORM_DATA_BODY_FORMAT = "FORM_DATA"
     PLUGIN_VERSION = "1.2.0"
     RAW_BODY_FORMAT = "RAW"
+    REPONSE_ERROR_KEY = "dku_error"

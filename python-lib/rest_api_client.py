@@ -17,7 +17,7 @@ class RestAPIClientError(ValueError):
 
 class RestAPIClient(object):
 
-    def __init__(self, credential, endpoint, custom_key_values={}, session=None):
+    def __init__(self, credential, endpoint, custom_key_values={}, session=None, behaviour_when_error=None):
         logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
@@ -57,6 +57,7 @@ class RestAPIClient(object):
         self.timeout = endpoint.get("timeout", -1)
         if self.timeout > 0:
             self.requests_kwargs.update({"timeout": self.timeout})
+        self.behaviour_when_error = behaviour_when_error or "add-error-column"
 
         self.requests_kwargs.update({"params": self.params})
         self.pagination = Pagination()
@@ -90,6 +91,8 @@ class RestAPIClient(object):
             key_value_body = endpoint.get("key_value_body", {})
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         self.metadata = {}
+        if self.behaviour_when_error == "keep-error-column":
+            self.metadata = {DKUConstants.REPONSE_ERROR_KEY: None}
         self.call_number = 0
         self.session = session or requests.Session()
 
@@ -133,8 +136,12 @@ class RestAPIClient(object):
         request_start_time = time.time()
         self.time_last_request = request_start_time
         error_message = None
+        status_code = None
+        response_headers = None
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
+            status_code = response.status_code
+            response_headers = response.headers
         except Exception as err:
             self.pagination.is_last_batch_empty = True
             error_message = "Error: {}".format(err)
@@ -143,11 +150,11 @@ class RestAPIClient(object):
 
         request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
-        self.set_metadata("status_code", response.status_code)
-        self.set_metadata("response_headers", "{}".format(response.headers))
+        self.set_metadata("status_code", status_code)
+        self.set_metadata("response_headers", "{}".format(response_headers))
 
         if error_message:
-            return {"error": error_message}
+            return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
         if response.status_code >= 400:
             error_message = "Error {}: {}".format(response.status_code, response.content)
@@ -155,7 +162,7 @@ class RestAPIClient(object):
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
             else:
-                return {"error": error_message}
+                return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
         if response.status_code in [204]:
             self.pagination.update_next_page({}, response.links)
             return self.empty_json_response()
@@ -168,7 +175,7 @@ class RestAPIClient(object):
             logger.error("response.content={}".format(response.content))
             if can_raise_exeption:
                 raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
-            return {"error": error_message}
+            return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
         self.pagination.update_next_page(json_response, response.links)
         return json_response

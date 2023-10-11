@@ -4,6 +4,7 @@
 
 - Add Brotli compression
 - Faster recurring calls
+- dku_error column kept at all time in API-Connect recipe output schema
 - Updated code-env descriptor for DSS 12
 
 
@@ -11,6 +12,7 @@
 
 - Add Brotli compression
 - Faster recurring calls
+- dku_error column kept at all time in API-Connect recipe output schema
 
 ## [Version 1.1.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.3) - Bugfix release - 2023-04-18
 
