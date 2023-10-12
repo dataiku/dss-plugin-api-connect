@@ -7,14 +7,14 @@ from dku_constants import DKUConstants
 import json
 
 
-logger = SafeLogger("api-connect plugin", forbiden_keys=["token", "password"])
+logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
 
 
 class RestAPIConnector(Connector):
 
     def __init__(self, config, plugin_config):
         Connector.__init__(self, config, plugin_config)  # pass the parameters to the base class
-        logger.info('API-Connect plugin connector v1.1.3')
+        logger.info('API-Connect plugin connector v{}'.format(DKUConstants.PLUGIN_VERSION))
         logger.info("config={}".format(logger.filter_secrets(config)))
         endpoint_parameters = get_endpoint_parameters(config)
         credential = config.get("credential", {})

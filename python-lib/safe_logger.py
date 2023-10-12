@@ -3,14 +3,14 @@ import copy
 
 
 class SafeLogger(object):
-    def __init__(self, name, forbiden_keys=None):
+    def __init__(self, name, forbidden_keys=None):
         self.name = name
         self.logger = logging.getLogger(self.name)
         logging.basicConfig(
             level=logging.INFO,
             format='{} %(levelname)s - %(message)s'.format(self.name)
         )
-        self.forbiden_keys = forbiden_keys
+        self.forbidden_keys = forbidden_keys
 
     def info(self, message):
         self.logger.info(message)
@@ -33,7 +33,7 @@ class SafeLogger(object):
         for key in dictionary:
             if isinstance(dictionary[key], dict):
                 dictionary[key] = self.filter_secrets(dictionary[key])
-            if key in self.forbiden_keys:
+            if key in self.forbidden_keys:
                 dictionary[key] = hash(dictionary[key])
         return dictionary
 

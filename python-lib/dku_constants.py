@@ -1,4 +1,7 @@
 class DKUConstants(object):
     API_RESPONSE_KEY = "api_response"
-    RAW_BODY_FORMAT = "RAW"
+    FORBIDDEN_KEYS = ["token", "password", "api_key_value"]
     FORM_DATA_BODY_FORMAT = "FORM_DATA"
+    PLUGIN_VERSION = "1.2.0"
+    RAW_BODY_FORMAT = "RAW"
+    REPONSE_ERROR_KEY = "dku_error"
