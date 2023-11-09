@@ -4,7 +4,7 @@
     "meta": {
         "label": "API Connect",
         "description": "Retrieve data from any REST API",
-        "author": "Dataiku (Alex Bourret)",
+        "author": "Dataiku (Alex Bourret), Safran (Guillaume Redoulès)",
         "icon": "icon-rocket",
         "tags": ["Connector", "Cloud"],
         "url": "https://www.dataiku.com/product/plugins/api-connect/",
