@@ -1,0 +1,54 @@
+{
+    "meta" : {
+        "label": "Secure SSO credentials",
+        "description": "",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": false,
+    "defaultDefinableAtProjectLevel": false,
+    "pluginParams": [
+    ],
+
+    "params": [
+        {
+            "name": "secure_token",
+            "type": "CREDENTIAL_REQUEST",
+            "label": "Single Sign On",
+            "credentialRequestSettings": {
+                "type": "OAUTH2",
+                "authorizationEndpoint": " ",
+                "tokenEndpoint": " ",
+                "scope": " "
+            },
+            "mandatory": true
+        },
+        {
+            "name": "authorizationEndpoint",
+            "label": "Authorization endpoint",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "tokenEndpoint",
+            "label": "Token endpoint",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "scope",
+            "label": "Scope",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "secure_domain",
+            "label": "Domain",
+            "description": "",
+            "type": "STRING",
+            "mandatory": true
+        }
+    ]
+}
