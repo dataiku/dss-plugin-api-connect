@@ -6,6 +6,7 @@ from safe_logger import SafeLogger
 from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values, template_dict, format_template
 from dku_constants import DKUConstants
+from rest_api_auth import get_auth
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -17,8 +18,12 @@ class RestAPIClientError(ValueError):
 
 class RestAPIClient(object):
 
-    def __init__(self, credential, endpoint, custom_key_values={}, session=None, behaviour_when_error=None):
-        logger.info("Initialising RestAPIClient, credential={}, endpoint={}".format(logger.filter_secrets(credential), endpoint))
+    def __init__(self, credential, secure_credentials, endpoint, custom_key_values={}, session=None, behaviour_when_error=None):
+        logger.info("Initialising RestAPIClient, credential={}, secure_credentials={}, endpoint={}".format(
+            logger.filter_secrets(credential),
+            logger.filter_secrets(secure_credentials),
+            endpoint)
+        )
 
         #  presets_variables contains all variables available in templates using the {{variable_name}} notation
         self.presets_variables = {}
@@ -44,8 +49,6 @@ class RestAPIClient(object):
         self.params = self.get_params(self.endpoint_query_string, self.presets_variables)
 
         self.extraction_key = endpoint.get("extraction_key", None)
-
-        self.set_login(credential)
 
         self.requests_kwargs.update({"headers": self.endpoint_headers})
         self.ignore_ssl_check = endpoint.get("ignore_ssl_check", False)
@@ -95,33 +98,16 @@ class RestAPIClient(object):
             self.metadata = {DKUConstants.REPONSE_ERROR_KEY: None}
         self.call_number = 0
         self.session = session or requests.Session()
-
-    def set_login(self, credential):
-        login_type = credential.get("login_type", "no_auth")
-        if login_type == "basic_login":
-            username = credential.get("username", "")
-            password = credential.get("password", "")
-            auth = (username, password)
-            self.requests_kwargs.update({"auth": auth})
-        if login_type == "ntlm":
-            from requests_ntlm import HttpNtlmAuth
-            username = credential.get("username", "")
-            password = credential.get("password", "")
-            auth = HttpNtlmAuth(username, password)
-            self.requests_kwargs.update({"auth": auth})
-        if login_type == "bearer_token":
-            token = credential.get("token", "")
-            bearer_template = credential.get("bearer_template", "Bearer {{token}}")
-            bearer_template = bearer_template.replace("{{token}}", token)
-            self.endpoint_headers.update({"Authorization": bearer_template})
-        if login_type == "api_key":
-            self.api_key_name = credential.get("api_key_name", "")
-            self.api_key_value = credential.get("api_key_value", "")
-            self.api_key_destination = credential.get("api_key_destination", "header")
-            if self.api_key_destination == "header":
-                self.endpoint_headers.update({self.api_key_name: self.api_key_value})
-            else:
-                self.params.update({self.api_key_name: self.api_key_value})
+        self.secure_domain = None
+        if secure_credentials:
+            self.session.auth = get_auth(secure_credentials)
+            self.secure_domain = secure_credentials.get("secure_domain")
+            if not self.secure_domain:
+                raise RestAPIClientError("Secure presets have to have a secure domain defined. Contact your Dataiku administrator.")
+            if not self.secure_domain.startswith("https://"):
+                self.secure_domain = "https://{}".format(self.secure_domain)
+        else:
+            self.session.auth = get_auth(credential)
 
     def get(self, url, can_raise_exeption=True, **kwargs):
         json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
@@ -129,6 +115,7 @@ class RestAPIClient(object):
 
     def request(self, method, url, can_raise_exeption=True, **kwargs):
         logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
+        self.assert_secure_domain(url)
         self.enforce_throttling()
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
@@ -236,3 +223,15 @@ class RestAPIClient(object):
 
     def get_metadata(self):
         return self.metadata
+
+    def assert_secure_domain(self, url):
+        if not self.secure_domain:
+            return
+        if self.ignore_ssl_check:
+            raise RestAPIClientError("SSL check cannot be desactivated when using this secure preset")
+        if not url:
+            raise RestAPIClientError("The URL is not defined")
+        if not url.startswith("https://"):
+            raise RestAPIClientError("The use of this secure preset is restricted to https URLs")
+        if not url.startswith(self.secure_domain):
+            raise RestAPIClientError("The use of this preset is restricted to the {} domain".format(self.secure_domain))
