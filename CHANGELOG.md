@@ -2,6 +2,7 @@
 
 ## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Feature release - 2023-11-20
 
+- Add secure SSO preset
 - Add secure username / password preset
 
 ## [Version 1.2.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.0) - Feature and bugfix release - 2023-05-31
