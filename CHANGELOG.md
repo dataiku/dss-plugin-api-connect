@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Feature release - 2023-12-04
+
+- Handle XML endpoints
+
 ## [Version 1.2.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.0) - Feature and bugfix release - 2023-05-31
 
 - Add Brotli compression
