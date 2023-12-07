@@ -79,8 +79,10 @@ class RestApiRecipeSession:
         logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_api_call(can_raise_exeption=self.can_raise)
         default_dict = {
-            DKUConstants.REPONSE_ERROR_KEY: json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
+            DKUConstants.REPONSE_ERROR_KEY: ""
         } if self.behaviour_when_error == "keep-error-column" else {}
+        if isinstance(json_response, dict) and DKUConstants.REPONSE_ERROR_KEY in default_dict:
+            default_dict[DKUConstants.REPONSE_ERROR_KEY] = json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
         metadata = self.client.get_metadata() if self.display_metadata else default_dict
         is_api_returning_dict = True
         if self.extraction_key:
@@ -116,7 +118,13 @@ class RestApiRecipeSession:
                         base_row.update(parse_keys_for_json(row))
                         base_row.update(self.initial_parameter_columns)
                         page_rows.append(base_row)
-
+                else:
+                    json_response = decode_csv_data(json_response)
+                    for row in json_response:
+                        base_row = copy.deepcopy(metadata)
+                        base_row.update(parse_keys_for_json(row))
+                        base_row.update(self.initial_parameter_columns)
+                        page_rows.append(base_row)
             if is_api_returning_dict:
                 base_row.update(self.initial_parameter_columns)
                 page_rows.append(base_row)
