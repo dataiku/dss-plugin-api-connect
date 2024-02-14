@@ -1,8 +1,18 @@
 # Changelog
 
-## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Feature release - 2023-12-04
+## [Version 1.2.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.2) - Feature release - 2024-02-14
 
-- Handle XML endpoints
+- Handle XML and CSV endpoints
+
+## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Bugfix release - 2023-12-13
+
+- Fix the `Add an error column` error behaviour on the recipe
+- Code-env descriptor for DSS 12
+
+## [Version 1.1.5](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.5) - Bugfix release - 2023-12-13
+
+- Fix the `Add an error column` error behaviour on the recipe
+- Code-env descriptor for DSS 11
 
 ## [Version 1.2.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.0) - Feature and bugfix release - 2023-05-31
 
