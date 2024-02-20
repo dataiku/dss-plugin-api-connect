@@ -166,16 +166,6 @@ class RestAPIClient(object):
         if response.status_code in [204]:
             self.pagination.update_next_page({}, response.links)
             return self.empty_json_response()
-        # try:
-        #     json_response = response.json()
-        # except Exception as err:
-        #     self.pagination.update_next_page({}, None)
-        #     error_message = "Error '{}' when decoding JSON".format(str(err)[:100])
-        #     logger.error(error_message)
-        #     logger.error("response.content={}".format(response.content))
-        #     if can_raise_exeption:
-        #         raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
-        #     return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
         json_response = self.get_json_from_response(response, can_raise_exeption=can_raise_exeption)
 
