@@ -1,0 +1,45 @@
+{
+    "meta" : {
+        "label": "Secure basic",
+        "description": "Username / password to be used on one domain name, https with SSL check ON",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": false,
+    "defaultDefinableAtProjectLevel": false,
+    "pluginParams": [
+    ],
+    "params": [
+        {
+            "name": "secure_token",
+            "type": "CREDENTIAL_REQUEST",
+            "label": "Azure Single Sign On",
+            "credentialRequestSettings": {
+                "type": "BASIC"
+            },
+            "mandatory": true
+        },
+        {
+            "name": "secure_domain",
+            "label": "Domain",
+            "description": "",
+            "type": "STRING",
+            "mandatory": true
+        },
+        {
+            "name": "login_type",
+            "label": "Login type",
+            "type": "SELECT",
+            "defaultValue": "basic_login",
+            "selectChoices": [
+                {
+                    "value": "basic_login",
+                    "label": "Basic auth"
+                },
+                {
+                    "value": "ntlm",
+                    "label": "NTLM"
+                }
+            ]
+        }
+    ]
+}
