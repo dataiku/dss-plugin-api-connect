@@ -1,11 +1,12 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path
+from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data
 from dku_constants import DKUConstants
 import copy
 import json
 import requests
+import collections
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -80,13 +81,15 @@ class RestApiRecipeSession:
         logger.info("retrieve_next_page: Calling next page")
         json_response = self.client.paginated_api_call(can_raise_exeption=self.can_raise)
         default_dict = {
-            DKUConstants.REPONSE_ERROR_KEY: json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
+            DKUConstants.REPONSE_ERROR_KEY: ""
         } if self.behaviour_when_error == "keep-error-column" else {}
+        if isinstance(json_response, dict) and DKUConstants.REPONSE_ERROR_KEY in default_dict:
+            default_dict[DKUConstants.REPONSE_ERROR_KEY] = json_response.get(DKUConstants.REPONSE_ERROR_KEY, None)
         metadata = self.client.get_metadata() if self.display_metadata else default_dict
         is_api_returning_dict = True
         if self.extraction_key:
             data_rows = get_value_from_path(json_response, self.extraction_key.split("."), can_raise=False)
-            if data_rows is None or type(data_rows) != list:
+            if data_rows is None:
                 if self.behaviour_when_error == "ignore":
                     return []
                 error_message = "Extraction key '{}' was not found in the incoming data".format(self.extraction_key)
@@ -117,7 +120,13 @@ class RestApiRecipeSession:
                         base_row.update(parse_keys_for_json(row))
                         base_row.update(self.initial_parameter_columns)
                         page_rows.append(base_row)
-
+                else:
+                    json_response = decode_csv_data(json_response)
+                    for row in json_response:
+                        base_row = copy.deepcopy(metadata)
+                        base_row.update(parse_keys_for_json(row))
+                        base_row.update(self.initial_parameter_columns)
+                        page_rows.append(base_row)
             if is_api_returning_dict:
                 base_row.update(self.initial_parameter_columns)
                 page_rows.append(base_row)
@@ -126,7 +135,23 @@ class RestApiRecipeSession:
     def format_page_rows(self, data_rows, is_raw_output, metadata=None):
         page_rows = []
         metadata = metadata or {}
-        for data_row in data_rows:
+        if type(data_rows) in [str, bytes]:
+            data_rows = decode_csv_data(data_rows)
+        if type(data_rows) in [list]:
+            for data_row in data_rows:
+                base_row = copy.deepcopy(self.initial_parameter_columns)
+                base_row.update(metadata)
+                if is_raw_output:
+                    if is_error_message(data_row):
+                        base_row.update(parse_keys_for_json(data_row))
+                    else:
+                        base_row.update({
+                            DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
+                        })
+                else:
+                    base_row.update(parse_keys_for_json(data_row))
+                page_rows.append(base_row)
+        if type(data_rows) in [dict, collections.OrderedDict]:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
             if is_raw_output:
@@ -137,10 +162,10 @@ class RestApiRecipeSession:
                     base_row.update(parse_keys_for_json(data_row))
                 else:
                     base_row.update({
-                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_row)
+                        DKUConstants.API_RESPONSE_KEY: json.dumps(data_rows)
                     })
             else:
-                base_row.update(parse_keys_for_json(data_row))
+                base_row.update(parse_keys_for_json(data_rows))
             page_rows.append(base_row)
         return page_rows
 

@@ -4,7 +4,7 @@ import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values, template_dict, format_template
+from dku_utils import get_dku_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
 from dku_constants import DKUConstants
 from rest_api_auth import get_auth
 
@@ -153,18 +153,9 @@ class RestAPIClient(object):
         if response.status_code in [204]:
             self.pagination.update_next_page({}, response.links)
             return self.empty_json_response()
-        try:
-            json_response = response.json()
-        except Exception as err:
-            self.pagination.update_next_page({}, None)
-            error_message = "Error '{}' when decoding JSON".format(str(err)[:100])
-            logger.error(error_message)
-            logger.error("response.content={}".format(response.content))
-            if can_raise_exeption:
-                raise RestAPIClientError("The API did not return JSON as expected. {}".format(error_message))
-            return {} if self.behaviour_when_error=="ignore" else {DKUConstants.REPONSE_ERROR_KEY: error_message}
 
-        self.pagination.update_next_page(json_response, response.links)
+        json_response = self.get_json_from_response(response, can_raise_exeption=can_raise_exeption)
+
         return json_response
 
     def request_with_redirect_retry(self, method, url, **kwargs):
@@ -235,3 +226,32 @@ class RestAPIClient(object):
             raise RestAPIClientError("The use of this secure preset is restricted to https URLs")
         if not url.startswith(self.secure_domain):
             raise RestAPIClientError("The use of this preset is restricted to the {} domain".format(self.secure_domain))
+
+    def get_json_from_response(self, response, can_raise_exeption=True):
+        json_response = None
+        if is_reponse_xml(response):
+            logger.info("XML reply detected, converting to JSON")
+            json_response = xml_to_json(response.content)
+        else:
+            try:
+                json_response = response.json()
+            except Exception as err:
+                self.pagination.update_next_page({}, None)
+                error_message = "Error '{}' when decoding JSON".format(str(err)[:100])
+                logger.error(error_message)
+                return response.content
+
+        self.pagination.update_next_page(json_response, response.links)
+        return json_response
+
+
+def get_status_code(response):
+    if isinstance(response, requests.Response):
+        return response.status_code
+    return None
+
+
+def get_headers(response):
+    if isinstance(response, requests.Response):
+        return response.headers
+    return None
