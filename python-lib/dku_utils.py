@@ -105,7 +105,7 @@ def extract_key_using_json_path(json_dictionary, json_path):
 def is_reponse_xml(response):
     content_types = response.headers.get("Content-Type", "").split(";")
     for content_type in content_types:
-        if content_type in ["text/xml", "application/soap+xml", "text/plain", "application/xml"]:
+        if content_type in ["text/xml", "application/soap+xml", "application/xml"]:
             return True
     return False
 
