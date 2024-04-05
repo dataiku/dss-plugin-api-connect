@@ -4,7 +4,7 @@ from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
 from dku_utils import (
     get_dku_key_values, get_endpoint_parameters,
-    parse_keys_for_json, get_value_from_path, get_secure_credentials, decode_csv_data
+    parse_keys_for_json, get_value_from_path, get_secure_credentials, decode_csv_data, get_extraction_key
 )
 from dku_constants import DKUConstants
 import json
@@ -24,7 +24,8 @@ class RestAPIConnector(Connector):
         credential = config.get("credential", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
         self.client = RestAPIClient(credential, secure_credentials, endpoint_parameters, custom_key_values)
-        extraction_key = endpoint_parameters.get("extraction_key", None)
+        # extraction_key = endpoint_parameters.get("extraction_key", None)
+        extraction_key = get_extraction_key(endpoint_parameters)
         self.extraction_key = extraction_key or ''
         self.extraction_path = self.extraction_key.split('.')
         self.raw_output = endpoint_parameters.get("raw_output", None)

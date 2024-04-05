@@ -4,7 +4,7 @@ import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
+from dku_utils import get_dku_key_values, template_dict, format_template, is_reponse_xml, xml_to_json, get_pagination_parameters
 from dku_constants import DKUConstants
 from rest_api_auth import get_auth
 
@@ -72,6 +72,8 @@ class RestAPIClient(object):
         pagination_type = endpoint.get("pagination_type", "na")
         if pagination_type == "next_page" and is_next_page_url_relative and not next_page_url_base:
             raise RestAPIClientError("Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set")
+        pagination_type, next_page_url_key, skip_key, next_page_url_base = get_pagination_parameters(endpoint)
+        next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
         self.pagination.configure_paging(
             skip_key=skip_key,
             next_page_key=next_page_url_key,
@@ -113,7 +115,7 @@ class RestAPIClient(object):
         json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
         return json_response
 
-    def request(self, method, url, can_raise_exeption=True, **kwargs):
+    def request(self, method, url, can_raise_exeption=True, return_raw_response=False, **kwargs):
         logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.assert_secure_domain(url)
         self.enforce_throttling()
@@ -134,6 +136,9 @@ class RestAPIClient(object):
             error_message = "Error: {}".format(err)
             if can_raise_exeption:
                 raise RestAPIClientError(error_message)
+
+        if return_raw_response:
+            return response
 
         request_finish_time = time.time()
         self.set_metadata("request_duration", request_finish_time - request_start_time)
@@ -169,7 +174,7 @@ class RestAPIClient(object):
             response = self.session.request(method, response.url, **redirection_kwargs)
         return response
 
-    def paginated_api_call(self, can_raise_exeption=True):
+    def paginated_api_call(self, can_raise_exeption=True, return_raw_response=False):
         if self.pagination.params_must_be_blanked:
             self.requests_kwargs["params"] = {}
         else:
@@ -179,7 +184,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"params": params})
         self.call_number = self.call_number + 1
         logger.info("API call number #{}".format(self.call_number))
-        return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
+        return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, return_raw_response, **self.requests_kwargs)
 
     def empty_json_response(self):
         return {self.extraction_key: {}} if self.extraction_key else {}

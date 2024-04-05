@@ -29,7 +29,7 @@ def get_endpoint_parameters(configuration):
         "requests_per_minute",
         "pagination_type",
         "next_page_url_key", "is_next_page_url_relative", "next_page_url_base",
-        "top_key", "skip_key", "maximum_number_rows"
+        "top_key", "skip_key", "maximum_number_rows", "extraction_path_selector"
     ]
     parameters = {
         endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None
@@ -57,16 +57,53 @@ def get_secure_credentials(configuration):
     return secure_credentials
 
 
+def get_extraction_key(configuration):
+    extraction_path_selector = configuration.get("extraction_path_selector", "")
+    if not extraction_path_selector or extraction_path_selector=="dku_manual_select":
+        return configuration.get("extraction_key")
+    if extraction_path_selector.startswith("$."):
+        return extraction_path_selector[2:]
+    if extraction_path_selector=="$":
+        return None
+    return extraction_path_selector
+
+def get_pagination_parameters(endpoint):
+    pagination_type = endpoint.get("pagination_type", "na")
+    if pagination_type.startswith("{"):
+        pagination_parameters = json.loads(pagination_type)
+        pagination_type = pagination_parameters.get("pagination_type")
+        next_page_url_key = pagination_parameters.get("next_page_url_key")
+        is_next_page_url_relative = pagination_parameters.get("is_next_page_url_relative")
+        next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
+        skip_key = pagination_parameters.get("skip_key")
+    else:
+        next_page_url_key = endpoint.get("next_page_url_key", "")
+        is_next_page_url_relative = endpoint.get("is_next_page_url_relative", False)
+        next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
+        #next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
+        skip_key = endpoint.get("skip_key")
+
+    if pagination_type == "next_page" and is_next_page_url_relative and not next_page_url_base:
+        raise Exception("Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set")
+    return pagination_type, next_page_url_key, skip_key, next_page_url_base
+
+
 def parse_keys_for_json(items):
     ret = {}
-    for key in items:
-        value = items.get(key)
-        if isinstance(value, dict) or isinstance(value, list):
-            ret.update({key: json.dumps(value)})
-        elif value is None:
-            continue
-        else:
-            ret.update({key: value})
+    if isinstance(items, list):
+        column_number = 0
+        for item in items:
+            ret["Column_{}".format(column_number)] = item
+            column_number += 1
+    else:
+        for key in items:
+            value = items.get(key)
+            if isinstance(value, dict) or isinstance(value, list):
+                ret.update({key: json.dumps(value)})
+            elif value is None:
+                continue
+            else:
+                ret.update({key: value})
     return ret
 
 

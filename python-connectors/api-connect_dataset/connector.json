@@ -6,6 +6,8 @@
     },
     "readable": true,
     "writable": false,
+    "kind": "PYTHON",
+    "paramsPythonSetup": "browse_api.py",
     "params": [
         {
             "type": "SEPARATOR",
@@ -136,17 +138,25 @@
             "label": "Data extraction"
         },
         {
+            "name": "extraction_path_selector",
+            "label": "Path to data",
+            "description": " ",
+            "type": "SELECT",
+            "getChoicesFromPython": true
+        },
+        {
             "name": "extraction_key",
             "label": "Path to data array (optional)",
             "description": "Dot separated key path",
             "defaultValue": null,
-            "type": "STRING"
+            "type": "STRING",
+            "visibilityCondition": "(model.extraction_key !=null && model.extraction_key.length>0 && model.extraction_path_selector==null) || (model.extraction_path_selector=='dku_manual_select')"
         },
         {
             "name": "raw_output",
             "label": "Raw JSON output",
             "description": "",
-            "defaultValue": true,
+            "defaultValue": false,
             "type": "BOOLEAN"
         },
         {
@@ -158,13 +168,7 @@
             "label": "Pagination mechanism",
             "description": "Refer to the API's documentation",
             "type": "SELECT",
-            "defaultValue": "na",
-            "selectChoices":[
-                {"value": "na", "label": "No pagination"},
-                {"value": "next_page", "label": "Next page URL provided"},
-                {"value": "offset", "label": "Offset pagination"},
-                {"value": "page", "label": "Per page"}
-            ]
+            "getChoicesFromPython": true
         },
         {
             "type": "SEPARATOR",
