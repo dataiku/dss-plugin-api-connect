@@ -225,7 +225,8 @@
         },
         {
             "name": "ignore_ssl_check",
-            "label": "Ignore SSL check",
+            "label": " ",
+            "description": "Ignore SSL check",
             "type": "BOOLEAN",
             "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
             "defaultValue": false
