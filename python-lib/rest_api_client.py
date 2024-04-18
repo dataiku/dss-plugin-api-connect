@@ -51,7 +51,10 @@ class RestAPIClient(object):
         self.extraction_key = endpoint.get("extraction_key", None)
 
         self.requests_kwargs.update({"headers": self.endpoint_headers})
-        self.ignore_ssl_check = endpoint.get("ignore_ssl_check", False)
+        if secure_credentials:
+            self.ignore_ssl_check = False
+        else:
+            self.ignore_ssl_check = endpoint.get("ignore_ssl_check", False)
         if self.ignore_ssl_check:
             self.requests_kwargs.update({"verify": False})
         else:

@@ -34,7 +34,7 @@
         },
         {
             "name": "auth_type",
-            "label": "Authentation type",
+            "label": "Authentication type",
             "description": "",
             "type": "SELECT",
             "defaultValue": null,
@@ -281,6 +281,7 @@
             "name": "ignore_ssl_check",
             "label": "Ignore SSL check",
             "type": "BOOLEAN",
+            "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
             "defaultValue": false
         },
         {
