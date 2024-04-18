@@ -1,7 +1,7 @@
 {
     "meta" : {
         "label": "Secure basic",
-        "description": "Username / password to be used on one domain name, https with SSL check ON",
+        "description": "Secured preset to be used solely on one domain. Username / password have to be set by individual users from their own profile's credential tab.",
         "icon": "icon-puzzle-piece"
     },
     "defaultDefinableInline": false,
