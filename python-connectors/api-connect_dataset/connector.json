@@ -144,8 +144,8 @@
         },
         {
             "name": "raw_output",
-            "label": "Raw JSON output",
-            "description": "",
+            "label": " ",
+            "description": "Raw JSON output",
             "defaultValue": true,
             "type": "BOOLEAN"
         },
@@ -232,14 +232,15 @@
         },
         {
             "name": "redirect_auth_header",
-            "label": "Redirect authorization header",
+            "label": " ",
+            "description": "Redirect authorization header",
             "type": "BOOLEAN",
             "defaultValue": false
         },
         {
             "name": "display_metadata",
-            "label": "Display metadata",
-            "description": "Status code, request time...",
+            "label": " ",
+            "description": "Display metadata",
             "type": "BOOLEAN",
             "defaultValue": false
         },
