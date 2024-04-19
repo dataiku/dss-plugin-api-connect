@@ -37,6 +37,26 @@ def get_endpoint_parameters(configuration):
     return parameters
 
 
+def get_secure_credentials(configuration):
+    secure_credentials = {}
+    auth_type = configuration.get("auth_type")
+    if auth_type:
+        secure_credentials["auth_type"] = auth_type
+    if auth_type == "secure_basic":
+        secure_credentials["login_type"] = configuration.get("login_type")
+        secure_basic = configuration.get("secure_basic", {})
+        secure_token = secure_basic.pop("secure_token", {})
+        secure_credentials.update(secure_basic)
+        secure_credentials.update(secure_token)
+
+    if auth_type == "secure_oauth":
+        secure_credentials["login_type"] = "bearer_token"
+        secure_oauth = configuration.get("secure_oauth", {})
+        secure_credentials["token"] = secure_oauth.pop("secure_token")
+        secure_credentials.update(secure_oauth)
+    return secure_credentials
+
+
 def parse_keys_for_json(items):
     ret = {}
     for key in items:

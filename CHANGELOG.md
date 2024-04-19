@@ -3,6 +3,8 @@
 ## [Version 1.2.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.2) - Feature release - 2024-02-14
 
 - Handle XML and CSV endpoints
+- Add secure SSO preset
+- Add secure username / password preset
 
 ## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Bugfix release - 2023-12-13
 

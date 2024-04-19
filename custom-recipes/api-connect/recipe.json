@@ -33,10 +33,37 @@
             "label": "Authentication"
         },
         {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": "secure_oauth", "label": "SSO"},
+                {"value": "secure_basic", "label": "Secure username / password"},
+                {"value": null, "label": "Other"}
+            ]
+        },
+        {
             "name": "credential",
             "label": "Credential preset",
             "type": "PRESET",
-            "parameterSetId": "credential"
+            "parameterSetId": "credential",
+            "visibilityCondition": "model.auth_type == null"
+        },
+        {
+            "name": "secure_oauth",
+            "label": "SSO preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-oauth",
+            "visibilityCondition": "model.auth_type == 'secure_oauth'"
+        },
+        {
+            "name": "secure_basic",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-basic",
+            "visibilityCondition": "model.auth_type == 'secure_basic'"
         },
         {
             "type": "SEPARATOR",
@@ -254,6 +281,7 @@
             "name": "ignore_ssl_check",
             "label": "Ignore SSL check",
             "type": "BOOLEAN",
+            "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
             "defaultValue": false
         },
         {

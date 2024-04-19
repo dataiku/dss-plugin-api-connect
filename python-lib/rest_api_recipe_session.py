@@ -13,11 +13,12 @@ logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_
 
 
 class RestApiRecipeSession:
-    def __init__(self, custom_key_values, credential_parameters, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
+    def __init__(self, custom_key_values, credential_parameters, secure_credentials, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
                  display_metadata=False,
                  maximum_number_rows=-1, behaviour_when_error=None):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
+        self.secure_credentials = secure_credentials
         self.endpoint_parameters = endpoint_parameters
         self.extraction_key = extraction_key
         self.client = None
@@ -59,6 +60,7 @@ class RestApiRecipeSession:
             ))
             self.client = RestAPIClient(
                 self.credential_parameters,
+                self.secure_credentials,
                 updated_endpoint_parameters,
                 custom_key_values=self.custom_key_values,
                 session=session,
