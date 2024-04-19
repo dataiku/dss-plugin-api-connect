@@ -12,10 +12,37 @@
             "label": "Authentication"
         },
         {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": "secure_oauth", "label": "SSO"},
+                {"value": "secure_basic", "label": "Secure username / password"},
+                {"value": null, "label": "Other"}
+            ]
+        },
+        {
             "name": "credential",
             "label": "Credential preset",
             "type": "PRESET",
-            "parameterSetId": "credential"
+            "parameterSetId": "credential",
+            "visibilityCondition": "model.auth_type == null"
+        },
+        {
+            "name": "secure_oauth",
+            "label": "SSO preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-oauth",
+            "visibilityCondition": "model.auth_type == 'secure_oauth'"
+        },
+        {
+            "name": "secure_basic",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-basic",
+            "visibilityCondition": "model.auth_type == 'secure_basic'"
         },
         {
             "type": "SEPARATOR",
@@ -117,8 +144,8 @@
         },
         {
             "name": "raw_output",
-            "label": "Raw JSON output",
-            "description": "",
+            "label": " ",
+            "description": "Raw JSON output",
             "defaultValue": true,
             "type": "BOOLEAN"
         },
@@ -198,20 +225,23 @@
         },
         {
             "name": "ignore_ssl_check",
-            "label": "Ignore SSL check",
+            "label": " ",
+            "description": "Ignore SSL check",
             "type": "BOOLEAN",
+            "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
             "defaultValue": false
         },
         {
             "name": "redirect_auth_header",
-            "label": "Redirect authorization header",
+            "label": " ",
+            "description": "Redirect authorization header",
             "type": "BOOLEAN",
             "defaultValue": false
         },
         {
             "name": "display_metadata",
-            "label": "Display metadata",
-            "description": "Status code, request time...",
+            "label": " ",
+            "description": "Display metadata",
             "type": "BOOLEAN",
             "defaultValue": false
         },

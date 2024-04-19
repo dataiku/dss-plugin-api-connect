@@ -1,6 +1,10 @@
 import json
 import copy
 from jsonpath_ng.ext import parse
+from safe_logger import SafeLogger
+
+
+logger = SafeLogger("api-connect plugin utils")
 
 
 def get_dku_key_values(endpoint_query_string):
@@ -31,6 +35,26 @@ def get_endpoint_parameters(configuration):
         endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None
     }
     return parameters
+
+
+def get_secure_credentials(configuration):
+    secure_credentials = {}
+    auth_type = configuration.get("auth_type")
+    if auth_type:
+        secure_credentials["auth_type"] = auth_type
+    if auth_type == "secure_basic":
+        secure_credentials["login_type"] = configuration.get("login_type")
+        secure_basic = configuration.get("secure_basic", {})
+        secure_token = secure_basic.pop("secure_token", {})
+        secure_credentials.update(secure_basic)
+        secure_credentials.update(secure_token)
+
+    if auth_type == "secure_oauth":
+        secure_credentials["login_type"] = "bearer_token"
+        secure_oauth = configuration.get("secure_oauth", {})
+        secure_credentials["token"] = secure_oauth.pop("secure_token")
+        secure_credentials.update(secure_oauth)
+    return secure_credentials
 
 
 def parse_keys_for_json(items):
@@ -96,3 +120,37 @@ def extract_key_using_json_path(json_dictionary, json_path):
         return res
     else:
         return None
+
+
+def is_reponse_xml(response):
+    content_types = response.headers.get("Content-Type", "").split(";")
+    for content_type in content_types:
+        if content_type in ["text/xml", "application/soap+xml", "application/xml"]:
+            return True
+    return False
+
+
+def xml_to_json(content):
+    import xmltodict
+    json_response = None
+    try:
+        json_response = xmltodict.parse(content)
+    except Exception as error:
+        logger.error("XML to JSON conversion failed, processing as STRING ({})".format(error))
+        json_response = content
+    return json_response
+
+
+def decode_csv_data(data):
+    import csv
+    import io
+    json_data = None
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
+    try:
+        reader = csv.DictReader(io.StringIO(data))
+        json_data = list(reader)
+    except Exception as error:
+        logger.error("Could not extract csv data. Error={}".format(error))
+        json_data = data
+    return json_data

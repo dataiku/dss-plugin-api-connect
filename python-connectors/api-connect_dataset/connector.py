@@ -2,7 +2,10 @@ from dataiku.connector import Connector
 from dataikuapi.utils import DataikuException
 from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
-from dku_utils import get_dku_key_values, get_endpoint_parameters, parse_keys_for_json, get_value_from_path
+from dku_utils import (
+    get_dku_key_values, get_endpoint_parameters,
+    parse_keys_for_json, get_value_from_path, get_secure_credentials, decode_csv_data
+)
 from dku_constants import DKUConstants
 import json
 
@@ -17,9 +20,10 @@ class RestAPIConnector(Connector):
         logger.info('API-Connect plugin connector v{}'.format(DKUConstants.PLUGIN_VERSION))
         logger.info("config={}".format(logger.filter_secrets(config)))
         endpoint_parameters = get_endpoint_parameters(config)
+        secure_credentials = get_secure_credentials(config)
         credential = config.get("credential", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
-        self.client = RestAPIClient(credential, endpoint_parameters, custom_key_values)
+        self.client = RestAPIClient(credential, secure_credentials, endpoint_parameters, custom_key_values)
         extraction_key = endpoint_parameters.get("extraction_key", None)
         self.extraction_key = extraction_key or ''
         self.extraction_path = self.extraction_key.split('.')
@@ -49,9 +53,14 @@ class RestAPIConnector(Connector):
                 record_count += len(data)
                 for row in data:
                     yield self.format_output(row, metadata)
-            else:
+            elif isinstance(data, dict):
                 record_count += 1
                 yield self.format_output(data, metadata)
+            else:
+                data = decode_csv_data(data)
+                record_count += len(data)
+                for row in data:
+                    yield self.format_output(row, metadata)
             if is_records_limit and record_count >= records_limit:
                 break
 

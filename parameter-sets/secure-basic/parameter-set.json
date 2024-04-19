@@ -1,0 +1,45 @@
+{
+    "meta" : {
+        "label": "Secure basic",
+        "description": "Secured preset to be used solely on one domain. Username / password have to be set by individual users from their own profile's credential tab.",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": false,
+    "defaultDefinableAtProjectLevel": false,
+    "pluginParams": [
+    ],
+    "params": [
+        {
+            "name": "secure_token",
+            "type": "CREDENTIAL_REQUEST",
+            "label": "Azure Single Sign On",
+            "credentialRequestSettings": {
+                "type": "BASIC"
+            },
+            "mandatory": true
+        },
+        {
+            "name": "secure_domain",
+            "label": "Domain",
+            "description": "",
+            "type": "STRING",
+            "mandatory": true
+        },
+        {
+            "name": "login_type",
+            "label": "Login type",
+            "type": "SELECT",
+            "defaultValue": "basic_login",
+            "selectChoices": [
+                {
+                    "value": "basic_login",
+                    "label": "Basic auth"
+                },
+                {
+                    "value": "ntlm",
+                    "label": "NTLM"
+                }
+            ]
+        }
+    ]
+}

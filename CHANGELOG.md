@@ -1,5 +1,11 @@
 # Changelog
 
+## [Version 1.2.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.2) - Feature release - 2024-02-14
+
+- Handle XML and CSV endpoints
+- Add secure SSO preset
+- Add secure username / password preset
+
 ## [Version 1.2.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.1) - Bugfix release - 2023-12-13
 
 - Fix the `Add an error column` error behaviour on the recipe
@@ -15,6 +21,8 @@
 - Add Brotli compression
 - Faster recurring calls
 - dku_error column kept at all time in API-Connect recipe output schema
+- Add XML to JSON conversion
+- Add CSV decoding
 - Updated code-env descriptor for DSS 12
 
 ## [Version 1.1.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.1.4) - Feature and bugfix release - 2023-02-28
