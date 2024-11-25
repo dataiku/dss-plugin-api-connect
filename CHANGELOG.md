@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.2.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.3) - Feature release - 2024-11-25
+
+- Fix xml decoding for content type application/atom+xml
+
 ## [Version 1.2.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.2) - Feature release - 2024-02-14
 
 - Handle XML and CSV endpoints
