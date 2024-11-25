@@ -15,15 +15,13 @@
             "label": "Azure Single Sign On",
             "credentialRequestSettings": {
                 "type": "BASIC"
-            },
-            "mandatory": true
+            }
         },
         {
             "name": "secure_domain",
             "label": "Domain",
             "description": "",
-            "type": "STRING",
-            "mandatory": true
+            "type": "STRING"
         },
         {
             "name": "login_type",

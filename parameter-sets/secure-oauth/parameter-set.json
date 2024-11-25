@@ -19,8 +19,7 @@
                 "authorizationEndpoint": " ",
                 "tokenEndpoint": " ",
                 "scope": " "
-            },
-            "mandatory": true
+            }
         },
         {
             "name": "authorizationEndpoint",
@@ -47,8 +46,7 @@
             "name": "secure_domain",
             "label": "Domain",
             "description": "",
-            "type": "STRING",
-            "mandatory": true
+            "type": "STRING"
         }
     ]
 }
