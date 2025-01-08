@@ -57,10 +57,16 @@ class RestAPIConnector(Connector):
                 record_count += 1
                 yield self.format_output(data, metadata)
             else:
-                data = decode_csv_data(data)
-                record_count += len(data)
-                for row in data:
-                    yield self.format_output(row, metadata)
+                csv_data = decode_csv_data(data)
+                if csv_data:
+                    record_count += len(csv_data)
+                    for row in csv_data:
+                        yield self.format_output(row, metadata)
+                else:
+                    record_count += 1
+                    yield {
+                        DKUConstants.API_RESPONSE_KEY: "{}".format(data.decode())
+                    }
             if is_records_limit and record_count >= records_limit:
                 break
 
