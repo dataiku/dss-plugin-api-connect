@@ -1,7 +1,7 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data
+from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN
 from dku_constants import DKUConstants
 import copy
 import json
@@ -49,7 +49,11 @@ class RestApiRecipeSession:
             self.initial_parameter_columns = {}
             for column_name in self.column_to_parameter_dict:
                 parameter_name = self.column_to_parameter_dict[column_name]
-                self.initial_parameter_columns.update({parameter_name: input_parameters_row.get(column_name)})
+                self.initial_parameter_columns.update(
+                    {
+                        parameter_name: de_NaN(input_parameters_row.get(column_name))
+                    }
+                )
             updated_endpoint_parameters = copy.deepcopy(self.endpoint_parameters)
             updated_endpoint_parameters.update(self.initial_parameter_columns)
             logger.info("Processing row #{}, creating client with credential={}, updated_endpoint={}, custom_key_values={}".format(
