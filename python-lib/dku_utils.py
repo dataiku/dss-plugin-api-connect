@@ -1,5 +1,6 @@
 import json
 import copy
+import math
 from jsonpath_ng.ext import parse
 from safe_logger import SafeLogger
 
@@ -145,8 +146,7 @@ def decode_csv_data(data):
     import csv
     import io
     json_data = None
-    if isinstance(data, bytes):
-        data = data.decode("utf-8")
+    data = decode_bytes(data)
     try:
         reader = csv.DictReader(io.StringIO(data))
         json_data = list(reader)
@@ -154,3 +154,16 @@ def decode_csv_data(data):
         logger.error("Could not extract csv data. Error={}".format(error))
         json_data = data
     return json_data
+
+
+def de_NaN(cell_content):
+    if isinstance(cell_content, float):
+        if math.isnan(cell_content):
+            return ''
+    return cell_content
+
+
+def decode_bytes(content):
+    if isinstance(content, bytes):
+        content = content.decode()
+    return content

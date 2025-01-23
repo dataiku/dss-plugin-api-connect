@@ -128,6 +128,10 @@ class RestAPIClient(object):
         error_message = None
         status_code = None
         response_headers = None
+        if "data" in kwargs:
+            data = kwargs.get("data")
+            if isinstance(data, str):
+                kwargs["data"] = data.encode("utf-8")
         try:
             response = self.request_with_redirect_retry(method, url, **kwargs)
             status_code = response.status_code
