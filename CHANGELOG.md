@@ -1,8 +1,11 @@
 # Changelog
 
-## [Version 1.2.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.3) - Feature release - 2024-11-25
+## [Version 1.2.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.3) - Feature and bugfix release - 2024-11-25
 
 - Fix xml decoding for content type application/atom+xml
+- Dump returned content that can't be decoded
+- Fix: Empty cells in the recipe's input dataset now produce an empty string instead of a 'nan' string
+- Fix: UTF-8 encoding of raw mode body
 
 ## [Version 1.2.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.2) - Feature release - 2024-02-14
 
