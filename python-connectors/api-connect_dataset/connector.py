@@ -4,7 +4,8 @@ from safe_logger import SafeLogger
 from rest_api_client import RestAPIClient
 from dku_utils import (
     get_dku_key_values, get_endpoint_parameters,
-    parse_keys_for_json, get_value_from_path, get_secure_credentials, decode_csv_data
+    parse_keys_for_json, get_value_from_path, get_secure_credentials,
+    decode_csv_data, decode_bytes
 )
 from dku_constants import DKUConstants
 import json
@@ -57,10 +58,16 @@ class RestAPIConnector(Connector):
                 record_count += 1
                 yield self.format_output(data, metadata)
             else:
-                data = decode_csv_data(data)
-                record_count += len(data)
-                for row in data:
-                    yield self.format_output(row, metadata)
+                csv_data = decode_csv_data(data)
+                if csv_data:
+                    record_count += len(csv_data)
+                    for row in csv_data:
+                        yield self.format_output(row, metadata)
+                else:
+                    record_count += 1
+                    yield {
+                        DKUConstants.API_RESPONSE_KEY: "{}".format(decode_bytes(data))
+                    }
             if is_records_limit and record_count >= records_limit:
                 break
 
