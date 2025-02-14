@@ -1,4 +1,4 @@
 pytest
 requests<2.22,>=2
 dataiku-api-client
-git+https://github.com/dataiku/dataiku-plugin-tests-utils.git@master#egg=dataiku-plugin-tests-utils
+git+https://github.com/dataiku/dataiku-plugin-tests-utils.git@chore/bump-allure-pytest#egg=dataiku-plugin-tests-utils
