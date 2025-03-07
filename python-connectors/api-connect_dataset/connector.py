@@ -5,7 +5,7 @@ from rest_api_client import RestAPIClient
 from dku_utils import (
     get_dku_key_values, get_endpoint_parameters,
     parse_keys_for_json, get_value_from_path, get_secure_credentials,
-    decode_csv_data, decode_bytes
+    decode_csv_data, decode_bytes, get_user_secrets
 )
 from dku_constants import DKUConstants
 import json
@@ -24,6 +24,8 @@ class RestAPIConnector(Connector):
         secure_credentials = get_secure_credentials(config)
         credential = config.get("credential", {})
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
+        user_secrets = get_user_secrets(config)
+        custom_key_values.update(user_secrets)
         self.client = RestAPIClient(credential, secure_credentials, endpoint_parameters, custom_key_values)
         extraction_key = endpoint_parameters.get("extraction_key", None)
         self.extraction_key = extraction_key or ''

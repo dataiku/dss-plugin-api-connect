@@ -3,7 +3,7 @@ import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
 import pandas as pd
 from safe_logger import SafeLogger
-from dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials
+from dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets
 from rest_api_recipe_session import RestApiRecipeSession
 from dku_constants import DKUConstants
 
@@ -45,6 +45,8 @@ if len(parameter_columns) == 0:
     raise ValueError("There is no parameter column selected.")
 parameter_renamings = get_dku_key_values(config.get("parameter_renamings", {}))
 custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
+user_secrets = get_user_secrets(config)
+custom_key_values.update(user_secrets)
 display_metadata = config.get("display_metadata", False)
 maximum_number_rows = config.get("maximum_number_rows", -1)
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])

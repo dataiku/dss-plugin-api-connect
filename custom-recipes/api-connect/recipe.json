@@ -298,6 +298,13 @@
             "defaultValue": false
         },
         {
+            "name": "should_use_user_secrets",
+            "label": "User's secrets",
+            "description": "Use secrets from user's profile",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "name": "timeout",
             "label": "Timeout (s)",
             "description": "-1 for no limit",
