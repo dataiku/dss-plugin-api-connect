@@ -248,7 +248,7 @@
         {
             "name": "should_use_user_secrets",
             "label": " ",
-            "description": "Use secrets from user's profile",
+            "description": "Use profile's 'other credentials'",
             "type": "BOOLEAN",
             "defaultValue": false
         },

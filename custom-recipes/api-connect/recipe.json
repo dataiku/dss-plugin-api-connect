@@ -299,8 +299,8 @@
         },
         {
             "name": "should_use_user_secrets",
-            "label": "User's secrets",
-            "description": "Use secrets from user's profile",
+            "label": "User 'Other credentials'",
+            "description": "If checked, secrets under Profile > My account > Other credentials, are available to use as {{variables}}",
             "type": "BOOLEAN",
             "defaultValue": false
         },
