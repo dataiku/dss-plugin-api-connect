@@ -66,6 +66,13 @@
             "visibilityCondition": "model.auth_type == 'secure_basic'"
         },
         {
+            "name": "should_use_user_secrets",
+            "label": "User 'Other credentials'",
+            "description": "If checked, secrets under Profile > My account > Other credentials, are available to use as {{variables}}",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "type": "SEPARATOR",
             "label": "API call parameters"
         },
@@ -294,13 +301,6 @@
             "name": "display_metadata",
             "label": "Display metadata",
             "description": "Status code, request time...",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
-            "name": "should_use_user_secrets",
-            "label": "User 'Other credentials'",
-            "description": "If checked, secrets under Profile > My account > Other credentials, are available to use as {{variables}}",
             "type": "BOOLEAN",
             "defaultValue": false
         },
