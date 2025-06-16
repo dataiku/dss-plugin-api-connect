@@ -4,6 +4,7 @@
 
 - Fix xml decoding for content type application/rss+xml
 - Let use the *Other credentials* stored in the user's profile
+- Prevent recipe from inferring its input data types
 
 ## [Version 1.2.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.3) - Feature and bugfix release - 2024-11-25
 
