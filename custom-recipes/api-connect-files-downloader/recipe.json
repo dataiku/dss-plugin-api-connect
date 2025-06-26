@@ -1,0 +1,252 @@
+{
+    "meta": {
+        "label": "File Downloader",
+        "description": "Download a list of files",
+        "icon": "icon-rocket"
+    },
+    "kind": "PYTHON",
+    "selectableFromDataset": "input_A_role",
+    "inputRoles": [
+        {
+            "name": "input_A_role",
+            "label": "Dataset listing the files to download",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+            
+        }
+    ],
+
+    "outputRoles": [
+        {
+            "name": "output_folder",
+            "label": "Download folder",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": false,
+            "acceptsManagedFolder": true
+        },
+        {
+            "name": "result_dataset",
+            "label": "Result dataset",
+            "description": "",
+            "arity": "UNARY",
+            "required": false,
+            "acceptsDataset": true,
+            "acceptsManagedFolder": false
+        }
+    ],
+    "params": [
+        {
+            "type": "SEPARATOR",
+            "label": "Authentication"
+        },
+        {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": "secure_oauth", "label": "SSO"},
+                {"value": "secure_basic", "label": "Secure username / password"},
+                {"value": null, "label": "Other"}
+            ]
+        },
+        {
+            "name": "credential",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "credential",
+            "visibilityCondition": "model.auth_type == null"
+        },
+        {
+            "name": "secure_oauth",
+            "label": "SSO preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-oauth",
+            "visibilityCondition": "model.auth_type == 'secure_oauth'"
+        },
+        {
+            "name": "secure_basic",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-basic",
+            "visibilityCondition": "model.auth_type == 'secure_basic'"
+        },
+        {
+            "name": "should_use_user_secrets",
+            "label": "User 'Other credentials'",
+            "description": "If checked, secrets under Profile > My account > Other credentials, are available to use as {{variables}}",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "API call parameters"
+        },
+
+        {
+            "name": "endpoint_url",
+            "label": "URL template",
+            "description": "https://{{my_variable}}.example.com/user/{{username}}/details",
+            "type": "TEXTAREA"
+        },
+        {
+            "name": "http_method",
+            "label": "HTTP method",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": "GET",
+            "selectChoices":[
+                {"value": "GET", "label": "GET"},
+                {"value": "POST", "label": "POST"},
+                {"value": "PUT", "label": "PUT"},
+                {"value": "PATCH", "label": "PATCH"},
+                {"value": "DELETE", "label": "DELETE"}
+            ]
+        },
+        {
+            "name": "endpoint_query_string",
+            "label": "Query Params",
+            "description": "Will add ?key1=val1&key2=val2 to the URL",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "endpoint_body",
+            "label": "Body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+        {
+            "name": "endpoint_headers",
+            "label": "Headers",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "defaultValue": [
+                {
+                    "from": "Content-Type",
+                    "to": "application/json"
+                },
+                {
+                    "from": "Accept",
+                    "to": "application/json"
+                }
+            ]
+        },
+        {
+            "name": "body_format",
+            "label": "Body",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": null, "label": "None"},
+                {"value": "FORM_DATA", "label": "Form-data"},
+                {"value": "RAW", "label": "Raw"}
+            ]
+        },
+        {
+            "name": "text_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "TEXTAREA",
+            "visibilityCondition": "model.body_format=='RAW'"
+        },
+        {
+            "name": "key_value_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
+        },
+
+        {
+            "type": "SEPARATOR",
+            "label": "Template variables",
+            "description": "URL, headers and parameters can be templated using {{variables}}"
+        },
+        {
+            "name": "parameter_columns",
+            "label": "Columns to use as variables",
+            "description": "Unless renamed, these columns can be used as {{ColumnName}} variables in templates",
+            "type": "COLUMNS",
+            "columnRole": "input_A_role"
+        },
+        {
+            "name": "parameter_renamings",
+            "label": "Variables columns renaming",
+            "description": "Rename 'My variable column' to 'my_variable', to use as {{my_variable}}, and avoid name colisions (optional)",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "custom_key_values",
+            "label": "Custom keys / values",
+            "description": "Replace the variable {{key}} by its value in templates (optional)",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced"
+        },
+        {
+            "name": "behaviour_when_error",
+            "label": "Error behaviour",
+            "description": "Decide how the recipe should react when an input line results in an error",
+            "type": "SELECT",
+            "defaultValue": "keep-error-column",
+            "selectChoices":[
+                {"value": "ignore", "label": "Ignore the error"},
+                {"value": "add-error-column", "label": "Add an error column"},
+                {"value": "keep-error-column", "label": "Error column always in schema"},
+                {"value": "raise", "label": "Fail the job"}
+            ]
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
+            "defaultValue": false
+        },
+        {
+            "name": "redirect_auth_header",
+            "label": "Redirect authorization header",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "display_metadata",
+            "label": "Display metadata",
+            "description": "Status code, request time...",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": 3600
+        },
+        {
+            "name": "requests_per_minute",
+            "label": "Rate limit (requests/m)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
+        },
+        {
+            "name": "maximum_number_rows",
+            "label": "Maximum number of rows",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
+        }
+    ],
+    "resourceKeys": []
+}
