@@ -40,7 +40,7 @@ class RestApiRecipeSession:
                 column_to_parameter_dict[parameter_column] = parameter_column
         return column_to_parameter_dict
 
-    def process_dataframe(self, input_parameters_dataframe, is_raw_output):
+    def process_dataframe(self, input_parameters_dataframe, is_raw_output, folder=None):
         results = []
         time_last_request = None
         session = requests.Session()
@@ -71,14 +71,33 @@ class RestApiRecipeSession:
                 behaviour_when_error=self.behaviour_when_error
             )
             self.client.time_last_request = time_last_request
-            while self.client.has_more_data():
-                page_results = self.retrieve_next_page(is_raw_output)
-                results.extend(page_results)
-                rows_count += len(page_results)
-                if self.is_row_limit and rows_count >= self.maximum_number_rows:
-                    break
+            if not folder:
+                while self.client.has_more_data():
+                    page_results = self.retrieve_next_page(is_raw_output)
+                    results.extend(page_results)
+                    rows_count += len(page_results)
+                    if self.is_row_limit and rows_count >= self.maximum_number_rows:
+                        break
+            else:
+                result = self.download_to_folder(folder)
+                previous = json.loads(input_parameters_row.to_json())
+                if isinstance(previous, dict):
+                    result.update(previous)
+                results.extend([result])
             time_last_request = self.client.time_last_request
         return results
+
+    def download_to_folder(self, folder):
+        file_name = self.client.endpoint_url.split("/")[-1:][0]
+        response = self.client.api_call(can_raise_exeption=False, raw_output=True)
+        status_code = None
+        if isinstance(response, requests.models.Response):
+            status_code = response.status_code
+            if status_code < 400:
+                folder.upload_data(file_name, response.content)
+        elif isinstance(response, dict):
+            return response
+        return {"Status code": status_code}
 
     def retrieve_next_page(self, is_raw_output):
         page_rows = []

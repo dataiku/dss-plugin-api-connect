@@ -116,7 +116,7 @@ class RestAPIClient(object):
         json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
         return json_response
 
-    def request(self, method, url, can_raise_exeption=True, **kwargs):
+    def request(self, method, url, can_raise_exeption=True, raw_output=False, **kwargs):
         logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.assert_secure_domain(url)
         self.enforce_throttling()
@@ -161,6 +161,9 @@ class RestAPIClient(object):
             self.pagination.update_next_page({}, response.links)
             return self.empty_json_response()
 
+        if raw_output:
+            return response
+
         json_response = self.get_json_from_response(response, can_raise_exeption=can_raise_exeption)
 
         return json_response
@@ -176,7 +179,7 @@ class RestAPIClient(object):
             response = self.session.request(method, response.url, **redirection_kwargs)
         return response
 
-    def paginated_api_call(self, can_raise_exeption=True):
+    def paginated_api_call(self, can_raise_exeption=True, raw_output=False):
         if self.pagination.params_must_be_blanked:
             self.requests_kwargs["params"] = {}
         else:
@@ -186,7 +189,14 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"params": params})
         self.call_number = self.call_number + 1
         logger.info("API call number #{}".format(self.call_number))
-        return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
+        return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, raw_output=raw_output, **self.requests_kwargs)
+
+    def api_call(self, can_raise_exeption=True, raw_output=False):
+        params = self.requests_kwargs.get("params")
+        self.requests_kwargs.update({"params": params})
+        self.call_number = self.call_number + 1
+        logger.info("API call number #{}".format(self.call_number))
+        return self.request(self.http_method, self.endpoint_url, can_raise_exeption, raw_output=raw_output, **self.requests_kwargs)
 
     def empty_json_response(self):
         return {self.extraction_key: {}} if self.extraction_key else {}
