@@ -17,7 +17,6 @@ def get_dku_key_values(endpoint_query_string):
     return dict(result)
 
 
-
 def get_endpoint_parameters(configuration):
     endpoint_parameters = [
         "endpoint_url",
