@@ -46,7 +46,7 @@ class RestAPIClient(object):
         endpoint_headers = endpoint.get("endpoint_headers", "")
         self.endpoint_headers = self.get_params(endpoint_headers, self.presets_variables)
 
-        self.params = self.get_params(self.endpoint_query_string, self.presets_variables)
+        self.params = self.get_params(self.endpoint_query_string, self.presets_variables, True)
 
         self.extraction_key = endpoint.get("extraction_key", None)
 
@@ -195,11 +195,11 @@ class RestAPIClient(object):
         self.metadata["dku_{}".format(metadata_name)] = value
 
     @staticmethod
-    def get_params(endpoint_query_string, keywords):
+    def get_params(endpoint_query_string, keywords, allow_list=False):
         templated_query_string = get_dku_key_values(endpoint_query_string)
         ret = {}
         for key in templated_query_string:
-            ret.update({key: format_template(templated_query_string.get(key, ""), **keywords) or ""})
+            ret.update({key: format_template(templated_query_string.get(key, ""),allow_list=allow_list, **keywords) or ""})
         return ret
 
     def has_more_data(self):
