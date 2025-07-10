@@ -98,15 +98,30 @@ def template_dict(dictionnary, **kwargs):
     return ret
 
 
-def format_template(template, **kwargs):
-    """ Replace {{keys}} elements in template with the matching value in the kwargs dictionnary"""
+def format_template(template, allow_list=False, **kwargs):
+    """
+    Replace {{key}} in template with the value(s) in the kwargs dictionnary.
+    If allow_list is False, list inputs will be joined into a comma-separated string (for headers).
+    If allow_list is True, lists will be returned as lists (for query params).
+    """
+    def replace_in(template):
+        formated = template
+        for key, value in kwargs.items():
+            formated = formated.replace(f"{{{{{key}}}}}", str(value))
+        return formated
     if template is None:
         return None
-    formated = template
-    for key in kwargs:
-        replacement = kwargs.get(key, "")
-        formated = formated.replace("{{{{{}}}}}".format(key), str(replacement))
-    return formated
+    elif isinstance(template, list):
+        replaced_list = [replace_in(item) for item in template]
+        if allow_list:
+            return replaced_list
+        else:
+        # To handle headers
+            return ", ".join(replaced_list)
+    elif isinstance(template, str):
+        return replace_in(template)
+    else:
+        return template
 
 
 def is_string(data):
