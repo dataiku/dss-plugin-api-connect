@@ -199,7 +199,7 @@ class RestAPIClient(object):
         templated_query_string = get_dku_key_values(endpoint_query_string)
         ret = {}
         for key in templated_query_string:
-            ret.update({key: format_template(templated_query_string.get(key, ""),allow_list=allow_list, **keywords) or ""})
+            ret.update({key: format_template(templated_query_string.get(key, ""), allow_list=allow_list, **keywords) or ""})
         return ret
 
     def has_more_data(self):
