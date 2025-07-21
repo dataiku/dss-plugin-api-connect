@@ -1,9 +1,10 @@
 # Changelog
 
-## [Version 1.2.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.4) - Feature release - 2025-02-18
+## [Version 1.2.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.4) - Feature and bugfix release - 2025-02-18
 
 - Fix xml decoding for content type application/rss+xml
 - Let use the *Other credentials* stored in the user's profile
+- Prevent recipe from inferring its input data types
 
 ## [Version 1.2.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.3) - Feature and bugfix release - 2024-11-25
 

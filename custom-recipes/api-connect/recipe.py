@@ -52,7 +52,7 @@ maximum_number_rows = config.get("maximum_number_rows", -1)
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
-input_parameters_dataframe = input_parameters_dataset.get_dataframe()
+input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False)
 
 recipe_session = RestApiRecipeSession(
     custom_key_values,
