@@ -167,3 +167,19 @@ def decode_bytes(content):
     if isinstance(content, bytes):
         content = content.decode()
     return content
+
+
+def get_user_secrets(configuration):
+    should_use_user_secrets = configuration.get("should_use_user_secrets", False)
+    if should_use_user_secrets:
+        import dataiku
+        logger.info("Using user's secrets:")
+        client = dataiku.api_client()
+        auth_info = client.get_auth_info(with_secrets=True)
+        secrets = auth_info.get("secrets", [])
+        user_secrets = {}
+        for secret in secrets:
+            logger.info("\t-'{}'".format(secret.get("key")))
+            user_secrets[secret.get("key")] = secret.get("value")
+        return user_secrets
+    return {}
