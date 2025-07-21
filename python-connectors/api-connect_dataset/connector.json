@@ -45,6 +45,13 @@
             "visibilityCondition": "model.auth_type == 'secure_basic'"
         },
         {
+            "name": "should_use_user_secrets",
+            "label": " ",
+            "description": "Use profile's 'other credentials'",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "type": "SEPARATOR",
             "label": "API call parameters"
         },

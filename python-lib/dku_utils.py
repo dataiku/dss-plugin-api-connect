@@ -126,7 +126,7 @@ def extract_key_using_json_path(json_dictionary, json_path):
 def is_reponse_xml(response):
     content_types = response.headers.get("Content-Type", "").split(";")
     for content_type in content_types:
-        if content_type in ["text/xml", "application/soap+xml", "application/xml", "application/atom+xml"]:
+        if content_type in ["text/xml", "application/soap+xml", "application/xml", "application/atom+xml", "application/rss+xml"]:
             return True
     return False
 
@@ -167,3 +167,19 @@ def decode_bytes(content):
     if isinstance(content, bytes):
         content = content.decode()
     return content
+
+
+def get_user_secrets(configuration):
+    should_use_user_secrets = configuration.get("should_use_user_secrets", False)
+    if should_use_user_secrets:
+        import dataiku
+        logger.info("Using user's secrets:")
+        client = dataiku.api_client()
+        auth_info = client.get_auth_info(with_secrets=True)
+        secrets = auth_info.get("secrets", [])
+        user_secrets = {}
+        for secret in secrets:
+            logger.info("\t-'{}'".format(secret.get("key")))
+            user_secrets[secret.get("key")] = secret.get("value")
+        return user_secrets
+    return {}
