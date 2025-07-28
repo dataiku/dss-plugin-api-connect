@@ -53,3 +53,7 @@ def test_run_api_connect_check_sc_163656_error_column_always_in_schema(user_dss_
 
 def test_run_api_connect_xml_handling(user_dss_clients):
     dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="XML_HANDLING")
+
+
+def test_run_api_connect_parameters_renaming(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="COLUMNPARAMETERRENAMING")
