@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.2.5](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.5) - Bugfix release - 2025-02-28
+
+- Fix issue with variables columns renaming
+
 ## [Version 1.2.4](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.4) - Feature and bugfix release - 2025-02-18
 
 - Fix xml decoding for content type application/rss+xml

@@ -4,7 +4,7 @@ import copy
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
+from dku_utils import get_dku_key_values, get_dku_duplicated_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
 from dku_constants import DKUConstants
 from rest_api_auth import get_auth
 
@@ -196,7 +196,7 @@ class RestAPIClient(object):
 
     @staticmethod
     def get_params(endpoint_query_string, keywords, allow_list=False):
-        templated_query_string = get_dku_key_values(endpoint_query_string)
+        templated_query_string = get_dku_duplicated_key_values(endpoint_query_string)
         ret = {}
         for key in templated_query_string:
             ret.update({key: format_template(templated_query_string.get(key, ""), allow_list=allow_list, **keywords) or ""})
