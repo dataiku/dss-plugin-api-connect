@@ -8,6 +8,7 @@
         "icon": "icon-rocket",
         "tags": ["Connector", "Cloud"],
         "url": "https://www.dataiku.com/product/plugins/api-connect/",
-        "licenseInfo": "Apache Software License"
+        "licenseInfo": "Apache Software License",
+        "recipesCategory": "visual"
     }
 }
