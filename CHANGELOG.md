@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.2.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.6) - Feature - 2025-09-24
+
+- Add "recipesCategory" parameter so that the API connect recipe is categorized as a Visual recipe in the right hand panel
+
 ## [Version 1.2.5](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.5) - Bugfix release - 2025-02-28
 
 - Fix issue with variables columns renaming
