@@ -6,7 +6,8 @@
         "description": "Retrieve data from any REST API",
         "author": "Dataiku (Alex Bourret)",
         "icon": "icon-rocket",
-        "tags": ["Connector", "Cloud"],
+        "category": "Connect",
+        "tags": ["API", "Recipe", "Dataset"],
         "url": "https://www.dataiku.com/product/plugins/api-connect/",
         "licenseInfo": "Apache Software License",
         "recipesCategory": "visual"
