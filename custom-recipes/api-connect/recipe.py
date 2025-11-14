@@ -35,7 +35,10 @@ dku_flow_variables = dataiku.get_flow_variables()
 logger.info("config={}".format(logger.filter_secrets(config)))
 
 credential_parameters = config.get("credential", {})
-behaviour_when_error = config.get("behaviour_when_error", "add-error-column")
+behaviour_when_error = config.get("behaviour_when_error", "ignore")
+# if behaviour_when_error not in UI, this is an update from older version
+# -> behave like the older version (=ignore)
+logger.info("Behaviour in case of an error: {}".format(behaviour_when_error))
 endpoint_parameters = get_endpoint_parameters(config)
 secure_credentials = get_secure_credentials(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
