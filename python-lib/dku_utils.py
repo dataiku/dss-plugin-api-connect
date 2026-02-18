@@ -171,9 +171,50 @@ def decode_csv_data(data):
     import io
     json_data = None
     data = decode_bytes(data)
+    logger.info("Sniffing potential csv data")
     try:
-        reader = csv.DictReader(io.StringIO(data))
+        sniffer = csv.Sniffer()
+        dialect = sniffer.sniff(data)
+        logger.info(
+            "Decoding CSV method 1 with delim='{}', dbl='{}', esc='{}', lnt='{}', qtchr='{}', qtng='{}', skip='{}'".format(
+                dialect.delimiter,
+                dialect.doublequote,
+                dialect.escapechar,
+                dialect.lineterminator,
+                dialect.quotechar,
+                dialect.quoting,
+                dialect.skipinitialspace
+            )
+        )
+    except Exception as error:
+        logger.error("Could not sniff csv dialect. Error={}".format(error))
+        dialect = "excel"
+    try:
+        reader = csv.DictReader(
+            io.StringIO(data),
+            dialect=dialect
+        )
         json_data = list(reader)
+    except Exception as error:
+        logger.error("Could not extract csv data. Error={}. Trying method 2.".format(error))
+        json_data = decode_csv_data_m2(data, dialect)
+    return json_data
+
+
+def decode_csv_data_m2(data, dialect):
+    import csv
+    json_data = None
+    try:
+        json_data = []
+        headers = []
+        for row in csv.reader(data.splitlines(), dialect=dialect):
+            if not headers:
+                headers = row
+            else:
+                output_row = {}
+                for header, item in zip(headers, row):
+                    output_row[header] = item
+                json_data.append(output_row)
     except Exception as error:
         logger.error("Could not extract csv data. Error={}".format(error))
         json_data = data
