@@ -126,6 +126,7 @@ class RestApiRecipeSession:
                         page_rows.append(base_row)
                 else:
                     json_response = decode_csv_data(json_response)
+                    is_api_returning_dict = False
                     for row in json_response:
                         base_row = copy.deepcopy(metadata)
                         base_row.update(parse_keys_for_json(row))
