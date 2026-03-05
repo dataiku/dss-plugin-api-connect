@@ -59,6 +59,14 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"verify": False})
         else:
             self.requests_kwargs.update({"verify": True})
+        if endpoint.get("use_mtls", False):
+            mtls_certificate_path = endpoint.get("mtls_certificate_path")
+            mtls_key_path = endpoint.get("mtls_key_path")
+            self.requests_kwargs.update(
+                {
+                    "cert": (mtls_certificate_path, mtls_key_path)
+                }
+            )
         self.redirect_auth_header = endpoint.get("redirect_auth_header", False)
         self.timeout = endpoint.get("timeout", -1)
         if self.timeout > 0:
