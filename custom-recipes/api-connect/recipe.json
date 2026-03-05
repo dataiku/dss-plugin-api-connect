@@ -292,6 +292,27 @@
             "defaultValue": false
         },
         {
+            "name": "use_mtls",
+            "label": "Use mTLS",
+            "description": "",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "mtls_certificate_path",
+            "label": "Path to certificate",
+            "description": "",
+            "type": "STRING",
+            "visibilityCondition": "model.use_mtls==true"
+        },
+        {
+            "name": "mtls_key_path",
+            "label": "Path to key",
+            "description": "",
+            "type": "STRING",
+            "visibilityCondition": "model.use_mtls==true"
+        },
+        {
             "name": "redirect_auth_header",
             "label": "Redirect authorization header",
             "type": "BOOLEAN",
