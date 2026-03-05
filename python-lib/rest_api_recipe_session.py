@@ -1,7 +1,7 @@
 from dataikuapi.utils import DataikuException
 from rest_api_client import RestAPIClient
 from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN
+from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN, decode_bytes
 from dku_constants import DKUConstants
 import copy
 import json
@@ -108,6 +108,7 @@ class RestApiRecipeSession:
             # Todo: check api_response key is free and add something overwise
             base_row = copy.deepcopy(metadata)
             if is_raw_output:
+                assert_json(json_response)
                 if is_error_message(json_response):
                     base_row.update(parse_keys_for_json(json_response))
                 else:
@@ -125,9 +126,18 @@ class RestApiRecipeSession:
                         base_row.update(self.initial_parameter_columns)
                         page_rows.append(base_row)
                 else:
-                    json_response = decode_csv_data(json_response)
+                    decoded_csv_data = decode_csv_data(json_response)
                     is_api_returning_dict = False
-                    for row in json_response:
+                    if not decoded_csv_data and json_response:
+                        logger.warning("Data is not in CSV format. Dumping it in text mode.")
+                        decoded_csv_data = [
+                            {
+                                DKUConstants.API_RESPONSE_KEY: "{}".format(
+                                    decode_bytes(json_response)
+                                )
+                            }
+                        ]
+                    for row in decoded_csv_data:
                         base_row = copy.deepcopy(metadata)
                         base_row.update(parse_keys_for_json(row))
                         base_row.update(self.initial_parameter_columns)
@@ -182,3 +192,9 @@ def is_error_message(jsons_response):
         return True
     else:
         return False
+
+
+def assert_json(variable_to_check):
+    if isinstance(variable_to_check, dict) or isinstance(variable_to_check, list):
+        return
+    raise Exception("Returned data is not JSON format. Try again with 'Raw JSON output' un-checked.")
