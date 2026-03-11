@@ -29,6 +29,7 @@ class RestApiRecipeSession:
         self.is_row_limit = (self.maximum_number_rows > 0)
         self.behaviour_when_error = behaviour_when_error or "add-error-column"
         self.can_raise = self.behaviour_when_error == "raise"
+        self.csv_configuration = endpoint_parameters
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -126,7 +127,7 @@ class RestApiRecipeSession:
                         base_row.update(self.initial_parameter_columns)
                         page_rows.append(base_row)
                 else:
-                    decoded_csv_data = decode_csv_data(json_response)
+                    decoded_csv_data = decode_csv_data(json_response, self.csv_configuration)
                     is_api_returning_dict = False
                     if not decoded_csv_data and json_response:
                         logger.warning("Data is not in CSV format. Dumping it in text mode.")
@@ -151,7 +152,7 @@ class RestApiRecipeSession:
         page_rows = []
         metadata = metadata or {}
         if type(data_rows) in [str, bytes]:
-            data_rows = decode_csv_data(data_rows)
+            data_rows = decode_csv_data(data_rows, self.csv_configuration)
         if type(data_rows) in [list]:
             for data_row in data_rows:
                 base_row = copy.deepcopy(self.initial_parameter_columns)
