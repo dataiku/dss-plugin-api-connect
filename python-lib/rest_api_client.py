@@ -59,9 +59,17 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"verify": False})
         else:
             self.requests_kwargs.update({"verify": True})
-        if endpoint.get("use_mtls", False):
-            mtls_certificate_path = endpoint.get("mtls_certificate_path")
-            mtls_key_path = endpoint.get("mtls_key_path")
+        if credential.get("use_mtls", False):
+            mtls_certificate_path = credential.get("mtls_certificate_path")
+            mtls_key_path = credential.get("mtls_key_path")
+            self.requests_kwargs.update(
+                {
+                    "cert": (mtls_certificate_path, mtls_key_path)
+                }
+            )
+        if secure_credentials.get("use_mtls", False):
+            mtls_certificate_path = secure_credentials.get("mtls_certificate_path")
+            mtls_key_path = secure_credentials.get("mtls_key_path")
             self.requests_kwargs.update(
                 {
                     "cert": (mtls_certificate_path, mtls_key_path)
