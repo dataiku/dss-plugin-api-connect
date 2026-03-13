@@ -50,10 +50,16 @@
         },
         {
             "name": "use_mtls",
-            "label": " ",
-            "description": "Use mTLS",
+            "label": "Use mTLS",
+            "description": "",
             "type": "BOOLEAN",
             "defaultValue": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Warning",
+            "description": "1 - Restricting access to this presset will not restrict access to the certificate and key files. This has to be done by setting the appropriate access rights on these two files.\n2 - Because the OAuth flow is not controled by the plugin, mTLS cannot be used for the retrieving the access token itself.",
+            "visibilityCondition": "model.use_mtls==true"
         },
         {
             "name": "mtls_certificate_path",
