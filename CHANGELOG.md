@@ -4,6 +4,7 @@
 
 - Detecting dialect for better csv decoding
 - Fixing duplication of last line in csv APIs using the recipe
+- Dumping API's response as a last resort
 
 ## [Version 1.2.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.6) - Feature - 2025-09-24
 
