@@ -68,7 +68,7 @@ class RestAPIConnector(Connector):
                 else:
                     record_count += 1
                     yield {
-                        DKUConstants.API_RESPONSE_KEY: "{}".format(decode_bytes(data))
+                        DKUConstants.API_RESPONSE_KEY: decode_bytes(data)
                     }
             if is_records_limit and record_count >= records_limit:
                 break
