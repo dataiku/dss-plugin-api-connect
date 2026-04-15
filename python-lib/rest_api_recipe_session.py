@@ -108,13 +108,17 @@ class RestApiRecipeSession:
             # Todo: check api_response key is free and add something overwise
             base_row = copy.deepcopy(metadata)
             if is_raw_output:
-                assert_json(json_response)
                 if is_error_message(json_response):
                     base_row.update(parse_keys_for_json(json_response))
                 else:
-                    base_row.update({
-                        DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)
-                    })
+                    try:
+                        base_row.update({
+                            DKUConstants.API_RESPONSE_KEY: json.dumps(json_response)
+                        })
+                    except Exception:
+                        base_row.update({
+                            DKUConstants.API_RESPONSE_KEY: decode_bytes(json_response)
+                        })
             else:
                 if isinstance(json_response, dict):
                     base_row.update(parse_keys_for_json(json_response))
@@ -192,9 +196,3 @@ def is_error_message(jsons_response):
         return True
     else:
         return False
-
-
-def assert_json(variable_to_check):
-    if isinstance(variable_to_check, dict) or isinstance(variable_to_check, list):
-        return
-    raise Exception("Returned data is not JSON format. Try again with 'Raw JSON output' un-checked.")
