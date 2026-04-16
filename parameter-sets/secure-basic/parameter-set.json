@@ -55,14 +55,14 @@
         {
             "name": "mtls_certificate_path",
             "label": "Path to certificate",
-            "description": "or full certificate from -----BEGIN to END CERTIFICATE-----",
+            "description": "or full certificate starting with -----BEGIN and ending with END CERTIFICATE-----",
             "type": "PASSWORD",
             "visibilityCondition": "model.use_mtls==true"
         },
         {
             "name": "mtls_key_path",
             "label": "Path to key",
-            "description": "or full key from -----BEGIN to END PRIVATE KEY-----",
+            "description": "or full key starting with -----BEGIN and ending with END PRIVATE KEY-----",
             "type": "PASSWORD",
             "visibilityCondition": "model.use_mtls==true"
         }
