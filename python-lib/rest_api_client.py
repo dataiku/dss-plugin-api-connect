@@ -196,7 +196,7 @@ class RestAPIClient(object):
     def request_with_cert(self, method, url, **kwargs):
         cert = kwargs.get("cert", None)
         if cert and len(cert) == 2:
-            if cert[0].startswith("-----BEGIN CERTIFICATE") and cert[1].startswith("-----BEGIN PRIVATE KEY"):
+            if cert[0].startswith("-----BEGIN CERTIFICATE") and cert[1].startswith("-----BEGIN "):
                 logger.info("mTLS certificate and key are strings")
                 response = None
                 with tempfile.NamedTemporaryFile(mode="w", suffix=".crt") as tmp_certificate:
@@ -303,18 +303,30 @@ def get_headers(response):
 
 
 def normalize_key(key):
+    PROTECTED_EXPRESSIONS = [
+        "BEGIN CERTIFICATE", "END CERTIFICATE",
+        "BEGIN PRIVATE KEY", "END PRIVATE KEY",
+        "BEGIN RSA PRIVATE KEY", "END RSA PRIVATE KEY"
+    ]
     tempo_text = str(key)
-    tempo_text = tempo_text.replace("BEGIN CERTIFICATE", "BEGINCERTIFICATE")
-    tempo_text = tempo_text.replace("END CERTIFICATE", "ENDCERTIFICATE")
-    tempo_text = tempo_text.replace("-----BEGIN PRIVATE KEY-----", "-----BEGINPRIVATEKEY-----")
-    tempo_text = tempo_text.replace("-----END PRIVATE KEY-----", "-----ENDPRIVATEKEY-----")
-    tempo_text = tempo_text.replace("BEGIN RSA PRIVATE KEY", "BEGINRSAPRIVATEKEY")
-    tempo_text = tempo_text.replace("END RSA PRIVATE KEY", "ENDRSAPRIVATEKEY")
+    for expression_to_protect in PROTECTED_EXPRESSIONS:
+        protected_form = expression_to_protect.replace(" ", "")
+        tempo_text = tempo_text.replace(expression_to_protect, protected_form)
     tempo_text = tempo_text.replace(" ", "\n")
-    tempo_text = tempo_text.replace("BEGINRSAPRIVATEKEY", "BEGIN RSA PRIVATE KEY")
-    tempo_text = tempo_text.replace("ENDRSAPRIVATEKEY", "END RSA PRIVATE KEY")
-    tempo_text = tempo_text.replace("BEGINCERTIFICATE", "BEGIN CERTIFICATE")
-    tempo_text = tempo_text.replace("ENDCERTIFICATE", "END CERTIFICATE")
-    tempo_text = tempo_text.replace("-----BEGINPRIVATEKEY-----", "-----BEGIN PRIVATE KEY-----")
-    tempo_text = tempo_text.replace("-----ENDPRIVATEKEY-----", "-----END PRIVATE KEY-----")
+    for expression_to_protect in PROTECTED_EXPRESSIONS:
+        protected_form = expression_to_protect.replace(" ", "")
+        tempo_text = tempo_text.replace(protected_form, expression_to_protect)
+    # tempo_text = tempo_text.replace("BEGIN CERTIFICATE", "BEGINCERTIFICATE")
+    # tempo_text = tempo_text.replace("END CERTIFICATE", "ENDCERTIFICATE")
+    # tempo_text = tempo_text.replace("-----BEGIN PRIVATE KEY-----", "-----BEGINPRIVATEKEY-----")
+    # tempo_text = tempo_text.replace("-----END PRIVATE KEY-----", "-----ENDPRIVATEKEY-----")
+    # tempo_text = tempo_text.replace("BEGIN RSA PRIVATE KEY", "BEGINRSAPRIVATEKEY")
+    # tempo_text = tempo_text.replace("END RSA PRIVATE KEY", "ENDRSAPRIVATEKEY")
+    # tempo_text = tempo_text.replace(" ", "\n")
+    # tempo_text = tempo_text.replace("BEGINRSAPRIVATEKEY", "BEGIN RSA PRIVATE KEY")
+    # tempo_text = tempo_text.replace("ENDRSAPRIVATEKEY", "END RSA PRIVATE KEY")
+    # tempo_text = tempo_text.replace("BEGINCERTIFICATE", "BEGIN CERTIFICATE")
+    # tempo_text = tempo_text.replace("ENDCERTIFICATE", "END CERTIFICATE")
+    # tempo_text = tempo_text.replace("-----BEGINPRIVATEKEY-----", "-----BEGIN PRIVATE KEY-----")
+    # tempo_text = tempo_text.replace("-----ENDPRIVATEKEY-----", "-----END PRIVATE KEY-----")
     return tempo_text
