@@ -316,17 +316,4 @@ def normalize_key(key):
     for expression_to_protect in PROTECTED_EXPRESSIONS:
         protected_form = expression_to_protect.replace(" ", "")
         tempo_text = tempo_text.replace(protected_form, expression_to_protect)
-    # tempo_text = tempo_text.replace("BEGIN CERTIFICATE", "BEGINCERTIFICATE")
-    # tempo_text = tempo_text.replace("END CERTIFICATE", "ENDCERTIFICATE")
-    # tempo_text = tempo_text.replace("-----BEGIN PRIVATE KEY-----", "-----BEGINPRIVATEKEY-----")
-    # tempo_text = tempo_text.replace("-----END PRIVATE KEY-----", "-----ENDPRIVATEKEY-----")
-    # tempo_text = tempo_text.replace("BEGIN RSA PRIVATE KEY", "BEGINRSAPRIVATEKEY")
-    # tempo_text = tempo_text.replace("END RSA PRIVATE KEY", "ENDRSAPRIVATEKEY")
-    # tempo_text = tempo_text.replace(" ", "\n")
-    # tempo_text = tempo_text.replace("BEGINRSAPRIVATEKEY", "BEGIN RSA PRIVATE KEY")
-    # tempo_text = tempo_text.replace("ENDRSAPRIVATEKEY", "END RSA PRIVATE KEY")
-    # tempo_text = tempo_text.replace("BEGINCERTIFICATE", "BEGIN CERTIFICATE")
-    # tempo_text = tempo_text.replace("ENDCERTIFICATE", "END CERTIFICATE")
-    # tempo_text = tempo_text.replace("-----BEGINPRIVATEKEY-----", "-----BEGIN PRIVATE KEY-----")
-    # tempo_text = tempo_text.replace("-----ENDPRIVATEKEY-----", "-----END PRIVATE KEY-----")
     return tempo_text
