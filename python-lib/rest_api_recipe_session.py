@@ -136,9 +136,7 @@ class RestApiRecipeSession:
                         logger.warning("Data is not in CSV format. Dumping it in text mode.")
                         decoded_csv_data = [
                             {
-                                DKUConstants.API_RESPONSE_KEY: "{}".format(
-                                    decode_bytes(json_response)
-                                )
+                                DKUConstants.API_RESPONSE_KEY: decode_bytes(json_response)
                             }
                         ]
                     for row in decoded_csv_data:
