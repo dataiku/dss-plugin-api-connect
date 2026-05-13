@@ -268,15 +268,15 @@
         },
         {
             "name": "csv_delimiter",
-            "label": " ",
-            "description": "Delimiter",
+            "label": "Delimiter",
+            "description": "",
             "type": "STRING",
             "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
             "name": "csv_doublequote",
-            "label": " ",
-            "description": "Double quote",
+            "label": "Double quote",
+            "description": "",
             "type": "SELECT",
             "selectChoices":[
                 {"value": null, "label": "Auto detect"},
@@ -287,29 +287,29 @@
         },
         {
             "name": "csv_escapechar",
-            "label": " ",
-            "description": "Escape char",
+            "label": "Escape char",
+            "description": "",
             "type": "STRING",
             "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
             "name": "csv_lineterminator",
-            "label": " ",
-            "description": "Line terminator",
+            "label": "Line terminator",
+            "description": "",
             "type": "STRING",
             "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
             "name": "csv_quotechar",
-            "label": " ",
-            "description": "Quote char",
+            "label": "Quote char",
+            "description": "",
             "type": "STRING",
             "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
             "name": "csv_quoting",
-            "label": " ",
-            "description": "Quote",
+            "label": "Quote",
+            "description": "",
             "type": "SELECT",
             "selectChoices":[
                 {"value": null, "label": "Auto detect"},
@@ -324,8 +324,8 @@
         },
         {
             "name": "csv_skipinitialspace",
-            "label": " ",
-            "description": "Skip initial space",
+            "label": "Skip initial space",
+            "description": "",
             "type": "SELECT",
             "selectChoices":[
                 {"value": null, "label": "Auto detect"},
