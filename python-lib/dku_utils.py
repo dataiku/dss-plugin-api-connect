@@ -41,7 +41,9 @@ def get_endpoint_parameters(configuration):
         "next_page_url_key", "is_next_page_url_relative", "next_page_url_base",
         "top_key", "skip_key", "maximum_number_rows",
         "use_mtls", "mtls_certificate_path", "mtls_key_path",
-        "force_csv_parameters", "csv_delimiter"
+        "force_csv_parameters", "csv_delimiter",
+        "csv_doublequote", "csv_escapechar", "csv_lineterminator",
+        "csv_quotechar", "csv_quoting", "csv_skipinitialspace"
     ]
     parameters = {
         endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None
