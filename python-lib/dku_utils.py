@@ -39,7 +39,11 @@ def get_endpoint_parameters(configuration):
         "requests_per_minute",
         "pagination_type",
         "next_page_url_key", "is_next_page_url_relative", "next_page_url_base",
-        "top_key", "skip_key", "maximum_number_rows"
+        "top_key", "skip_key", "maximum_number_rows",
+        "use_mtls", "mtls_certificate_path", "mtls_key_path",
+        "force_csv_parameters", "csv_delimiter",
+        "csv_doublequote", "csv_escapechar", "csv_lineterminator",
+        "csv_quotechar", "csv_quoting", "csv_skipinitialspace"
     ]
     parameters = {
         endpoint_parameter: configuration.get(endpoint_parameter) for endpoint_parameter in endpoint_parameters if configuration.get(endpoint_parameter) is not None
@@ -166,7 +170,7 @@ def xml_to_json(content):
     return json_response
 
 
-def decode_csv_data(data):
+def decode_csv_data(data, csv_configuation):
     import csv
     import io
     json_data = None
@@ -180,7 +184,7 @@ def decode_csv_data(data):
                 dialect.delimiter,
                 dialect.doublequote,
                 dialect.escapechar,
-                dialect.lineterminator,
+                dialect.lineterminator.encode(encoding="utf-8"),
                 dialect.quotechar,
                 dialect.quoting,
                 dialect.skipinitialspace
@@ -188,17 +192,65 @@ def decode_csv_data(data):
         )
     except Exception as error:
         logger.error("Could not sniff csv dialect. Error={}".format(error))
-        dialect = "excel"
-    try:
-        reader = csv.DictReader(
-            io.StringIO(data),
-            dialect=dialect
-        )
-        json_data = list(reader)
-    except Exception as error:
-        logger.error("Could not extract csv data. Error={}. Trying method 2.".format(error))
+        # dialect = "excel"
+        dialect = csv.Dialect()
+        dialect.delimiter = ','
+        dialect.quotechar = '"'
+        dialect.doublequote = True
+        dialect.skipinitialspace = False
+        dialect.lineterminator = '\r\n'
+        dialect.quoting = 0
+    dialect = update_csv_dialect(csv_configuation, dialect)
+    if not csv_configuation.get("force_csv_parameters", False):
+        #  For back compatibility reason, if csv params are not forced,
+        # we try the old method first.
+        try:
+            reader = csv.DictReader(
+                io.StringIO(data),
+                dialect=dialect
+            )
+            json_data = list(reader)
+        except Exception as error:
+            logger.error("Could not extract csv data. Error={}. Trying method 2.".format(error))
+            json_data = decode_csv_data_m2(data, dialect)
+    else:
+        logger.error("CSV parameters are forced, trying method 2")
         json_data = decode_csv_data_m2(data, dialect)
     return json_data
+
+
+def update_csv_dialect(config, input_dialect):
+    if config.get("force_csv_parameters", False):
+        logger.info("Updating csv parameters with ")
+        csv_delimiter = config.get("csv_delimiter")
+        if csv_delimiter:
+            input_dialect.delimiter = csv_delimiter
+            logger.info("delimiter={}".format(csv_delimiter))
+        csv_doublequote = config.get("csv_doublequote", None)
+        if csv_doublequote:
+            input_dialect.doublequote = csv_doublequote == "double_quote"
+            logger.info("doublequote={}".format(input_dialect.doublequote))
+        csv_escapechar = config.get("csv_escapechar", "")
+        if csv_escapechar:
+            input_dialect.escapechar = csv_escapechar
+            logger.info("escapechar={}".format(csv_escapechar))
+        csv_lineterminator = config.get("csv_lineterminator", "")
+        if csv_lineterminator:
+            input_dialect.lineterminator = csv_lineterminator
+            logger.info("lineterminator={}".format(csv_lineterminator))
+        csv_quotechar = config.get("csv_quotechar", "")
+        if csv_quotechar:
+            input_dialect.quotechar = csv_quotechar
+            logger.info("quotechar={}".format(csv_quotechar))
+        csv_quoting = config.get("csv_quoting", None)
+        if csv_quoting is not None:
+            input_dialect.quoting = csv_quoting
+            logger.info("quoting={}".format(csv_quoting))
+        csv_skipinitialspace = config.get("csv_skipinitialspace", None)
+        if csv_skipinitialspace:
+            input_dialect.skipinitialspace = csv_skipinitialspace == "skip"
+            logger.info("skipinitialspace={}".format(input_dialect.skipinitialspace))
+    return input_dialect
 
 
 def decode_csv_data_m2(data, dialect):

@@ -33,6 +33,7 @@ class RestAPIConnector(Connector):
         self.raw_output = endpoint_parameters.get("raw_output", None)
         self.maximum_number_rows = config.get("maximum_number_rows", -1)
         self.display_metadata = config.get("display_metadata", False)
+        self.csv_configuration = config
 
     def get_read_schema(self):
         # In this example, we don't specify a schema here, so DSS will infer the schema
@@ -60,7 +61,7 @@ class RestAPIConnector(Connector):
                 record_count += 1
                 yield self.format_output(data, metadata)
             else:
-                csv_data = decode_csv_data(data)
+                csv_data = decode_csv_data(data, self.csv_configuration)
                 if csv_data:
                     record_count += len(csv_data)
                     for row in csv_data:
@@ -68,7 +69,7 @@ class RestAPIConnector(Connector):
                 else:
                     record_count += 1
                     yield {
-                        DKUConstants.API_RESPONSE_KEY: "{}".format(decode_bytes(data))
+                        DKUConstants.API_RESPONSE_KEY: decode_bytes(data)
                     }
             if is_records_limit and record_count >= records_limit:
                 break

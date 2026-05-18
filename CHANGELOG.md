@@ -3,6 +3,9 @@
 ## [Version 1.2.7](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.7) - Feature - 2026-02-18
 
 - Detecting dialect for better csv decoding
+- Adding mutual TLS authentication
+- Fixing duplication of last line in csv APIs using the recipe
+- Dumping API's response as a last resort
 
 ## [Version 1.2.6](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.2.6) - Feature - 2025-09-24
 
