@@ -239,27 +239,6 @@
             "defaultValue": false
         },
         {
-            "name": "use_mtls",
-            "label": " ",
-            "description": "Use mTLS",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
-            "name": "mtls_certificate_path",
-            "label": "Path to certificate",
-            "description": "",
-            "type": "STRING",
-            "visibilityCondition": "model.use_mtls==true"
-        },
-        {
-            "name": "mtls_key_path",
-            "label": "Path to key",
-            "description": "",
-            "type": "STRING",
-            "visibilityCondition": "model.use_mtls==true"
-        },
-        {
             "name": "force_csv_parameters",
             "label": " ",
             "description": "Force CSV parameters",
