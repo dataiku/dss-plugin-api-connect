@@ -184,7 +184,7 @@ def decode_csv_data(data, csv_configuation):
                 dialect.delimiter,
                 dialect.doublequote,
                 dialect.escapechar,
-                dialect.lineterminator,
+                dialect.lineterminator.encode(encoding="utf-8"),
                 dialect.quotechar,
                 dialect.quoting,
                 dialect.skipinitialspace
