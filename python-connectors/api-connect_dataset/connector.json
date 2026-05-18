@@ -239,25 +239,79 @@
             "defaultValue": false
         },
         {
-            "name": "use_mtls",
+            "name": "force_csv_parameters",
             "label": " ",
-            "description": "Use mTLS",
+            "description": "Force CSV parameters",
             "type": "BOOLEAN",
             "defaultValue": false
         },
         {
-            "name": "mtls_certificate_path",
-            "label": "Path to certificate",
+            "name": "csv_delimiter",
+            "label": "Delimiter",
             "description": "",
             "type": "STRING",
-            "visibilityCondition": "model.use_mtls==true"
+            "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
-            "name": "mtls_key_path",
-            "label": "Path to key",
+            "name": "csv_doublequote",
+            "label": "Double quote",
+            "description": "",
+            "type": "SELECT",
+            "selectChoices":[
+                {"value": null, "label": "Auto detect"},
+                {"value": "double_quote", "label": "Double quote"},
+                {"value": "not_double_quote", "label": "No double quote"}
+            ],
+            "visibilityCondition": "model.force_csv_parameters==true"
+        },
+        {
+            "name": "csv_escapechar",
+            "label": "Escape char",
             "description": "",
             "type": "STRING",
-            "visibilityCondition": "model.use_mtls==true"
+            "visibilityCondition": "model.force_csv_parameters==true"
+        },
+        {
+            "name": "csv_lineterminator",
+            "label": "Line terminator",
+            "description": "",
+            "type": "STRING",
+            "visibilityCondition": "model.force_csv_parameters==true"
+        },
+        {
+            "name": "csv_quotechar",
+            "label": "Quote char",
+            "description": "",
+            "type": "STRING",
+            "visibilityCondition": "model.force_csv_parameters==true"
+        },
+        {
+            "name": "csv_quoting",
+            "label": "Quote",
+            "description": "",
+            "type": "SELECT",
+            "selectChoices":[
+                {"value": null, "label": "Auto detect"},
+                {"value": 0, "label": "Minimal"},
+                {"value": 1, "label": "All"},
+                {"value": 2, "label": "Non numeric"},
+                {"value": 3, "label": "None"},
+                {"value": 4, "label": "Strings"},
+                {"value": 5, "label": "Not null"}
+            ],
+            "visibilityCondition": "model.force_csv_parameters==true"
+        },
+        {
+            "name": "csv_skipinitialspace",
+            "label": "Skip initial space",
+            "description": "",
+            "type": "SELECT",
+            "selectChoices":[
+                {"value": null, "label": "Auto detect"},
+                {"value": "skip", "label": "Skip"},
+                {"value": "not_skip", "label": "Do not skip"}
+            ],
+            "visibilityCondition": "model.force_csv_parameters==true"
         },
         {
             "name": "redirect_auth_header",
