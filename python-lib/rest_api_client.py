@@ -1,6 +1,7 @@
 import requests
 import time
 import copy
+import tempfile
 from pagination import Pagination
 from safe_logger import SafeLogger
 from loop_detector import LoopDetector
@@ -184,13 +185,34 @@ class RestAPIClient(object):
     def request_with_redirect_retry(self, method, url, **kwargs):
         # In case of redirection to another domain, the authorization header is not kept
         # If redirect_auth_header is true, another attempt is made with initial headers to the redirected url
-        response = self.session.request(method, url, **kwargs)
+        response = self.request_with_cert(method, url, **kwargs)
         if self.redirect_auth_header and not response.url.startswith(url):
             redirection_kwargs = copy.deepcopy(kwargs)
             redirection_kwargs.pop("params", None)  # params are contained in the redirected url
             logger.warning("Redirection ! Accessing endpoint {} with initial authorization headers".format(response.url))
-            response = self.session.request(method, response.url, **redirection_kwargs)
+            response = self.request_with_cert(method, response.url, **redirection_kwargs)
         return response
+
+    def request_with_cert(self, method, url, **kwargs):
+        cert = kwargs.get("cert", None)
+        if cert and len(cert) == 2:
+            if cert[0].startswith("-----BEGIN CERTIFICATE") and cert[1].startswith("-----BEGIN "):
+                logger.info("mTLS certificate and key are strings")
+                response = None
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".crt") as tmp_certificate:
+                    with tempfile.NamedTemporaryFile(mode="w", suffix=".key") as tmp_key:
+                        tmp_certificate.write(
+                            normalize_key(cert[0])
+                        )
+                        tmp_certificate.seek(0)
+                        tmp_key.write(
+                            normalize_key(cert[1])
+                        )
+                        tmp_key.seek(0)
+                        kwargs["cert"] = (tmp_certificate.name, tmp_key.name)
+                        response = self.session.request(method, url, **kwargs)
+                return response
+        return self.session.request(method, url, **kwargs)
 
     def paginated_api_call(self, can_raise_exeption=True):
         if self.pagination.params_must_be_blanked:
@@ -278,3 +300,20 @@ def get_headers(response):
     if isinstance(response, requests.Response):
         return response.headers
     return None
+
+
+def normalize_key(key):
+    PROTECTED_EXPRESSIONS = [
+        "BEGIN CERTIFICATE", "END CERTIFICATE",
+        "BEGIN PRIVATE KEY", "END PRIVATE KEY",
+        "BEGIN RSA PRIVATE KEY", "END RSA PRIVATE KEY"
+    ]
+    tempo_text = str(key)
+    for expression_to_protect in PROTECTED_EXPRESSIONS:
+        protected_form = expression_to_protect.replace(" ", "")
+        tempo_text = tempo_text.replace(expression_to_protect, protected_form)
+    tempo_text = tempo_text.replace(" ", "\n")
+    for expression_to_protect in PROTECTED_EXPRESSIONS:
+        protected_form = expression_to_protect.replace(" ", "")
+        tempo_text = tempo_text.replace(protected_form, expression_to_protect)
+    return tempo_text
