@@ -120,7 +120,8 @@
             "defaultValue": null,
             "selectChoices":[
                 {"value": null, "label": "None"},
-                {"value": "FORM_DATA", "label": "Form-data"},
+                {"value": "FORM_DATA", "label": "Form-data (Json)"},
+                {"value": "MULTIPART_FORM_DATA", "label": "Multipart Form-data"},
                 {"value": "RAW", "label": "Raw"}
             ]
         },
@@ -136,7 +137,7 @@
             "label": "Request's body",
             "description": "",
             "type": "KEY_VALUE_LIST",
-            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
+            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)||(['MULTIPART_FORM_DATA'].indexOf(model.body_format)>-1)"
         },
         {
             "type": "SEPARATOR",
