@@ -68,6 +68,12 @@ def get_secure_credentials(configuration):
         secure_oauth = configuration.get("secure_oauth", {})
         secure_credentials["token"] = secure_oauth.pop("secure_token")
         secure_credentials.update(secure_oauth)
+
+    if auth_type == "secure_oauth_refresh_token_rotation":
+        secure_credentials["login_type"] = "bearer_token"
+        secure_oauth = configuration.get("secure_oauth_refresh_token_rotation", {})
+        secure_credentials["token"] = secure_oauth.pop("secure_token")
+        secure_credentials.update(secure_oauth)
     return secure_credentials
 
 
