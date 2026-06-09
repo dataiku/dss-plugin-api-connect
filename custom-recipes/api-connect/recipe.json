@@ -151,7 +151,7 @@
             "label": "Request's body",
             "description": "",
             "type": "KEY_VALUE_LIST",
-            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)||(['MULTIPART_FORM_DATA'].indexOf(model.body_format)>-1)"
+            "visibilityCondition": "(['FORM_DATA', 'MULTIPART_FORM_DATA'].includes(model.body_format))"
         },
 
         {
