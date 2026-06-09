@@ -1,0 +1,80 @@
+{
+    "meta" : {
+        "label": "Secure SSO with rotation",
+        "description": "With refresh token rotation",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": false,
+    "defaultDefinableAtProjectLevel": false,
+    "pluginParams": [
+    ],
+
+    "params": [
+        {
+            "name": "secure_token",
+            "type": "CREDENTIAL_REQUEST",
+            "label": "Single Sign On",
+            "credentialRequestSettings": {
+                "type": "OAUTH2",
+                "authorizationEndpoint": " ",
+                "tokenEndpoint": " ",
+                "scope": " ",
+                "refreshTokenRotation": true
+            }
+        },
+        {
+            "name": "authorizationEndpoint",
+            "label": "Authorization endpoint",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "tokenEndpoint",
+            "label": "Token endpoint",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "scope",
+            "label": "Scope",
+            "type": "STRING",
+            "description": "",
+            "mandatory": false
+        },
+        {
+            "name": "secure_domain",
+            "label": "Domain",
+            "description": "",
+            "type": "STRING"
+        },
+        {
+            "name": "use_mtls",
+            "label": "Use mTLS",
+            "description": "",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Warning",
+            "description": "1 - Restricting access to this presset will not restrict access to the certificate and key files. This has to be done by setting the appropriate access rights on these two files.\n2 - Because the OAuth flow is not controled by the plugin, mTLS cannot be used for the retrieving the access token itself.",
+            "visibilityCondition": "model.use_mtls==true"
+        },
+        {
+            "name": "mtls_certificate_path",
+            "label": "Path to certificate",
+            "description": "or full certificate starting with -----BEGIN and ending with END CERTIFICATE-----",
+            "type": "PASSWORD",
+            "visibilityCondition": "model.use_mtls==true"
+        },
+        {
+            "name": "mtls_key_path",
+            "label": "Path to key",
+            "description": "or full key starting with -----BEGIN and ending with END PRIVATE KEY-----",
+            "type": "PASSWORD",
+            "visibilityCondition": "model.use_mtls==true"
+        }
+    ]
+}
