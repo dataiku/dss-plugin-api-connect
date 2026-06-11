@@ -1,4 +1,4 @@
-from dku_utils import template_dict
+from dku_utils import template_dict, join_url
 import pytest
 
 
@@ -32,3 +32,17 @@ class TestCommonMethods:
     def test_template_dict(self):
         endpoint = template_dict(self.template, **self.kwargs)
         assert endpoint == self.endpoint_ok
+
+    def test_join_url(self):
+        assert "https://bla.com/bla/bli" == join_url("https://bla.com", "bla/bli")
+        assert "https://bla.com/bla/bli" == join_url("https://bla.com/", "bla/bli")
+        assert "https://bla.com/bla/bli" == join_url("https://bla.com/", "/bla/bli")
+        assert "https://bla.com/bla/bli" == join_url("https://bla.com/", "bla/bli")
+        assert "https://bla.com/bla/bli/" == join_url("https://bla.com", "bla/bli/")
+        assert "https://bla.com/bla/bli/" == join_url("https://bla.com/", "bla/bli/")
+        assert "https://bla.com/bla/bli/" == join_url("https://bla.com/", "/bla/bli/")
+        assert "https://bla.com/bla/bli/" == join_url("https://bla.com/", "bla/bli/")
+        assert "https://bla.com" == join_url("https://bla.com/", "")
+        assert "https://bla.com" == join_url("https://bla.com/", None)
+        assert "https://bla.com" == join_url("https://bla.com", "")
+        assert "https://bla.com" == join_url("https://bla.com", None)
