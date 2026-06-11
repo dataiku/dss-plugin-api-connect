@@ -1,10 +1,11 @@
 # Changelog
 
-## [Version 1.4.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.0) - Feature - 2026-06-10
+## [Version 1.4.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.0) - Feature and bugfix - 2026-06-10
 
 - Adding support of multipart form data
 - Adding support for refresh token rotation
 - Adding auto refresh of access token (for DSS 14.5 and above)
+- Fixing possible double slash issues with `next page` pagination mode in relative URL mode
 
 ## [Version 1.3.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.3.0) - Feature - 2026-02-18
 
