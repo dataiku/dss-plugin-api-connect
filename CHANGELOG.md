@@ -6,6 +6,7 @@
 - Adding support for refresh token rotation
 - Adding auto refresh of access token (for DSS 14.5 and above)
 - Fixing possible double slash issues with `next page` pagination mode in relative URL mode
+- Fixing dataset issue with empty returns from post
 
 ## [Version 1.3.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.3.0) - Feature - 2026-02-18
 
