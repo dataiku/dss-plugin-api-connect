@@ -121,7 +121,9 @@ class RestApiRecipeSession:
                             DKUConstants.API_RESPONSE_KEY: decode_bytes(json_response)
                         })
             else:
-                if isinstance(json_response, dict):
+                if not json_response:
+                    pass
+                elif isinstance(json_response, dict):
                     base_row.update(parse_keys_for_json(json_response))
                 elif isinstance(json_response, list):
                     is_api_returning_dict = False
