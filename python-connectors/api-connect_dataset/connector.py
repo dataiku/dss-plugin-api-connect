@@ -53,7 +53,12 @@ class RestAPIConnector(Connector):
                 data = get_value_from_path(json_response, self.extraction_path)
             else:
                 data = json_response
-            if isinstance(data, list):
+            if not data:
+                record_count += 1
+                yield {
+                    DKUConstants.API_RESPONSE_KEY: None
+                }
+            elif isinstance(data, list):
                 record_count += len(data)
                 for row in data:
                     yield self.format_output(row, metadata)
