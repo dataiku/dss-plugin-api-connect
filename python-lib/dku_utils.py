@@ -306,3 +306,16 @@ def get_user_secrets(configuration):
             user_secrets[secret.get("key")] = secret.get("value")
         return user_secrets
     return {}
+
+
+def join_url(base_url, segment):
+    # urllib.parse.urljoin can't be used here:
+    # urllib.parse.urljoin("https://services.odata.org/V3/Northwind/Northwind.svc", "Order_Details?$skiptoken=10436,75")
+    # -> https://services.odata.org/V3/Northwind/Order_Details?$skiptoken=10436,75 -> 404
+    base_url = base_url or ""
+    base_url = base_url.strip("/")
+    segments = [base_url]
+    if segment:
+        segment = segment.lstrip("/")
+        segments.append(segment)
+    return "/".join(segments)
