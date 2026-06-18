@@ -1,5 +1,5 @@
 from safe_logger import SafeLogger
-from dku_utils import get_value_from_path, extract_key_using_json_path
+from dku_utils import get_value_from_path, extract_key_using_json_path, join_url
 
 
 logger = SafeLogger("api-connect plugin Pagination")
@@ -110,7 +110,7 @@ class Pagination(object):
         if self.next_page_key:
             next_page_path = extract_key_using_json_path(data, self.next_page_key)
             if self.next_page_url_base and next_page_path:
-                self.next_page_url = "/".join([self.next_page_url_base, next_page_path])
+                self.next_page_url = join_url(self.next_page_url_base, next_page_path)
             else:
                 self.next_page_url = next_page_path
             logger.info("update_next_page_link:next_page_url_base={}, next_page_path={}, next_page_url={}".format(

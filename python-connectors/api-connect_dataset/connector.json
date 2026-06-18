@@ -19,6 +19,7 @@
             "defaultValue": null,
             "selectChoices":[
                 {"value": "secure_oauth", "label": "SSO"},
+                {"value": "secure_oauth_refresh_token_rotation", "label": "SSO (token rotation)"},
                 {"value": "secure_basic", "label": "Secure username / password"},
                 {"value": null, "label": "Other"}
             ]
@@ -36,6 +37,13 @@
             "type": "PRESET",
             "parameterSetId": "secure-oauth",
             "visibilityCondition": "model.auth_type == 'secure_oauth'"
+        },
+        {
+            "name": "secure_oauth_refresh_token_rotation",
+            "label": "SSO preset (token rotation)",
+            "type": "PRESET",
+            "parameterSetId": "secure-oauth-refresh-token-rotation",
+            "visibilityCondition": "model.auth_type == 'secure_oauth_refresh_token_rotation'"
         },
         {
             "name": "secure_basic",
