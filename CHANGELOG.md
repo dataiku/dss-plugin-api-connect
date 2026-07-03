@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.4.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.1) - Bugfix - 2026-07-01
+
+- Update the codenv requirements for NTLM access
+
 ## [Version 1.4.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.0) - Feature and bugfix - 2026-06-10
 
 - Adding support of multipart form data
