@@ -1,29 +1,21 @@
 # Cobuild guidance
 
-Use this recipe to call a REST API once for each row of the input dataset and write the extracted response to the output dataset.
+Role-specific behavior:
+- `input_A_role` supplies one API call per row and the column values available to request templates.
+- `api_output` collects the response rows extracted from those calls and any paginated responses.
 
-Roles:
-- `input_A_role`: required input dataset containing the variables used in URL, header, query, body, and pagination templates.
-- `api_output`: required output dataset for the API response rows.
+Request behavior:
+- Columns selected in `parameter_columns` become `{{column_name}}` template variables across the URL, headers, query parameters, body, and pagination settings; `parameter_renamings` changes their template names.
+- `should_use_user_secrets=true` also exposes the current user's Profile > My account > Other credentials as template variables.
+- `body_format=RAW` uses `text_body`; `FORM_DATA` and `MULTIPART_FORM_DATA` use `key_value_body`.
+- `auth_type=null` selects the generic `credential` preset path; each secure authentication type selects its corresponding preset field.
 
-Core configuration:
-- Set `endpoint_url` to the URL template. Dataset columns can be referenced as `{{column_name}}`.
-- Set `http_method` to `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
-- Use `endpoint_query_string` for query parameters and `endpoint_headers` for headers.
-- Use `parameter_columns` to expose input columns as template variables.
-- Use `parameter_renamings` when column names should map to cleaner template variable names.
-- Use `body_format`, `text_body`, or `key_value_body` for request bodies. `text_body` is visible for `RAW`; `key_value_body` is visible for `FORM_DATA` and `MULTIPART_FORM_DATA`.
-- Set `extraction_key` when the response data is nested under a JSON key. Keep `raw_output=true` when the full response JSON should be kept.
-
-Authentication and presets:
-- This recipe uses preset fields for credentials. Prefer an existing usable preset from the recipe definition.
-- For the generic credential preset, keep `auth_type` null and set `credential` to the selected preset name from parameter set `credential`.
-- For secure OAuth, set `auth_type=secure_oauth` and set `secure_oauth` to a preset from parameter set `secure-oauth`.
-- For secure OAuth with refresh-token rotation, set `auth_type=secure_oauth_refresh_token_rotation` and set `secure_oauth_refresh_token_rotation` to a preset from parameter set `secure-oauth-refresh-token-rotation`.
-- For secure basic auth, set `auth_type=secure_basic` and set `secure_basic` to a preset from parameter set `secure-basic`.
-- Do not ask the user to paste preset secrets in chat. If no usable preset is available or selected, create the recipe skeleton, navigate to the recipe settings, and ask the user to select or create the preset there.
+Response extraction:
+- Use the dot-separated `extraction_key` when response rows are nested under a JSON path.
+- Keep `raw_output=true` when each response item should be preserved as raw JSON instead of flattened into columns.
 
 Pagination:
-- Keep `pagination_type=na` unless the API documentation requires pagination.
-- For next-page pagination, set `next_page_url_key`, and set `is_next_page_url_relative` plus `next_page_url_base` when the returned next URL is relative.
-- For offset or page pagination, set the visible key fields and define `extraction_key` when required by the API response shape.
+- Select the pagination mechanism from the target API's documentation; do not infer one from the endpoint shape.
+- For next-page pagination, `next_page_url_key` is the dot-separated response path containing the following request URL. When that URL is relative, enable `is_next_page_url_relative` and provide `next_page_url_base`.
+- Page pagination requires `extraction_key` so the recipe can locate and count the returned data array.
+- For offset and page pagination, `skip_key` is the query parameter carrying the next offset or page number.
