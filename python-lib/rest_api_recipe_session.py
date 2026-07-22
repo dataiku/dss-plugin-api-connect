@@ -57,11 +57,10 @@ class RestApiRecipeSession:
                 )
             updated_endpoint_parameters = copy.deepcopy(self.endpoint_parameters)
             updated_endpoint_parameters.update(self.initial_parameter_columns)
-            logger.info("Processing row #{}, creating client with credential={}, updated_endpoint={}, custom_key_values={}".format(
+            logger.info("Processing row #{}, creating client with credential={}, updated_endpoint={}".format(
                 index + 1,
                 logger.filter_secrets(self.credential_parameters),
                 updated_endpoint_parameters,
-                self.custom_key_values
             ))
             self.client = RestAPIClient(
                 self.credential_parameters,

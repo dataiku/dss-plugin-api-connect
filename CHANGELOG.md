@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.4.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.2) - Bugfix - 2026-07-22
+
+- Remove user's 'Other credentials' from recipe's logs
+
 ## [Version 1.4.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.1) - Bugfix - 2026-07-01
 
 - Update the codenv requirements for NTLM access
