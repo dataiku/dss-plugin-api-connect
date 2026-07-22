@@ -9,6 +9,7 @@ Request behavior:
 - `should_use_user_secrets=true` also exposes the current user's Profile > My account > Other credentials as template variables.
 - `body_format=RAW` uses `text_body`; `FORM_DATA` and `MULTIPART_FORM_DATA` use `key_value_body`.
 - `auth_type=null` selects the generic `credential` preset path; each secure authentication type selects its corresponding preset field.
+- For API-key presets, API Connect automatically injects the key into either a request header or query parameter, as configured by the user in the preset.
 
 Response extraction:
 - Use the dot-separated `extraction_key` when response rows are nested under a JSON path.
