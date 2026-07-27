@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.4.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.3) - Bugfix - 2026-07-27
+
+- Fix templating for multiform body
+
 ## [Version 1.4.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.2) - Bugfix - 2026-07-22
 
 - Remove user's 'Other credentials' from recipe's logs
