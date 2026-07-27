@@ -165,7 +165,7 @@
         {
             "type": "SEPARATOR",
             "label": "Template variables",
-            "description": "URL, headers and parameters can be templated using {{variables}}"
+            "description": "URL, headers, parameters and body can be templated using {{variables}}"
         },
         {
             "name": "parameter_columns",
