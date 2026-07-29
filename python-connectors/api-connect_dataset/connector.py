@@ -5,10 +5,11 @@ from rest_api_client import RestAPIClient
 from dku_utils import (
     get_dku_key_values, get_endpoint_parameters,
     parse_keys_for_json, get_value_from_path, get_secure_credentials,
-    decode_csv_data, decode_bytes, get_user_secrets
+    decode_csv_data, decode_bytes, get_user_secrets, get_retry_handler_parameters_from_config
 )
 from dku_constants import DKUConstants
 import json
+from retry_handler import RetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -26,7 +27,14 @@ class RestAPIConnector(Connector):
         custom_key_values = get_dku_key_values(config.get("custom_key_values", {}))
         user_secrets = get_user_secrets(config)
         custom_key_values.update(user_secrets)
-        self.client = RestAPIClient(credential, secure_credentials, endpoint_parameters, custom_key_values)
+        backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry = get_retry_handler_parameters_from_config(config)
+        retry_handler = None
+        if backoff_type:
+            retry_handler = RetryHandler(
+                backoff_type=backoff_type, initial_delay=initial_delay, maximum_number_of_retries=maximum_number_of_retries,
+                maximum_duration_of_retry=maximum_duration_of_retry, status_codes_to_retry=status_codes_to_retry
+            )
+        self.client = RestAPIClient(credential, secure_credentials, endpoint_parameters, custom_key_values, retry_handler=retry_handler)
         extraction_key = endpoint_parameters.get("extraction_key", None)
         self.extraction_key = extraction_key or ''
         self.extraction_path = self.extraction_key.split('.')

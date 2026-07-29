@@ -15,7 +15,7 @@ logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_
 class RestApiRecipeSession:
     def __init__(self, custom_key_values, credential_parameters, secure_credentials, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
                  display_metadata=False,
-                 maximum_number_rows=-1, behaviour_when_error=None):
+                 maximum_number_rows=-1, behaviour_when_error=None, retry_handler=None):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
         self.secure_credentials = secure_credentials
@@ -30,6 +30,7 @@ class RestApiRecipeSession:
         self.behaviour_when_error = behaviour_when_error or "add-error-column"
         self.can_raise = self.behaviour_when_error == "raise"
         self.csv_configuration = endpoint_parameters
+        self.retry_handler = retry_handler
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -68,7 +69,8 @@ class RestApiRecipeSession:
                 updated_endpoint_parameters,
                 custom_key_values=self.custom_key_values,
                 session=session,
-                behaviour_when_error=self.behaviour_when_error
+                behaviour_when_error=self.behaviour_when_error,
+                retry_handler=self.retry_handler
             )
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():

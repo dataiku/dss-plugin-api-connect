@@ -8,6 +8,7 @@ from loop_detector import LoopDetector
 from dku_utils import get_dku_key_values, get_dku_duplicated_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
 from dku_constants import DKUConstants
 from rest_api_auth import get_auth
+from retry_handler import DefaultRetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -19,7 +20,7 @@ class RestAPIClientError(ValueError):
 
 class RestAPIClient(object):
 
-    def __init__(self, credential, secure_credentials, endpoint, custom_key_values={}, session=None, behaviour_when_error=None):
+    def __init__(self, credential, secure_credentials, endpoint, custom_key_values={}, session=None, behaviour_when_error=None, retry_handler=None):
         logger.info("Initialising RestAPIClient, credential={}, secure_credentials={}, endpoint={}".format(
             logger.filter_secrets(credential),
             logger.filter_secrets(secure_credentials),
@@ -134,6 +135,7 @@ class RestAPIClient(object):
                 self.secure_domain = "https://{}".format(self.secure_domain)
         else:
             self.session.auth = get_auth(credential)
+        self.retry_handler = retry_handler or DefaultRetryHandler()
 
     def get(self, url, can_raise_exeption=True, **kwargs):
         json_response = self.request("GET", url, can_raise_exeption=can_raise_exeption, **kwargs)
@@ -216,9 +218,15 @@ class RestAPIClient(object):
                         )
                         tmp_key.seek(0)
                         kwargs["cert"] = (tmp_certificate.name, tmp_key.name)
-                        response = self.session.request(method, url, **kwargs)
+                        response = self.request_with_errors_retry(method, url, **kwargs)
                 return response
-        return self.session.request(method, url, **kwargs)
+        return self.request_with_errors_retry(method, url, **kwargs)
+
+    def request_with_errors_retry(self, method, url, **kwargs):
+        response = None
+        while self.retry_handler.should_retry(response):
+            response = self.session.request(method, url, **kwargs)
+        return response
 
     def paginated_api_call(self, can_raise_exeption=True):
         if self.pagination.params_must_be_blanked:

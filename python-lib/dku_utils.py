@@ -319,3 +319,21 @@ def join_url(base_url, segment):
         segment = segment.lstrip("/")
         segments.append(segment)
     return "/".join(segments)
+
+
+def get_retry_handler_parameters_from_config(config):
+    backoff_type = initial_delay = maximum_number_of_retries = maximum_duration_of_retry = status_codes_to_retry = None
+    http_errors_retry_strategy = config.get("http_errors_retry_strategy", None)
+    if not http_errors_retry_strategy:
+        return backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry
+    if http_errors_retry_strategy in ["linear", "exponential"]:
+        backoff_type = http_errors_retry_strategy
+    if backoff_type == "linear":
+        initial_delay = config.get("http_errors_delay")
+        maximum_number_of_retries = config.get("http_errors_maximum_retries", None)
+    if backoff_type == "exponential":
+        initial_delay = config.get("http_errors_initial_delay")
+        maximum_duration_of_retry = config.get("http_errors_maximum_delay", None)
+    if backoff_type:
+        status_codes_to_retry = config.get("http_errors_to_retry", [])
+    return backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry
