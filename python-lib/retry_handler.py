@@ -11,13 +11,9 @@ class DefaultRetryHandler():
         self.number_of_tries = 0
 
     def should_retry(self, response):
-        self.number_of_tries += 1
-        if self.number_of_tries == 1:
+        if response is None:
             return True
         return False
-
-    def reset(self):
-        self.number_of_tries = 0
 
 
 class RetryHandler():
@@ -50,10 +46,8 @@ class RetryHandler():
         ))
 
     def should_retry(self, response):
-        logger.info("Should retry?")
-        if self.number_of_tries == 0:
-            logger.info("Initial try: should.")
-            self.number_of_tries = 1
+        logger.debug("Should retry?")
+        if response is None:
             return True
         if isinstance(response, requests.Response):
             logger.info("is response")
@@ -103,6 +97,3 @@ class RetryHandler():
             logger.warning("Sleep time before retry reached the max. Not retrying.")
             return True
         return False
-
-    def reset(self):
-        self.number_of_tries = 0
