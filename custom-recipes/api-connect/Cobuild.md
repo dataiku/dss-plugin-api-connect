@@ -1,22 +1,9 @@
 # Cobuild guidance
 
-Role-specific behavior:
-- `input_A_role` supplies one API call per row and the column values available to request templates.
-- `api_output` collects the response rows extracted from those calls and any paginated responses.
-
-Request behavior:
-- Columns selected in `parameter_columns` become `{{column_name}}` template variables across the URL, headers, query parameters, body, and pagination settings; `parameter_renamings` changes their template names.
-- `should_use_user_secrets=true` also exposes the current user's Profile > My account > Other credentials as template variables.
-- `body_format=RAW` uses `text_body`; `FORM_DATA` and `MULTIPART_FORM_DATA` use `key_value_body`.
-- `auth_type=null` selects the generic `credential` preset path; each secure authentication type selects its corresponding preset field.
-- For API-key presets, API Connect automatically injects the key into either a request header or query parameter, as configured by the user in the preset.
-
-Response extraction:
+- API Connect performs one API call per input row and writes the extracted rows from each response, including paginated responses, to the output dataset.
+- Always set `endpoint_url` and select at least one `parameter_columns` column. Selected columns become `{{column_name}}` template variables across request fields; `parameter_renamings` changes their template names.
+- With `auth_type=null`, leave `credential` unset for an unauthenticated API; otherwise select a compatible generic credential preset. For a secure authentication type, select its corresponding visible preset.
+- API Connect automatically injects an API-key preset into the header or query parameter configured by the user in that preset. Do not add the API key again to request fields.
 - Use the dot-separated `extraction_key` when response rows are nested under a JSON path.
 - Keep `raw_output=true` when each response item should be preserved as raw JSON instead of flattened into columns.
-
-Pagination:
-- Select the pagination mechanism from the target API's documentation; do not infer one from the endpoint shape.
-- For next-page pagination, `next_page_url_key` is the dot-separated response path containing the following request URL. When that URL is relative, enable `is_next_page_url_relative` and provide `next_page_url_base`.
-- Page pagination requires `extraction_key` so the recipe can locate and count the returned data array.
-- For offset and page pagination, `skip_key` is the query parameter carrying the next offset or page number.
+- Select the pagination mechanism from the target API's documentation; do not infer one from the endpoint shape. Relative next-page URLs require `next_page_url_base`, page pagination requires `extraction_key`, and offset or page pagination requires `skip_key`.
