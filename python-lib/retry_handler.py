@@ -16,6 +16,9 @@ class DefaultRetryHandler():
             return True
         return False
 
+    def reset(self):
+        self.number_of_tries = 0
+
 
 class RetryHandler():
     def __init__(self, backoff_type=None, initial_delay=None, maximum_number_of_retries=None,
@@ -100,3 +103,6 @@ class RetryHandler():
             logger.warning("Sleep time before retry reached the max. Not retrying.")
             return True
         return False
+
+    def reset(self):
+        self.number_of_tries = 0

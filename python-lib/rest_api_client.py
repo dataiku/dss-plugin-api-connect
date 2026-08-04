@@ -238,6 +238,7 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"params": params})
         self.call_number = self.call_number + 1
         logger.info("API call number #{}".format(self.call_number))
+        self.retry_handler.reset()
         return self.request(self.http_method, self.pagination.get_next_page_url(), can_raise_exeption, **self.requests_kwargs)
 
     def empty_json_response(self):
