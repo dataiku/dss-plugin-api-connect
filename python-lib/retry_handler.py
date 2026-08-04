@@ -8,7 +8,7 @@ logger = SafeLogger("api-connect plugin retry handler")
 
 class DefaultRetryHandler():
     def __init__(self):
-        self.number_of_tries = 0
+        pass
 
     def should_retry(self, response):
         if response is None:
@@ -36,7 +36,6 @@ class RetryHandler():
         if isinstance(status_codes_to_retry, list):
             self.status_codes_to_retry = status_codes_to_retry
         self.number_of_tries = 0
-        #Retry handler initialised with None/1/None/10/['429']/
         logger.info("Retry handler initialised with {}/{}/{}/{}/{}/".format(
             self.backoff_type,
             self.initial_delay,
