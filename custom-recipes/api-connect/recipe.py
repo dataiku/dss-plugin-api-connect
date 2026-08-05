@@ -2,11 +2,11 @@
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
 import pandas as pd
-from safe_logger import SafeLogger
-from dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
-from rest_api_recipe_session import RestApiRecipeSession
-from dku_constants import DKUConstants
-from retry_handler import RetryHandler
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
+from api_connect_rest_api_recipe_session import RestApiRecipeSession
+from api_connect_dku_constants import DKUConstants
+from api_connect_retry_handler import RetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)

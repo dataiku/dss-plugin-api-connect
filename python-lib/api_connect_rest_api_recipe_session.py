@@ -1,8 +1,8 @@
 from dataikuapi.utils import DataikuException
-from rest_api_client import RestAPIClient
-from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN, decode_bytes
-from dku_constants import DKUConstants
+from api_connect_rest_api_client import RestAPIClient
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN, decode_bytes
+from api_connect_dku_constants import DKUConstants
 import copy
 import json
 import requests

@@ -1,6 +1,6 @@
 import requests
 import time
-from safe_logger import SafeLogger
+from api_connect_safe_logger import SafeLogger
 
 
 logger = SafeLogger("api-connect plugin retry handler")

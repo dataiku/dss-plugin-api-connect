@@ -2,13 +2,13 @@ import requests
 import time
 import copy
 import tempfile
-from pagination import Pagination
-from safe_logger import SafeLogger
-from loop_detector import LoopDetector
-from dku_utils import get_dku_key_values, get_dku_duplicated_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
-from dku_constants import DKUConstants
-from rest_api_auth import get_auth
-from retry_handler import DefaultRetryHandler
+from api_connect_pagination import Pagination
+from api_connect_safe_logger import SafeLogger
+from api_connect_loop_detector import LoopDetector
+from api_connect_dku_utils import get_dku_key_values, get_dku_duplicated_key_values, template_dict, format_template, is_reponse_xml, xml_to_json
+from api_connect_dku_constants import DKUConstants
+from api_connect_rest_api_auth import get_auth
+from api_connect_retry_handler import DefaultRetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
