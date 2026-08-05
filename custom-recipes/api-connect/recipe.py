@@ -53,7 +53,7 @@ maximum_number_rows = config.get("maximum_number_rows", -1)
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
-input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False)
+input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False, use_nullable_integers=True)
 backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry = get_retry_handler_parameters_from_config(config)
 retry_handler = None
 if backoff_type:
