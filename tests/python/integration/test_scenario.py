@@ -1,4 +1,4 @@
-from api_connect_dku_plugin_test_utils import dss_scenario
+from dku_plugin_test_utils import dss_scenario
 
 TEST_PROJECT_KEY = "PLUGINTESTAPICONNECT"
 
