@@ -411,7 +411,7 @@
         },
         {
             "name": "http_errors_retry_strategy",
-            "label": "Retry strategy",
+            "label": "Retry on error logic",
             "description": "",
             "type": "SELECT",
             "defaultValue": null,
@@ -424,7 +424,7 @@
         {
             "name": "http_errors_to_retry",
             "label": "Errors to retry",
-            "description": "",
+            "description": "Click to select errors that can trigger a retry",
             "type": "MULTISELECT",
             "defaultValue": null,
             "selectChoices":[
