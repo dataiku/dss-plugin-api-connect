@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.5.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.5.0) - Feature - 2026-08
+
+- Add Cobuild support to the API Connect recipe
+
 ## [Version 1.4.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.2) - Bugfix - 2026-07-22
 
 - Remove user's 'Other credentials' from recipe's logs
