@@ -50,6 +50,7 @@ user_secrets = get_user_secrets(config)
 custom_key_values.update(user_secrets)
 display_metadata = config.get("display_metadata", False)
 maximum_number_rows = config.get("maximum_number_rows", -1)
+retry_scope = config.get("http_errors_retry_scope", "dataset")
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
@@ -73,7 +74,8 @@ recipe_session = RestApiRecipeSession(
     display_metadata,
     maximum_number_rows=maximum_number_rows,
     behaviour_when_error=behaviour_when_error,
-    retry_handler=retry_handler
+    retry_handler=retry_handler,
+    retry_scope=retry_scope
 )
 results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
 

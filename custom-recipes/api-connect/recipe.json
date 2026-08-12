@@ -436,6 +436,18 @@
             "visibilityCondition": "(['exponential', 'linear'].includes(model.http_errors_retry_strategy))"
         },
         {
+            "name": "http_errors_retry_scope",
+            "label": "Retry scope",
+            "description": "Apply the retry budget to the entire input dataset or independently to each input row",
+            "type": "SELECT",
+            "defaultValue": "dataset",
+            "selectChoices":[
+                {"value": "dataset", "label": "Per dataset"},
+                {"value": "row", "label": "Per row"}
+            ],
+            "visibilityCondition": "(['exponential', 'linear'].includes(model.http_errors_retry_strategy))"
+        },
+        {
             "name": "http_errors_initial_delay",
             "label": "Initial delay",
             "description": "in seconds",

@@ -65,6 +65,15 @@ class RetryHandler():
                 return True
         return False
 
+    def recreate(self):
+        return RetryHandler(
+            backoff_type=self.backoff_type,
+            initial_delay=self.initial_delay,
+            maximum_number_of_retries=self.maximum_number_of_retries,
+            maximum_duration_of_retry=self.maximum_duration_of_retry,
+            status_codes_to_retry=self.status_codes_to_retry
+        )
+
     def _compute_next_delay(self):
         self.number_of_tries += 1
         if self.next_delay is None:
