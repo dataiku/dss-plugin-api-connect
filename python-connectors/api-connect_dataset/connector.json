@@ -410,7 +410,7 @@
         {
             "name": "http_errors_maximum_retries",
             "label": "Maximum number of retries",
-            "description": "in seconds",
+            "description": "Number of times to retry a request after an error",
             "type": "INT",
             "defaultValue": 5,
             "visibilityCondition": "(['linear'].includes(model.http_errors_retry_strategy))"
