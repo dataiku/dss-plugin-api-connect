@@ -115,7 +115,10 @@ class RestAPIClient(object):
             self.requests_kwargs.update({"json": get_dku_key_values(key_value_body)})
         elif body_format in [DKUConstants.MULTIPART_FORM_DATA_BODY_FORMAT]:
             key_value_body = endpoint.get("key_value_body", {})
-            self.requests_kwargs.update({"files": {k: (None, v) for k, v in get_dku_key_values(key_value_body).items()}})
+            files = {}
+            for key, value in get_dku_key_values(key_value_body).items():
+                files[key] = (None, format_template(value, **self.presets_variables))
+            self.requests_kwargs.update({"files": files})
         self.metadata = {}
         if self.behaviour_when_error == "keep-error-column":
             self.metadata = {DKUConstants.REPONSE_ERROR_KEY: None}
