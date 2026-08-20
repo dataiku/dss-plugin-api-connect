@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 1.6.0 - Enhancement release - 2026-08-19
+## Version 1.6.0 - Enhancement release - 2026-08-20
 
 - Added supported Python versions: 3.12, 3.13, 3.14
 - Bumps Brotli 1.0.9 to 1.2.0
