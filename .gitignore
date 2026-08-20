@@ -1,5 +1,6 @@
 # DSS specific stuff
 dist/
+.ci/
 .wlock
 .ts
 

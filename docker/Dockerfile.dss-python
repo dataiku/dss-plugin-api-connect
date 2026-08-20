@@ -1,0 +1,15 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE:-dataiku/dss:14.2.0}
+
+USER root
+ARG EXTRA_PYTHON_VERSIONS="3.11"
+
+RUN set -euxo pipefail \
+    && dnf -y install dnf-plugins-core epel-release \
+    && (dnf config-manager --set-enabled crb || dnf config-manager --set-enabled powertools || true) \
+    && for version in ${EXTRA_PYTHON_VERSIONS}; do \
+         dnf -y install "python${version}" "python${version}-devel" "python${version}-pip"; \
+       done \
+    && dnf clean all
+
+USER dataiku

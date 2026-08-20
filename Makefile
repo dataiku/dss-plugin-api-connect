@@ -27,12 +27,12 @@ unit-tests:
 	)
 	@( \
 		rm -rf ./env/; \
-		python3 -m venv env/; \
+		python3.11 -m venv env/; \
 		source env/bin/activate; \
 		pip install --upgrade pip;\
 		pip install --no-cache-dir -r tests/python/unit/requirements.txt; \
 		pip install --no-cache-dir -r code-env/python/spec/requirements.txt; \
-		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
+		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib:$(PWD)/tests/python/integration"; \
 		pytest tests/python/unit --alluredir=tests/allure_report || ret=$$?; exit $$ret \
 	)
 
@@ -40,11 +40,11 @@ integration-tests:
 	@echo "Running integration tests..."
 	@( \
 		rm -rf ./env/; \
-		python3 -m venv env/; \
+		python3.11 -m venv env/; \
 		source env/bin/activate; \
 		pip3 install --upgrade pip;\
 		pip install --no-cache-dir -r tests/python/integration/requirements.txt; \
-		pytest tests/python/integration --alluredir=tests/allure_report || ret=$$?; exit $$ret \
+		python tests/python/integration/run_pytest_integration.py || ret=$$?; exit $$ret \
 	)
 
 tests: unit-tests integration-tests

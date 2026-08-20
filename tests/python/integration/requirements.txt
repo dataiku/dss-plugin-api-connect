@@ -1,4 +1,6 @@
 pytest
 requests<2.22,>=2
 dataiku-api-client
+dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
+pandas>=2.3.3
 git+https://github.com/dataiku/dataiku-plugin-tests-utils.git@master#egg=dataiku-plugin-tests-utils

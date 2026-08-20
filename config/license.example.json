@@ -1,0 +1,20 @@
+{
+    "content": {
+        "licensee": {
+            "email": "robin.barker@darmaiku.ai",
+            "company": "darmaiku",
+            "name": "Robin Barker"
+        },
+        "dssMode": "ON_PREMISE_DISCONNECTED",
+        "instanceId": "a8yk39bt",
+        "licenseKind": "COMMUNITY",
+        "licenseId": "dPve9W9DeHIA8jcI",
+        "properties": {
+            "automationFeaturesVersion": "2018-1"
+        },
+        "communityEdition": "true"
+    },
+    "r1Sig": "MYScPrbTVvEIhHsXs3FL88f20+Wo5s+Wz4QTv/0lkGHyEwAwNo1QjCAhhx0SV9149Iqfv67HHNqWpINQihmjUoPV/Q0Bi6TaBGyfC+UICOyUdUwD8/tRkpGo1RCOdzE7StH9XrlwYW7ZhnyW0G15MMPeCINLfkIvfTgUNPffLzM=",
+    "r1Pub": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDqyiqepcWLOnxAX+nuRvTeapLJ3sAWJ0DCtJjrraYnrTSwbVZJ5Xu5ZPukb99mxq45z3jux6ljlmdMlo0/hRwKLHEIjzK7B+XGSJYBcSfcUEe8ENcHV7ZW5PSpxYWWq2h+aA/xpsA3vvM1DWxdgSUErnY2kaZe2X2nStQHlpwBmwIDAQAB",
+    "r1PubSig": "OG7+Ke0UY+poOjCVj43krxo5uqHZ/Itrh27rIwlRhIzBsWvxjTGThDDaaNhwxTwDCjenX5rdCkYqrauD0ztE2Y7iBDSgO7PkzgVW+KFdRrYM+zsEr7nsGfhgdDVQnCUetD4kOxbaqCl7LDo0DXaT+bZGdiNjyiq3ByslIEA5QQ8="
+}

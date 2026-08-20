@@ -1,0 +1,29 @@
+services:
+  # Pytest is intentionally run by the host/CI runner.  The launcher derives
+  # EXTRA_DSS_PY_VERSIONS from code-env/python/desc.json before starting this
+  # service.
+  dss:
+    image: ${DSS_IMAGE:-dataiku/dss:${DSS_VERSION}-py}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dss-python
+      args:
+        BASE_IMAGE: dataiku/dss:${DSS_VERSION}
+        EXTRA_PYTHON_VERSIONS: ${EXTRA_DSS_PY_VERSIONS:-3.11}
+    platform: linux/amd64
+    environment:
+      EXTRA_DSS_PY_VERSIONS: ${EXTRA_DSS_PY_VERSIONS}
+    # volumes:
+      # - integration-dss:/home/dataiku/dss
+    ports:
+      - "10000:10000"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl --fail http://localhost:10000/dip/api/ping &&
+          for version in $$EXTRA_DSS_PY_VERSIONS; do python$$version --version; done
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 45s

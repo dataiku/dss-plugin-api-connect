@@ -1,0 +1,111 @@
+name: DSS Python code-environment compatibility
+
+on:
+  pull_request:
+    paths:
+      - 'code-env/python/**'
+      - 'docker/**'
+      - 'docker-compose.python.yaml'
+      - 'docker-compose.code-env-tests.yaml'
+      - 'tests/python/**'
+      - 'plugin.json'
+      - '.github/workflows/dss-python-code-env.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  code-environment-matrix:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-north-1
+      ECR_REGISTRY: 651558070443.dkr.ecr.eu-north-1.amazonaws.com
+      DSS_BASE_IMAGE: ${{ secrets.DSS_BASE_IMAGE }}
+      DEVX_TASKS_IMAGE: 651558070443.dkr.ecr.eu-north-1.amazonaws.com/bs-tools/devx-tasks:latest
+      DSS_IMAGE: api-connect-dss-code-env:${{ github.sha }}
+      PLUGIN_ID: api-connect
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials for ECR
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ECR_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Authenticate Docker to ECR
+        run: aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
+      - name: Read the plugin Python interpreter descriptor
+        id: interpreters
+        run: |
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+
+          with open("code-env/python/desc.json", encoding="utf-8") as stream:
+              labels = json.load(stream).get("acceptedPythonInterpreters")
+          if not isinstance(labels, list) or not labels:
+              raise SystemExit("acceptedPythonInterpreters must be a non-empty list")
+          if len(labels) != len(set(labels)):
+              raise SystemExit("acceptedPythonInterpreters must not contain duplicates")
+
+          versions = []
+          for label in labels:
+              if not isinstance(label, str) or not label.startswith("PYTHON3"):
+                  raise SystemExit("unsupported interpreter label: {!r}".format(label))
+              digits = label[len("PYTHON"):]
+              if len(digits) < 2 or not digits.isdigit():
+                  raise SystemExit("malformed interpreter label: {!r}".format(label))
+              versions.append("{}.{}".format(digits[0], digits[1:]))
+
+          print("DSS_PYTHON_INTERPRETERS={}".format(" ".join(labels)))
+          print("EXTRA_DSS_PY_VERSIONS={}".format(" ".join(versions)))
+          PY
+
+      - name: Build the plugin archive
+        run: |
+          make plugin
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+          metadata = json.load(open("plugin.json", encoding="utf-8"))
+          print("PLUGIN_ARCHIVE_NAME=dss-plugin-{}-{}.zip".format(metadata["id"], metadata["version"]))
+          PY
+
+      - name: Provision the ephemeral DSS license
+        env:
+          DSS_LICENSE_JSON: ${{ secrets.DSS_LICENSE_JSON }}
+        run: |
+          mkdir -p .ci/code-env
+          printf '%s' "$DSS_LICENSE_JSON" > .ci/dss-license.json
+
+      - name: Run the descriptor-driven code-environment matrix
+        run: |
+          docker compose -f docker-compose.python.yaml -f docker-compose.code-env-tests.yaml \
+            --project-name api-connect-code-env-${{ github.run_id }} \
+            up --build --abort-on-container-exit --exit-code-from code-env-tests code-env-tests
+
+      - name: Collect DSS logs
+        if: always()
+        run: |
+          docker compose -f docker-compose.python.yaml -f docker-compose.code-env-tests.yaml \
+            --project-name api-connect-code-env-${{ github.run_id }} logs --no-color > .ci/code-env/docker.log || true
+
+      - name: Upload compatibility artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dss-python-code-environment-results
+          path: |
+            .ci/code-env/results.json
+            .ci/code-env/docker.log
+          if-no-files-found: warn
+
+      - name: Remove ephemeral DSS resources
+        if: always()
+        run: |
+          docker compose -f docker-compose.python.yaml -f docker-compose.code-env-tests.yaml \
+            --project-name api-connect-code-env-${{ github.run_id }} down --volumes --remove-orphans || true
+          rm -f .ci/dss-license.json
