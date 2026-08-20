@@ -178,6 +178,7 @@
             "selectChoices":[
                 {"value": "na", "label": "No pagination"},
                 {"value": "next_page", "label": "Next page URL provided"},
+                {"value": "cursor", "label": "Cursor pagination"},
                 {"value": "offset", "label": "Offset pagination"},
                 {"value": "page", "label": "Per page"}
             ]
@@ -234,6 +235,22 @@
             "type": "STRING",
             "defaultValue": null,
             "visibilityCondition": "model.pagination_type=='page'"
+        },
+        {
+            "name": "cursor_next_token_path",
+            "label": "Key to next cursor token",
+            "description": "Dot separated key path to next cursor token",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='cursor'"
+        },
+        {
+            "name": "cursor_query_param",
+            "label": "Query parameter",
+            "description": "Name of the url parameter that will contain the cursor token in following calls",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='cursor'"
         },
         {
             "type": "SEPARATOR",
