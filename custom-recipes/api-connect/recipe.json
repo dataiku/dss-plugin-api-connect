@@ -297,6 +297,14 @@
             "visibilityCondition": "model.pagination_type=='cursor'"
         },
         {
+            "name": "cursor_initial_token",
+            "label": "Initial cursor value",
+            "description": "Optional value sent in the query parameter on the first request",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='cursor'"
+        },
+        {
             "type": "SEPARATOR",
             "label": "Advanced"
         },
