@@ -430,6 +430,7 @@
             "selectChoices":[
                 {"value": "408", "label": "408 Request Timeout"},
                 {"value": "429", "label": "429 Too many requests"},
+                {"value": "502", "label": "502 Bad Gateway"},
                 {"value": "503", "label": "503 Service Unavailable"},
                 {"value": "504", "label": "504 Gateway Time out"}
             ],
