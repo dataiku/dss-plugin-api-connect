@@ -34,31 +34,28 @@ class Pagination(object):
                          cursor_initial_token=None, pagination_type="na"):
         config = {} if config is None else config
         self.pagination_type = config.get("pagination_type", pagination_type)
+        self.update_next_page = self.update_next_page_default
         if self.pagination_type == "next_page":
             self.next_page_key = config.get("next_page_key", next_page_key)
             self.next_page_key = None if self.next_page_key == '' else self.next_page_key
             if next_page_url_base:
                 next_page_url_base = next_page_url_base.strip('/')
             self.next_page_url_base = next_page_url_base
+            self.update_next_page = self.update_next_page_link
         elif self.pagination_type == "cursor":
             self.cursor_next_token_path = config.get("cursor_next_token_path", cursor_next_token_path)
             self.cursor_query_param = config.get("cursor_query_param", cursor_query_param)
             self.cursor_initial_token = config.get("cursor_initial_token", cursor_initial_token)
-        elif self.pagination_type in ["offset", "page"]:
+            self.update_next_page = self.update_next_page_cursor
+        elif self.pagination_type == "offset":
             self.skip_key = config.get("skip_key", skip_key)
+            self.update_next_page = self.update_next_page_offset
+        elif self.pagination_type == "page":
+            self.skip_key = config.get("skip_key", skip_key)
+            self.update_next_page = self.update_next_page_per_page
         logger.info("configure_paging: self.pagination_type='{}', self.next_page_key='{}', self.next_page_url_base='{}', self.skip_key='{}', self.cursor_next_token_path='{}', self.cursor_query_param='{}', self.cursor_initial_token='{}'".format(
                 self.pagination_type, self.next_page_key, self.next_page_url_base, self.skip_key, self.cursor_next_token_path, self.cursor_query_param, self.cursor_initial_token
             ))
-        if self.pagination_type == "next_page":
-            self.update_next_page = self.update_next_page_link
-        elif self.pagination_type == "offset":
-            self.update_next_page = self.update_next_page_offset
-        elif self.pagination_type == "page":
-            self.update_next_page = self.update_next_page_per_page
-        elif self.pagination_type == "cursor":
-            self.update_next_page = self.update_next_page_cursor
-        else:
-            self.update_next_page = self.update_next_page_default
 
     def reset_paging(self, counting_key=None, url=None):
         self.records_to_skip = 0
