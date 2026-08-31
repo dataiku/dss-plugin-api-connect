@@ -1,15 +1,15 @@
 from dataiku.connector import Connector
 from dataikuapi.utils import DataikuException
-from safe_logger import SafeLogger
-from rest_api_client import RestAPIClient
-from dku_utils import (
+from api_connect_safe_logger import SafeLogger
+from api_connect_rest_api_client import RestAPIClient
+from api_connect_dku_utils import (
     get_dku_key_values, get_endpoint_parameters,
     parse_keys_for_json, get_value_from_path, get_secure_credentials,
     decode_csv_data, decode_bytes, get_user_secrets, get_retry_handler_parameters_from_config
 )
-from dku_constants import DKUConstants
+from api_connect_dku_constants import DKUConstants
 import json
-from retry_handler import RetryHandler
+from api_connect_retry_handler import RetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)

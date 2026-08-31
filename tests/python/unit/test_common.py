@@ -1,4 +1,4 @@
-from dku_utils import template_dict, join_url
+from api_connect_dku_utils import template_dict, join_url
 import pytest
 
 

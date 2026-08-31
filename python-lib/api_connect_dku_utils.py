@@ -3,7 +3,7 @@ import copy
 import math
 from collections import defaultdict
 from jsonpath_ng.ext import parse
-from safe_logger import SafeLogger
+from api_connect_safe_logger import SafeLogger
 
 
 logger = SafeLogger("api-connect plugin utils")
