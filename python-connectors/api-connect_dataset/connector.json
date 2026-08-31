@@ -378,6 +378,7 @@
             "selectChoices":[
                 {"value": "408", "label": "408 Request Timeout"},
                 {"value": "429", "label": "429 Too many requests"},
+                {"value": "502", "label": "502 Bad Gateway"},
                 {"value": "503", "label": "503 Service Unavailable"},
                 {"value": "504", "label": "504 Gateway Time out"}
             ],
@@ -410,7 +411,7 @@
         {
             "name": "http_errors_maximum_retries",
             "label": "Maximum number of retries",
-            "description": "in seconds",
+            "description": "Number of times to retry a request after an error",
             "type": "INT",
             "defaultValue": 5,
             "visibilityCondition": "(['linear'].includes(model.http_errors_retry_strategy))"

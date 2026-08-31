@@ -144,12 +144,10 @@ class RestAPIClient(object):
     def request(self, method, url, can_raise_exeption=True, **kwargs):
         logger.info(u"Accessing endpoint {} with params={}".format(url, kwargs.get("params")))
         self.assert_secure_domain(url)
-        self.enforce_throttling()
         kwargs = template_dict(kwargs, **self.presets_variables)
         if self.loop_detector.is_stuck_in_loop(url, kwargs.get("params", {}), kwargs.get("headers", {})):
             raise RestAPIClientError("The api-connect plugin is stuck in a loop. Please check the pagination parameters.")
         request_start_time = time.time()
-        self.time_last_request = request_start_time
         error_message = None
         status_code = None
         response_headers = None
@@ -225,6 +223,8 @@ class RestAPIClient(object):
     def request_with_errors_retry(self, method, url, **kwargs):
         response = None
         while self.retry_handler.should_retry(response):
+            self.enforce_throttling()
+            self.time_last_request = time.time()
             response = self.session.request(method, url, **kwargs)
         return response
 
@@ -264,7 +264,7 @@ class RestAPIClient(object):
         self.pagination.reset_paging(counting_key=self.extraction_key, url=self.endpoint_url)
 
     def enforce_throttling(self):
-        if self.time_between_requests and self.time_last_request:
+        if self.time_between_requests and self.time_last_request is not None:
             current_time = time.time()
             time_since_last_resquests = current_time - self.time_last_request
             if time_since_last_resquests < self.time_between_requests:

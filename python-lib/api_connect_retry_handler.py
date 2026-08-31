@@ -65,6 +65,15 @@ class RetryHandler():
                 return True
         return False
 
+    def recreate(self):
+        return RetryHandler(
+            backoff_type=self.backoff_type,
+            initial_delay=self.initial_delay,
+            maximum_number_of_retries=self.maximum_number_of_retries,
+            maximum_duration_of_retry=self.maximum_duration_of_retry,
+            status_codes_to_retry=self.status_codes_to_retry
+        )
+
     def _compute_next_delay(self):
         self.number_of_tries += 1
         if self.next_delay is None:
@@ -82,7 +91,7 @@ class RetryHandler():
             time.sleep(self.next_delay)
 
     def _too_many_retries(self):
-        if not self.maximum_number_of_retries:
+        if self.maximum_number_of_retries is None:
             return False
         if self.number_of_tries > self.maximum_number_of_retries:
             logger.warning("Maximum number of retries reached. Not retrying.")
@@ -90,7 +99,7 @@ class RetryHandler():
         return False
 
     def _is_next_delay_too_long(self):
-        if not self.maximum_duration_of_retry:
+        if self.maximum_duration_of_retry is None:
             return False
         if self.next_delay >= self.maximum_duration_of_retry:
             logger.warning("Sleep time before retry reached the max. Not retrying.")
