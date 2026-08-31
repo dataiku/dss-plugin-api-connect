@@ -1,5 +1,5 @@
-from safe_logger import SafeLogger
-from dku_utils import get_value_from_path, extract_key_using_json_path, join_url
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import get_value_from_path, extract_key_using_json_path, join_url
 
 
 logger = SafeLogger("api-connect plugin Pagination")

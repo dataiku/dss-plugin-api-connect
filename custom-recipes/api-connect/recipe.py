@@ -2,10 +2,11 @@
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
 import pandas as pd
-from safe_logger import SafeLogger
-from dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets
-from rest_api_recipe_session import RestApiRecipeSession
-from dku_constants import DKUConstants
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
+from api_connect_rest_api_recipe_session import RestApiRecipeSession
+from api_connect_dku_constants import DKUConstants
+from api_connect_retry_handler import RetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -49,10 +50,18 @@ user_secrets = get_user_secrets(config)
 custom_key_values.update(user_secrets)
 display_metadata = config.get("display_metadata", False)
 maximum_number_rows = config.get("maximum_number_rows", -1)
+retry_scope = config.get("http_errors_retry_scope", "dataset")
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
-input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False)
+input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False, use_nullable_integers=True)
+backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry = get_retry_handler_parameters_from_config(config)
+retry_handler = None
+if backoff_type:
+    retry_handler = RetryHandler(
+        backoff_type=backoff_type, initial_delay=initial_delay, maximum_number_of_retries=maximum_number_of_retries,
+        maximum_duration_of_retry=maximum_duration_of_retry, status_codes_to_retry=status_codes_to_retry
+    )
 
 recipe_session = RestApiRecipeSession(
     custom_key_values,
@@ -64,7 +73,9 @@ recipe_session = RestApiRecipeSession(
     parameter_renamings,
     display_metadata,
     maximum_number_rows=maximum_number_rows,
-    behaviour_when_error=behaviour_when_error
+    behaviour_when_error=behaviour_when_error,
+    retry_handler=retry_handler,
+    retry_scope=retry_scope
 )
 results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
 
