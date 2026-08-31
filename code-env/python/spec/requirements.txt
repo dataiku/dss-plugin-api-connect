@@ -1,5 +1,6 @@
 jsonpath-ng==1.5.3
 requests_ntlm==1.2.0
 requests==2.26.0
-Brotli==1.0.9
+Brotli==1.2.0
 xmltodict==0.13.0
+setuptools<82.0.0

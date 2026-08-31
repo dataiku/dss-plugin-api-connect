@@ -1,10 +1,20 @@
 # Changelog
 
-## [Version 1.4.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.3) - Feature and bugfix - 2026-07-27
+## [Version 1.6.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.1) - Feature and bugfix - 2026-07-27
 
 - Fix templating for multiform body
 - Adding a configurable retry for several HTTP errors
 - Fix issue with empty cell(s) in bigint columns of the recipe's input dataset
+
+## Version 1.6.0 - Enhancement release - 2026-08-20
+
+- Added supported Python versions: 3.12, 3.13, 3.14
+- Bumps Brotli 1.0.9 to 1.2.0
+- Sets setuptools<82.0.0
+
+## Version 1.5.0 - Feature - 2026-08-19
+
+- Added Cobuild support to the API Connect recipe
 
 ## [Version 1.4.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.2) - Bugfix - 2026-07-22
 

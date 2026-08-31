@@ -5,6 +5,9 @@
         "icon": "icon-rocket"
     },
     "kind": "PYTHON",
+    "cobuild": {
+        "supported": true
+    },
     "selectableFromDataset": "input_A_role",
     "inputRoles": [
         {
