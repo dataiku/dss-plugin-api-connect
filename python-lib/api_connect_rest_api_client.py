@@ -90,6 +90,9 @@ class RestAPIClient(object):
         next_page_url_base = endpoint.get("next_page_url_base", None) if is_next_page_url_relative else None
         next_page_url_base = format_template(next_page_url_base, **self.presets_variables)
         skip_key = endpoint.get("skip_key")
+        cursor_next_token_path = endpoint.get("cursor_next_token_path")
+        cursor_query_param = endpoint.get("cursor_query_param")
+        cursor_initial_token = format_template(endpoint.get("cursor_initial_token"), **self.presets_variables)
         pagination_type = endpoint.get("pagination_type", "na")
         if pagination_type == "next_page" and is_next_page_url_relative and not next_page_url_base:
             raise RestAPIClientError("Pagination's 'Next page URL' is relative but no 'Base URL to next page' has been set")
@@ -97,6 +100,9 @@ class RestAPIClient(object):
             skip_key=skip_key,
             next_page_key=next_page_url_key,
             next_page_url_base=next_page_url_base,
+            cursor_next_token_path=cursor_next_token_path,
+            cursor_query_param=cursor_query_param,
+            cursor_initial_token=cursor_initial_token,
             pagination_type=pagination_type
         )
         self.last_interaction = None

@@ -39,6 +39,7 @@ def get_endpoint_parameters(configuration):
         "requests_per_minute",
         "pagination_type",
         "next_page_url_key", "is_next_page_url_relative", "next_page_url_base",
+        "cursor_next_token_path", "cursor_query_param", "cursor_initial_token",
         "top_key", "skip_key", "maximum_number_rows",
         "use_mtls", "mtls_certificate_path", "mtls_key_path",
         "force_csv_parameters", "csv_delimiter",

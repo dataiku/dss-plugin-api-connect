@@ -4,4 +4,4 @@
 - API Connect automatically injects an API-key preset into the header or query parameter configured by the user in that preset. Do not add the API key again to request fields.
 - Use the dot-separated `extraction_key` when response rows are nested under a JSON path.
 - Keep `raw_output=true` when each response item should be preserved as raw JSON instead of flattened into columns.
-- Select the pagination mechanism from the target API's documentation; do not infer one from the endpoint shape. Relative next-page URLs require `next_page_url_base`, page pagination requires `extraction_key`, and offset or page pagination requires `skip_key`.
+- Select the pagination mechanism from the target API's documentation; do not infer one from the endpoint shape. Relative next-page URLs require `next_page_url_base`, page pagination requires `extraction_key`, offset or page pagination requires `skip_key`, cursor pagination requires `cursor_next_token_path` and `cursor_query_param`, and can optionally use `cursor_initial_token` to start from a known cursor.

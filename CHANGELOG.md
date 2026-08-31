@@ -5,6 +5,7 @@
 - Fix templating for multiform body
 - Adding a configurable retry for several HTTP errors
 - Fix issue with empty cell(s) in bigint columns of the recipe's input dataset
+- Adding support for cursor based pagination
 
 ## Version 1.6.0 - Enhancement release - 2026-08-20
 

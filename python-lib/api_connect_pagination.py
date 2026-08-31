@@ -12,6 +12,10 @@ class Pagination(object):
         self.next_page_url_base = None
         self.skip_key = None
         self.next_page_url = None
+        self.cursor_next_token_path = None
+        self.cursor_query_param = None
+        self.cursor_initial_token = None
+        self.cursor_query_param_value = None
         self.records_to_skip = None
         self.pagination_type = ""
         self.counting_key = None
@@ -25,28 +29,33 @@ class Pagination(object):
         self.update_next_page = self.update_next_page_default
 
     def configure_paging(self, config=None, skip_key=None,
-                         next_page_key=None, next_page_url_base=None, pagination_type="na"):
+                         next_page_key=None, next_page_url_base=None,
+                         cursor_next_token_path=None, cursor_query_param=None,
+                         cursor_initial_token=None, pagination_type="na"):
         config = {} if config is None else config
         self.pagination_type = config.get("pagination_type", pagination_type)
+        self.update_next_page = self.update_next_page_default
         if self.pagination_type == "next_page":
             self.next_page_key = config.get("next_page_key", next_page_key)
             self.next_page_key = None if self.next_page_key == '' else self.next_page_key
             if next_page_url_base:
                 next_page_url_base = next_page_url_base.strip('/')
             self.next_page_url_base = next_page_url_base
-        elif self.pagination_type in ["offset", "page"]:
-            self.skip_key = config.get("skip_key", skip_key)
-        logger.info("configure_paging: self.pagination_type='{}', self.next_page_key='{}', self.next_page_url_base='{}', self.skip_key='{}'".format(
-                self.pagination_type, self.next_page_key, self.next_page_url_base, self.skip_key
-            ))
-        if self.pagination_type == "next_page":
             self.update_next_page = self.update_next_page_link
+        elif self.pagination_type == "cursor":
+            self.cursor_next_token_path = config.get("cursor_next_token_path", cursor_next_token_path)
+            self.cursor_query_param = config.get("cursor_query_param", cursor_query_param)
+            self.cursor_initial_token = config.get("cursor_initial_token", cursor_initial_token)
+            self.update_next_page = self.update_next_page_cursor
         elif self.pagination_type == "offset":
+            self.skip_key = config.get("skip_key", skip_key)
             self.update_next_page = self.update_next_page_offset
         elif self.pagination_type == "page":
+            self.skip_key = config.get("skip_key", skip_key)
             self.update_next_page = self.update_next_page_per_page
-        else:
-            self.update_next_page = self.update_next_page_default
+        logger.info("configure_paging: self.pagination_type='{}', self.next_page_key='{}', self.next_page_url_base='{}', self.skip_key='{}', self.cursor_next_token_path='{}', self.cursor_query_param='{}', self.cursor_initial_token='{}'".format(
+                self.pagination_type, self.next_page_key, self.next_page_url_base, self.skip_key, self.cursor_next_token_path, self.cursor_query_param, self.cursor_initial_token
+            ))
 
     def reset_paging(self, counting_key=None, url=None):
         self.records_to_skip = 0
@@ -57,6 +66,7 @@ class Pagination(object):
         else:
             self.next_page_number = 0
         self.next_page_url = url
+        self.cursor_query_param_value = self.cursor_initial_token
         self.is_last_batch_empty = False
         self.is_first_batch = True
         self.is_paging_started = True
@@ -127,6 +137,16 @@ class Pagination(object):
                 next_link, self.next_page_url, self.params_must_be_blanked, self.next_page_number, self.counter
             ))
 
+    def update_next_page_cursor(self, data, response_links=None):
+        self.is_first_batch = False
+        self.counter += 1
+        self.cursor_query_param_value = None
+        self.data_is_list = False
+
+        if self.cursor_next_token_path and self.cursor_query_param:
+            self.cursor_query_param_value = extract_key_using_json_path(data, self.cursor_next_token_path)
+            logger.info("update_next_page_cursor:{}".format({self.cursor_query_param_value}))
+
     def update_next_page_default(self, data, response_links=None):
         self.is_first_batch = False
 
@@ -142,6 +162,15 @@ class Pagination(object):
             logger.info("has_next_page:next_page_key={} next_page_url={} -> {}".format(
                 self.next_page_key,
                 self.next_page_url,
+                ret
+            ))
+            return ret
+        if self.pagination_type == "cursor":
+            ret = (self.cursor_query_param_value is not None) and (self.cursor_query_param_value != "")
+            logger.info("has_next_page:cursor_next_token_path={} cursor_query_param={} cursor_query_param_value={} -> {}".format(
+                self.cursor_next_token_path,
+                self.cursor_query_param,
+                self.cursor_query_param_value,
                 ret
             ))
             return ret
@@ -167,6 +196,10 @@ class Pagination(object):
         if self.skip_key and (self.records_to_skip > 0 or self.next_page_number > 0):
             ret.update({
                 self.skip_key: self.next_page_number if self.pagination_type == "page" else self.records_to_skip
+            })
+        if self.cursor_query_param and self.cursor_query_param_value not in [None, ""]:
+            ret.update({
+                self.cursor_query_param: self.cursor_query_param_value
             })
         return ret
 
