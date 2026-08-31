@@ -356,6 +356,65 @@
             "description": "-1 for no limit",
             "type": "INT",
             "defaultValue": -1
+        },
+        {
+            "name": "http_errors_retry_strategy",
+            "label": "Retry on error logic",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": null, "label": "No retry"},
+                {"value": "linear", "label": "Linear backoff"},
+                {"value": "exponential", "label": "Exponential backoff"}
+            ]
+        },
+        {
+            "name": "http_errors_to_retry",
+            "label": "Errors to retry",
+            "description": "Click to select errors that can trigger a retry",
+            "type": "MULTISELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": "408", "label": "408 Request Timeout"},
+                {"value": "429", "label": "429 Too many requests"},
+                {"value": "502", "label": "502 Bad Gateway"},
+                {"value": "503", "label": "503 Service Unavailable"},
+                {"value": "504", "label": "504 Gateway Time out"}
+            ],
+            "visibilityCondition": "(['exponential', 'linear'].includes(model.http_errors_retry_strategy))"
+        },
+        {
+            "name": "http_errors_initial_delay",
+            "label": "Initial delay",
+            "description": "in seconds",
+            "type": "INT",
+            "defaultValue": 1,
+            "visibilityCondition": "(['exponential'].includes(model.http_errors_retry_strategy))"
+        },
+        {
+            "name": "http_errors_maximum_delay",
+            "label": "Maximum delay",
+            "description": "in seconds",
+            "type": "INT",
+            "defaultValue": 120,
+            "visibilityCondition": "(['exponential'].includes(model.http_errors_retry_strategy))"
+        },
+        {
+            "name": "http_errors_delay",
+            "label": "Delay",
+            "description": "in seconds",
+            "type": "INT",
+            "defaultValue": 1,
+            "visibilityCondition": "(['linear'].includes(model.http_errors_retry_strategy))"
+        },
+        {
+            "name": "http_errors_maximum_retries",
+            "label": "Maximum number of retries",
+            "description": "Number of times to retry a request after an error",
+            "type": "INT",
+            "defaultValue": 5,
+            "visibilityCondition": "(['linear'].includes(model.http_errors_retry_strategy))"
         }
     ]
 }

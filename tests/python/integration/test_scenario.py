@@ -65,3 +65,15 @@ def test_run_api_connect_mtls(user_dss_clients):
 
 def test_run_api_connect_multipart_form_data(user_dss_clients):
     dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="MULTIPARTFORMDATA")
+
+
+def test_run_api_connect_multipart_form_data_templating(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="MULTIPARTFORMDATATEMPLATING")
+
+
+def test_run_api_connect_multipart_form_data(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="NULLININPUTDATASET")
+
+
+def test_run_api_connect_retry_handler(user_dss_clients):
+    dss_scenario.run(user_dss_clients, project_key=TEST_PROJECT_KEY, scenario_id="RETRY")

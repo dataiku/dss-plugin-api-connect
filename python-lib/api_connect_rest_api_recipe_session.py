@@ -1,8 +1,8 @@
 from dataikuapi.utils import DataikuException
-from rest_api_client import RestAPIClient
-from safe_logger import SafeLogger
-from dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN, decode_bytes
-from dku_constants import DKUConstants
+from api_connect_rest_api_client import RestAPIClient
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import parse_keys_for_json, get_value_from_path, decode_csv_data, de_NaN, decode_bytes
+from api_connect_dku_constants import DKUConstants
 import copy
 import json
 import requests
@@ -15,7 +15,7 @@ logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_
 class RestApiRecipeSession:
     def __init__(self, custom_key_values, credential_parameters, secure_credentials, endpoint_parameters, extraction_key, parameter_columns, parameter_renamings,
                  display_metadata=False,
-                 maximum_number_rows=-1, behaviour_when_error=None):
+                 maximum_number_rows=-1, behaviour_when_error=None, retry_handler=None, retry_scope="dataset"):
         self.custom_key_values = custom_key_values
         self.credential_parameters = credential_parameters
         self.secure_credentials = secure_credentials
@@ -30,6 +30,8 @@ class RestApiRecipeSession:
         self.behaviour_when_error = behaviour_when_error or "add-error-column"
         self.can_raise = self.behaviour_when_error == "raise"
         self.csv_configuration = endpoint_parameters
+        self.retry_handler = retry_handler
+        self.retry_scope = retry_scope
 
     @staticmethod
     def get_column_to_parameter_dict(parameter_columns, parameter_renamings):
@@ -46,6 +48,9 @@ class RestApiRecipeSession:
         time_last_request = None
         session = requests.Session()
         for index, input_parameters_row in input_parameters_dataframe.iterrows():
+            retry_handler = self.retry_handler
+            if self.retry_scope == "row" and retry_handler:
+                retry_handler = retry_handler.recreate()
             rows_count = 0
             self.initial_parameter_columns = {}
             for column_name in self.column_to_parameter_dict:
@@ -68,7 +73,8 @@ class RestApiRecipeSession:
                 updated_endpoint_parameters,
                 custom_key_values=self.custom_key_values,
                 session=session,
-                behaviour_when_error=self.behaviour_when_error
+                behaviour_when_error=self.behaviour_when_error,
+                retry_handler=retry_handler
             )
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():
