@@ -2,11 +2,11 @@
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
 import pandas as pd
-from safe_logger import SafeLogger
-from dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
-from rest_api_recipe_session import RestApiRecipeSession
-from dku_constants import DKUConstants
-from retry_handler import RetryHandler
+from api_connect_safe_logger import SafeLogger
+from api_connect_dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
+from api_connect_rest_api_recipe_session import RestApiRecipeSession
+from api_connect_dku_constants import DKUConstants
+from api_connect_retry_handler import RetryHandler
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -54,7 +54,7 @@ retry_scope = config.get("http_errors_retry_scope", "dataset")
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
-input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False)
+input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False, use_nullable_integers=True)
 backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry = get_retry_handler_parameters_from_config(config)
 retry_handler = None
 if backoff_type:

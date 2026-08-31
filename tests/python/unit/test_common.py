@@ -1,6 +1,6 @@
-from dku_utils import template_dict, join_url
-from rest_api_client import RestAPIClient
-from retry_handler import RetryHandler
+from api_connect_dku_utils import template_dict, join_url
+from api_connect_rest_api_client import RestAPIClient
+from api_connect_retry_handler import RetryHandler
 import pytest
 import requests
 

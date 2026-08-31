@@ -1,9 +1,10 @@
 # Changelog
 
-## [Version 1.4.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.3) - Bugfix - 2026-07-27
+## [Version 1.4.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.3) - Feature and bugfix - 2026-07-27
 
 - Fix templating for multiform body
 - Adding a configurable retry for several HTTP errors
+- Fix issue with empty cell(s) in bigint columns of the recipe's input dataset
 
 ## [Version 1.4.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.4.2) - Bugfix - 2026-07-22
 
