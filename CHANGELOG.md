@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.6.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.2) - Feature and bugfix - 2026-08-03
+
+- Fix issue with empty cell(s) in boolean columns of the recipe's input dataset
+
 ## [Version 1.6.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.1) - Feature and bugfix - 2026-07-27
 
 - Fix templating for multiform body
