@@ -1,5 +1,4 @@
 import json
-import copy
 import math
 from collections import defaultdict
 from jsonpath_ng.ext import parse
@@ -92,7 +91,7 @@ def parse_keys_for_json(items):
 
 
 def get_value_from_path(dictionary, path, default=None, can_raise=True):
-    ret = copy.deepcopy(dictionary)
+    ret = dictionary
     for key in path:
         if isinstance(ret, dict) and (key in ret):
             ret = ret.get(key)
