@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.6.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.2) - Security fix - 2026-10-25
+
+- Update Brotli to 1.2.1
+
 ## [Version 1.6.1](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.1) - Feature and bugfix - 2026-07-27
 
 - Fix templating for multiform body
