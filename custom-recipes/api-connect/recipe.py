@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 import dataiku
-from dataiku.customrecipe import get_input_names_for_role, get_recipe_config, get_output_names_for_role
+from dataiku.customrecipe import (
+    get_input_names_for_role, get_recipe_config, get_output_names_for_role
+)
 import pandas as pd
 from api_connect_safe_logger import SafeLogger
-from api_connect_dku_utils import get_dku_key_values, get_endpoint_parameters, get_secure_credentials, get_user_secrets, get_retry_handler_parameters_from_config
+from api_connect_dku_utils import (
+    get_dku_key_values, get_endpoint_parameters, get_secure_credentials,
+    get_user_secrets, get_retry_handler_parameters_from_config
+)
 from api_connect_rest_api_recipe_session import RestApiRecipeSession
 from api_connect_dku_constants import DKUConstants
 from api_connect_retry_handler import RetryHandler
+from api_connect_recipe_output import write_streamed_pages
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -41,6 +47,8 @@ endpoint_parameters = get_endpoint_parameters(config)
 secure_credentials = get_secure_credentials(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
+unique_schema = config.get("unique_schema", False)
+stream_output = is_raw_output or unique_schema
 parameter_columns = [column for column in config.get("parameter_columns", []) if column]
 if len(parameter_columns) == 0:
     raise ValueError("There is no parameter column selected.")
@@ -54,7 +62,14 @@ retry_scope = config.get("http_errors_retry_scope", "dataset")
 input_parameters_dataset = dataiku.Dataset(input_A_names[0])
 partitioning_keys = get_partitioning_keys(input_parameters_dataset, dku_flow_variables)
 custom_key_values.update(partitioning_keys)
-input_parameters_dataframe = input_parameters_dataset.get_dataframe(infer_with_pandas=False, use_nullable_integers=True)
+if stream_output:
+    input_parameters_dataframes = input_parameters_dataset.iter_dataframes(
+        chunksize=1000, infer_with_pandas=False, use_nullable_integers=True
+    )
+else:
+    input_parameters_dataframe = input_parameters_dataset.get_dataframe(
+        infer_with_pandas=False, use_nullable_integers=True
+    )
 backoff_type, initial_delay, maximum_number_of_retries, maximum_duration_of_retry, status_codes_to_retry = get_retry_handler_parameters_from_config(config)
 retry_handler = None
 if backoff_type:
@@ -77,11 +92,17 @@ recipe_session = RestApiRecipeSession(
     retry_handler=retry_handler,
     retry_scope=retry_scope
 )
-results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
-
 output_names_stats = get_output_names_for_role('api_output')
-odf = pd.DataFrame(results)
-
-if odf.size > 0:
+if stream_output:
     api_output = dataiku.Dataset(output_names_stats[0])
-    api_output.write_with_schema(odf)
+    pages = recipe_session.iter_pages(input_parameters_dataframes, is_raw_output)
+    try:
+        write_streamed_pages(api_output, pages, is_raw_output, unique_schema)
+    finally:
+        pages.close()
+else:
+    results = recipe_session.process_dataframe(input_parameters_dataframe, is_raw_output)
+    odf = pd.DataFrame(results)
+    if odf.size > 0:
+        api_output = dataiku.Dataset(output_names_stats[0])
+        api_output.write_with_schema(odf)

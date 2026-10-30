@@ -210,6 +210,14 @@
             "type": "BOOLEAN"
         },
         {
+            "name": "unique_schema",
+            "label": "Responses have a single schema",
+            "description": "Write results incrementally using the first nonempty page's schema.",
+            "defaultValue": false,
+            "type": "BOOLEAN",
+            "visibilityCondition": "!model.raw_output"
+        },
+        {
             "type": "SEPARATOR",
             "label": "Pagination"
         },
