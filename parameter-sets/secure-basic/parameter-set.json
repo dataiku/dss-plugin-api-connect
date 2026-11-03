@@ -12,7 +12,7 @@
         {
             "name": "secure_token",
             "type": "CREDENTIAL_REQUEST",
-            "label": "Azure Single Sign On",
+            "label": "Basic credentials",
             "credentialRequestSettings": {
                 "type": "BASIC"
             }
