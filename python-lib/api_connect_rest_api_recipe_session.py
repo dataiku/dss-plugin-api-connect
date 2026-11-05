@@ -189,11 +189,11 @@ class RestApiRecipeSession:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
             if is_raw_output:
-                if is_error_message(data_row):
+                if is_error_message(data_rows):
                     base_row.update({
                         DKUConstants.API_RESPONSE_KEY: None
                     })
-                    base_row.update(parse_keys_for_json(data_row))
+                    base_row.update(parse_keys_for_json(data_rows))
                 else:
                     base_row.update({
                         DKUConstants.API_RESPONSE_KEY: json.dumps(data_rows)

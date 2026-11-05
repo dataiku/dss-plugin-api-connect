@@ -210,11 +210,15 @@
             "type": "BOOLEAN"
         },
         {
-            "name": "unique_schema",
-            "label": "Responses have a single schema",
-            "description": "Write results incrementally using the first nonempty page's schema.",
-            "defaultValue": false,
-            "type": "BOOLEAN",
+            "name": "schema_resolution_strategy",
+            "label": "Schema resolution strategy",
+            "description": "Build output schema based on first page or load everything in memory.",
+            "defaultValue": "use_first_page",
+            "type": "SELECT",
+            "selectChoices": [
+                {"value": "use_first_page", "label": "Use first page"},
+                {"value": "read_all_in_memory", "label": "Read all in memory"}
+            ],
             "visibilityCondition": "!model.raw_output"
         },
         {

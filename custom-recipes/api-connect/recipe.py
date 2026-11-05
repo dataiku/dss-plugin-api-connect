@@ -47,7 +47,7 @@ endpoint_parameters = get_endpoint_parameters(config)
 secure_credentials = get_secure_credentials(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
-unique_schema = config.get("unique_schema", False)
+unique_schema = config.get("schema_resolution_strategy", "use_first_page") == "use_first_page"
 stream_output = is_raw_output or unique_schema
 parameter_columns = [column for column in config.get("parameter_columns", []) if column]
 if len(parameter_columns) == 0:
