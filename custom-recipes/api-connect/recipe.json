@@ -213,7 +213,7 @@
             "name": "schema_resolution_strategy",
             "label": "Schema resolution strategy",
             "description": "Build output schema based on first page or load everything in memory.",
-            "defaultValue": "use_first_page",
+            "defaultValue": "read_all_in_memory",
             "type": "SELECT",
             "selectChoices": [
                 {"value": "use_first_page", "label": "Use first page"},
