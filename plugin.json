@@ -1,6 +1,6 @@
 {
     "id": "api-connect",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "meta": {
         "label": "API Connect",
         "description": "Retrieve data from any REST API",
@@ -9,6 +9,6 @@
         "tags": ["Connector"],
         "url": "https://www.dataiku.com/product/plugins/api-connect/",
         "licenseInfo": "Apache Software License",
-        "recipesCategory": "visual"
+        "category": "Connect"
     }
 }

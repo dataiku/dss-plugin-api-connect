@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.6.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.3) - Bugfix - 2026-10-26
+
+- Fix OOM issues with recipe
+
 ## [Version 1.6.2](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.2) - Security fix - 2026-10-25
 
 - Update Brotli to 1.2.1

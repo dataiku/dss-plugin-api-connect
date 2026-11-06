@@ -7,6 +7,7 @@ import copy
 import json
 import requests
 import collections
+import itertools
 
 
 logger = SafeLogger("api-connect plugin", forbidden_keys=DKUConstants.FORBIDDEN_KEYS)
@@ -45,9 +46,18 @@ class RestApiRecipeSession:
 
     def process_dataframe(self, input_parameters_dataframe, is_raw_output):
         results = []
+        for page_results in self.iter_pages([input_parameters_dataframe], is_raw_output):
+            results.extend(page_results)
+        return results
+
+    def iter_pages(self, input_parameters_dataframes, is_raw_output):
+        with requests.Session() as session:
+            yield from self._iter_pages(input_parameters_dataframes, is_raw_output, session)
+
+    def _iter_pages(self, input_parameters_dataframes, is_raw_output, session):
         time_last_request = None
-        session = requests.Session()
-        for index, input_parameters_row in input_parameters_dataframe.iterrows():
+        input_rows = itertools.chain.from_iterable(dataframe.iterrows() for dataframe in input_parameters_dataframes)
+        for index, (_, input_parameters_row) in enumerate(input_rows):
             retry_handler = self.retry_handler
             if self.retry_scope == "row" and retry_handler:
                 retry_handler = retry_handler.recreate()
@@ -79,12 +89,11 @@ class RestApiRecipeSession:
             self.client.time_last_request = time_last_request
             while self.client.has_more_data():
                 page_results = self.retrieve_next_page(is_raw_output)
-                results.extend(page_results)
                 rows_count += len(page_results)
+                yield page_results
                 if self.is_row_limit and rows_count >= self.maximum_number_rows:
                     break
             time_last_request = self.client.time_last_request
-        return results
 
     def retrieve_next_page(self, is_raw_output):
         page_rows = []
@@ -180,11 +189,11 @@ class RestApiRecipeSession:
             base_row = copy.deepcopy(self.initial_parameter_columns)
             base_row.update(metadata)
             if is_raw_output:
-                if is_error_message(data_row):
+                if is_error_message(data_rows):
                     base_row.update({
                         DKUConstants.API_RESPONSE_KEY: None
                     })
-                    base_row.update(parse_keys_for_json(data_row))
+                    base_row.update(parse_keys_for_json(data_rows))
                 else:
                     base_row.update({
                         DKUConstants.API_RESPONSE_KEY: json.dumps(data_rows)
