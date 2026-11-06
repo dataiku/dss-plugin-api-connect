@@ -25,7 +25,7 @@ def value_kind(value):
     return type(value).__name__
 
 
-def write_streamed_pages(dataset, pages, is_raw_output, unique_schema, batch_size=1000):
+def write_streamed_pages(dataset, pages, is_raw_output, batch_size=1000):
     if batch_size <= 0:
         raise ValueError("Batch size must be positive")
     schema = None
@@ -74,7 +74,7 @@ def write_streamed_pages(dataset, pages, is_raw_output, unique_schema, batch_siz
                     for name, value in row.items():
                         if name not in column_kinds:
                             errors.append("unexpected column '{}'".format(name))
-                        elif unique_schema and value_kind(value) is not None and value_kind(value) not in column_kinds[name]:
+                        elif is_raw_output and value_kind(value) is not None and value_kind(value) not in column_kinds[name]:
                             errors.append("incompatible type for column '{}' (expected {}, got {})".format(
                                 name, "/".join(sorted(column_kinds[name])), value_kind(value)
                             ))
