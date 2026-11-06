@@ -47,7 +47,8 @@ endpoint_parameters = get_endpoint_parameters(config)
 secure_credentials = get_secure_credentials(config)
 extraction_key = endpoint_parameters.get("extraction_key", "")
 is_raw_output = endpoint_parameters.get("raw_output", True)
-stream_output = config.get("schema_resolution_strategy", "read_all_in_memory") == "use_first_page" or is_raw_output
+unique_schema = config.get("schema_resolution_strategy", "read_all_in_memory") == "use_first_page"
+stream_output = is_raw_output or unique_schema
 parameter_columns = [column for column in config.get("parameter_columns", []) if column]
 if len(parameter_columns) == 0:
     raise ValueError("There is no parameter column selected.")
@@ -96,7 +97,7 @@ if stream_output:
     api_output = dataiku.Dataset(output_names_stats[0])
     pages = recipe_session.iter_pages(input_parameters_dataframes, is_raw_output)
     try:
-        write_streamed_pages(api_output, pages, is_raw_output)
+        write_streamed_pages(api_output, pages, is_raw_output, unique_schema)
     finally:
         pages.close()
 else:
