@@ -4,6 +4,9 @@
         "description": "Retrieve data from external API as dataset",
         "icon": "icon-rocket"
     },
+    "cobuild": {
+        "supported": true
+    },
     "readable": true,
     "writable": false,
     "params": [
