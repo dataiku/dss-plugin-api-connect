@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.7.0](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.7.0) - Feature - 2026-11-09
+
+- Added Cobuild support to the API Connect datasets
+
 ## [Version 1.6.3](https://github.com/dataiku/dss-plugin-api-connect/releases/tag/v1.6.3) - Bugfix - 2026-10-26
 
 - Fix OOM issues with recipe
