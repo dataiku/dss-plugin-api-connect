@@ -1,0 +1,308 @@
+{
+    "meta" : {
+        "label": "API Connect agent tool",
+        "description": "Give LLM access to any Rest API",
+        "icon": "icon-rocket"
+    },
+    "params": [
+        {
+            "type": "SEPARATOR",
+            "label": "Tool description"
+        },
+        {
+            "name": "tool_description",
+            "label": "Descriptors",
+            "type": "STRING"
+        },
+        {
+            "name": "tool_parameters",
+            "label": "Parameters",
+            "type": "OBJECT_LIST",
+            "subParams": [
+                {
+                    "name": "tool_parameter_name",
+                    "label": "Name",
+                    "type": "STRING"
+                },
+                {
+                    "name": "tool_parameter_type",
+                    "label": "Type",
+                    "type": "SELECT",
+                    "selectChoices":[
+                        {"value": "string", "label": "String"},
+                        {"value": "integer", "label": "Int"}
+                    ]
+                },
+                {
+                    "name": "tool_parameter_description",
+                    "label": "Description",
+                    "type": "STRING"
+                },
+                {
+                    "name": "tool_parameter_is_required",
+                    "label": "Required",
+                    "type": "BOOLEAN"
+                }
+            ]
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Authentication"
+        },
+        {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": "secure_oauth", "label": "SSO"},
+                {"value": "secure_basic", "label": "Secure username / password"},
+                {"value": null, "label": "Other"}
+            ]
+        },
+        {
+            "name": "credential",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "credential",
+            "visibilityCondition": "model.auth_type == null"
+        },
+        {
+            "name": "secure_oauth",
+            "label": "SSO preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-oauth",
+            "visibilityCondition": "model.auth_type == 'secure_oauth'"
+        },
+        {
+            "name": "secure_basic",
+            "label": "Credential preset",
+            "type": "PRESET",
+            "parameterSetId": "secure-basic",
+            "visibilityCondition": "model.auth_type == 'secure_basic'"
+        },
+        {
+            "name": "should_use_user_secrets",
+            "label": " ",
+            "description": "Use profile's 'other credentials'",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "API call parameters"
+        },
+        {
+            "name": "custom_key_values",
+            "label": "Custom keys / values",
+            "description": "Replace {{key}} by value in presets (optional)",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+
+        {
+            "name": "endpoint_url",
+            "label": "URL template",
+            "description": "https://{{variable}}.exmpl.com/usr/{{username}}/details",
+            "type": "TEXTAREA"
+        },
+        {
+            "name": "http_method",
+            "label": "HTTP method",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": "GET",
+            "selectChoices":[
+                {"value": "GET", "label": "GET"},
+                {"value": "POST", "label": "POST"},
+                {"value": "PUT", "label": "PUT"},
+                {"value": "PATCH", "label": "PATCH"},
+                {"value": "DELETE", "label": "DELETE"}
+            ]
+        },
+        {
+            "name": "endpoint_query_string",
+            "label": "Query Params",
+            "description": "Will add ?key1=val1&key2=val2 to the URL",
+            "type": "KEY_VALUE_LIST"
+        },
+        {
+            "name": "endpoint_body",
+            "label": "Body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": false
+        },
+        {
+            "name": "endpoint_headers",
+            "label": "Headers",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "defaultValue": [
+                {
+                    "from": "Content-Type",
+                    "to": "application/json"
+                },
+                {
+                    "from": "Accept",
+                    "to": "application/json"
+                }
+            ]
+        },
+        {
+            "name": "body_format",
+            "label": "Body",
+            "description": "",
+            "type": "SELECT",
+            "defaultValue": null,
+            "selectChoices":[
+                {"value": null, "label": "None"},
+                {"value": "FORM_DATA", "label": "Form-data"},
+                {"value": "RAW", "label": "Raw"}
+            ]
+        },
+        {
+            "name": "text_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "TEXTAREA",
+            "visibilityCondition": "model.body_format=='RAW'"
+        },
+        {
+            "name": "key_value_body",
+            "label": "Request's body",
+            "description": "",
+            "type": "KEY_VALUE_LIST",
+            "visibilityCondition": "(['FORM_DATA'].indexOf(model.body_format)>-1)"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Data extraction"
+        },
+        {
+            "name": "extraction_key",
+            "label": "JSON path to data",
+            "description": "$.path.to.my[*].data (optional)",
+            "defaultValue": null,
+            "type": "STRING"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Pagination"
+        },
+        {
+            "name": "pagination_type",
+            "label": "Pagination mechanism",
+            "description": "Refer to the API's documentation",
+            "type": "SELECT",
+            "defaultValue": "na",
+            "selectChoices":[
+                {"value": "na", "label": "No pagination"},
+                {"value": "next_page", "label": "Next page URL provided"},
+                {"value": "offset", "label": "Offset pagination"},
+                {"value": "page", "label": "Per page"}
+            ]
+        },
+        {
+            "type": "SEPARATOR",
+            "description": "&#9888; Requires a key to data array",
+            "visibilityCondition": "model.pagination_type=='page' && !model.extraction_key"
+        },
+        {
+            "name": "next_page_url_key",
+            "label": "Key to next request URL",
+            "description": "Dot separated key path to next request URL",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='next_page'"
+        },
+        {
+            "name": "is_next_page_url_relative",
+            "label": " ",
+            "description": "Next page URL is relative",
+            "type": "BOOLEAN",
+            "defaultValue": false,
+            "visibilityCondition": "model.pagination_type=='next_page'"
+        },
+        {
+            "name": "next_page_url_base",
+            "label": "Base URL to next page",
+            "description": "https://mysite.com/path/",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='next_page' && (model.is_next_page_url_relative==true)"
+        },
+        {
+            "name": "top_key",
+            "label": "Key limiting elements per page",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type == 'offset'"
+        },
+        {
+            "name": "skip_key",
+            "label": "Key for element offset",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='offset'"
+        },
+        {
+            "name": "skip_key",
+            "label": "Key for page offset",
+            "description": "",
+            "type": "STRING",
+            "defaultValue": null,
+            "visibilityCondition": "model.pagination_type=='page'"
+        },
+        {
+            "type": "SEPARATOR",
+            "label": "Advanced"
+        },
+        {
+            "name": "ignore_ssl_check",
+            "label": " ",
+            "description": "Ignore SSL check",
+            "type": "BOOLEAN",
+            "visibilityCondition": "model.auth_type!='secure_oauth' && model.auth_type!='secure_basic'",
+            "defaultValue": false
+        },
+        {
+            "name": "redirect_auth_header",
+            "label": " ",
+            "description": "Redirect authorization header",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "display_metadata",
+            "label": " ",
+            "description": "Display metadata",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "timeout",
+            "label": "Timeout (s)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": 3600
+        },
+        {
+            "name": "requests_per_minute",
+            "label": "Rate limit (requests/m)",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
+        },
+        {
+            "name": "maximum_number_rows",
+            "label": "Maximum number of rows",
+            "description": "-1 for no limit",
+            "type": "INT",
+            "defaultValue": -1
+        }
+    ]
+}
